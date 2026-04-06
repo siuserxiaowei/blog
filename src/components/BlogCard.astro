@@ -5,9 +5,10 @@ interface Props {
   date: string;
   tags?: string[];
   slug: string;
+  image?: string;
 }
 
-const { title, description, date, tags = [], slug } = Astro.props;
+const { title, description, date, tags = [], slug, image } = Astro.props;
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
@@ -17,6 +18,12 @@ function formatDate(dateStr: string) {
 
 <a href={`/blog/${slug}`} class="group block">
   <article class="card-hover shine-hover glass-card relative rounded-xl overflow-hidden">
+    <!-- Hero Image -->
+    {image && (
+      <div class="aspect-[2.4/1] overflow-hidden">
+        <img src={image} alt={title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+      </div>
+    )}
     <!-- Main content -->
     <div class="p-6 md:p-8">
       <!-- Date & Tags -->

@@ -73,6 +73,7 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
               date={post.data.date.toISOString()}
               tags={post.data.tags}
               slug={post.id}
+              image={post.data.image}
             />
           </div>
         ))}
@@ -95,11 +96,36 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
   <script is:inline>
     (function() {
       const searchInput = document.getElementById('search-input');
-      const postsContainer = document.getElementById('posts-container');
       const noResults = document.getElementById('no-results');
       const postItems = document.querySelectorAll('.post-item');
       const tagFilters = document.querySelectorAll('.tag-filter');
-      let activeTag = 'all';
+
+      // Read URL params
+      const params = new URLSearchParams(window.location.search);
+      let activeTag = params.get('tag') || 'all';
+      const initialQuery = params.get('q') || '';
+
+      if (searchInput && initialQuery) searchInput.value = initialQuery;
+
+      function updateURL() {
+        const query = searchInput ? searchInput.value.trim() : '';
+        const url = new URL(window.location);
+        if (activeTag && activeTag !== 'all') { url.searchParams.set('tag', activeTag); } else { url.searchParams.delete('tag'); }
+        if (query) { url.searchParams.set('q', query); } else { url.searchParams.delete('q'); }
+        history.replaceState(null, '', url);
+      }
+
+      function updateTagStyles() {
+        tagFilters.forEach(b => {
+          if (b.getAttribute('data-tag') === activeTag) {
+            b.style.borderColor = 'var(--color-accent)';
+            b.style.color = 'var(--color-accent)';
+          } else {
+            b.style.borderColor = 'var(--border)';
+            b.style.color = 'var(--text-secondary)';
+          }
+        });
+      }
 
       function filterPosts() {
         const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -121,9 +147,8 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
           }
         });
 
-        if (noResults) {
-          noResults.classList.toggle('hidden', visibleCount > 0);
-        }
+        if (noResults) noResults.classList.toggle('hidden', visibleCount > 0);
+        updateURL();
       }
 
       if (searchInput) {
@@ -133,18 +158,14 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
       tagFilters.forEach(btn => {
         btn.addEventListener('click', () => {
           activeTag = btn.getAttribute('data-tag') || 'all';
-          tagFilters.forEach(b => {
-            if (b.getAttribute('data-tag') === activeTag) {
-              b.style.borderColor = 'var(--color-accent)';
-              b.style.color = 'var(--color-accent)';
-            } else {
-              b.style.borderColor = 'var(--border)';
-              b.style.color = 'var(--text-secondary)';
-            }
-          });
+          updateTagStyles();
           filterPosts();
         });
       });
+
+      // Apply initial state from URL
+      updateTagStyles();
+      filterPosts();
     })();
   </script>
 </BaseLayout>

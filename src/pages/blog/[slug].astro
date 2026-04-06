@@ -59,6 +59,13 @@ const readingTime = Math.max(1, Math.ceil(post.body!.length / 500));
         </div>
       )}
 
+      <!-- Hero Image -->
+      {post.data.image && (
+        <div class="animate-fade-in stagger-4 rounded-xl overflow-hidden mb-10">
+          <img src={post.data.image} alt={post.data.title} class="w-full h-auto" loading="lazy" />
+        </div>
+      )}
+
       <!-- Divider -->
       <div class="animate-fade-in stagger-4 divider-accent mb-12"></div>
 
@@ -83,8 +90,8 @@ const readingTime = Math.max(1, Math.ceil(post.body!.length / 500));
         <script is:inline>
           (function() {
             // Giscus 配置 — 填入 repo-id 和 category-id 后自动启用
-            const REPO_ID = '';      // 从 giscus.app 获取
-            const CATEGORY_ID = '';  // 从 giscus.app 获取
+            const REPO_ID = 'R_kgDOR6Qj0A';
+            const CATEGORY_ID = 'DIC_kwDOR6Qj0M4C6JlO';
 
             if (!REPO_ID || !CATEGORY_ID) return; // 未配置则跳过
 

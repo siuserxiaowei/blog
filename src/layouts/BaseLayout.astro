@@ -65,7 +65,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <!-- Latin fonts: Inter (body), Playfair Display (heading), JetBrains Mono (code/meta) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <!-- CJK fonts: load async to prevent render blocking -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -266,15 +270,23 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     })();
   </script>
 
-  <!-- Floating Particles (with mouse interaction like iamyukino) -->
+  <!-- Floating Particles (performance-optimized) -->
   <script is:inline>
     (function() {
       const canvas = document.getElementById('particles-canvas');
       if (!canvas) return;
+
+      // Skip on low-end devices (mobile with low memory or no pointer)
+      const isMobile = window.matchMedia('(pointer: coarse)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) { canvas.style.display = 'none'; return; }
+
       const ctx = canvas.getContext('2d');
       let particles = [];
       let w, h;
       let mouseX = -1000, mouseY = -1000;
+      let animId = null;
+      let isVisible = true;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -282,8 +294,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       }
       resize();
       window.addEventListener('resize', resize);
-      document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-      document.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+
+      if (!isMobile) {
+        document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+        document.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+      }
+
+      // Pause when tab is hidden
+      document.addEventListener('visibilitychange', () => {
+        isVisible = !document.hidden;
+        if (isVisible && !animId) animate();
+      });
 
       class Particle {
         constructor() { this.reset(); }
@@ -298,15 +319,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           this.fadeDir = 1;
         }
         update() {
-          // Mouse interaction: gentle attraction
-          const dx = mouseX - this.x;
-          const dy = mouseY - this.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150 && dist > 0) {
-            this.x += dx * 0.003;
-            this.y += dy * 0.003;
+          if (!isMobile) {
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < 22500 && distSq > 0) { // 150^2
+              const inv = 0.003;
+              this.x += dx * inv;
+              this.y += dy * inv;
+            }
           }
-
           this.x += this.speedX;
           this.y += this.speedY;
           this.opacity += this.fadeSpeed * this.fadeDir;
@@ -322,18 +344,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         }
       }
 
-      const count = Math.min(40, Math.floor(w * h / 25000));
+      // Fewer particles on mobile, more on desktop
+      const maxCount = isMobile ? 15 : 40;
+      const count = Math.min(maxCount, Math.floor(w * h / (isMobile ? 50000 : 25000)));
       for (let i = 0; i < count; i++) particles.push(new Particle());
 
-      // Draw connecting lines between nearby particles
+      // Only draw lines on desktop (O(n^2) is expensive)
       function drawLines() {
+        if (isMobile) return;
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 120) {
-              const alpha = (1 - dist / 120) * 0.08;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < 14400) { // 120^2
+              const alpha = (1 - Math.sqrt(distSq) / 120) * 0.08;
               ctx.beginPath();
               ctx.moveTo(particles[i].x, particles[i].y);
               ctx.lineTo(particles[j].x, particles[j].y);
@@ -346,10 +371,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       }
 
       function animate() {
+        if (!isVisible) { animId = null; return; }
         ctx.clearRect(0, 0, w, h);
         particles.forEach(p => { p.update(); p.draw(); });
         drawLines();
-        requestAnimationFrame(animate);
+        animId = requestAnimationFrame(animate);
       }
       animate();
     })();
