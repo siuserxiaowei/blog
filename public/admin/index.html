@@ -93,6 +93,13 @@
     .editor-tab.active { background: var(--surface-2); color: var(--accent); }
     .editor-grid { display: grid; gap: 16px; }
 
+    /* Toolbar */
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 2px; padding: 8px; border: 1px solid var(--border); border-bottom: none; border-radius: 12px 12px 0 0; background: var(--surface); }
+    .toolbar-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; color: var(--text-sec); cursor: pointer; transition: all 0.15s; font-size: 14px; font-weight: 600; }
+    .toolbar-btn:hover { background: var(--surface-2); color: var(--accent); }
+    .toolbar-sep { width: 1px; height: 24px; background: var(--border); margin: 4px 6px; }
+    .editor-area.has-toolbar { border-radius: 0 0 12px 12px; }
+
     /* Toasts */
     .toast { position: fixed; top: 72px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 100; animation: slideIn 0.3s ease; }
     .toast-success { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
@@ -121,8 +128,8 @@
 
   <script>
     // ===== Config =====
-    const REPO_OWNER = 'siuserjy';
-    const REPO_NAME = 'siuserjy.github.io';
+    const REPO_OWNER = 'siuserxiaowei';
+    const REPO_NAME = 'blog';
     const CONTENT_PATH = 'src/content/blog';
     const BRANCH = 'main';
 
@@ -437,7 +444,30 @@
             </div>
           </div>
           <div id="editor-grid" class="editor-grid" style="grid-template-columns:1fr;">
-            <textarea name="body" class="editor-area" id="md-editor" placeholder="开始写作...">${escHtml(body)}</textarea>
+            <div>
+              <div class="editor-toolbar" id="md-toolbar">
+                <button type="button" class="toolbar-btn" data-action="h1" title="标题 1">H1</button>
+                <button type="button" class="toolbar-btn" data-action="h2" title="标题 2">H2</button>
+                <button type="button" class="toolbar-btn" data-action="h3" title="标题 3">H3</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn" data-action="bold" title="加粗 (Ctrl+B)"><strong>B</strong></button>
+                <button type="button" class="toolbar-btn" data-action="italic" title="斜体 (Ctrl+I)"><em>I</em></button>
+                <button type="button" class="toolbar-btn" data-action="strike" title="删除线">S̶</button>
+                <button type="button" class="toolbar-btn" data-action="code" title="行内代码">&lt;&gt;</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn" data-action="link" title="链接 (Ctrl+K)">🔗</button>
+                <button type="button" class="toolbar-btn" data-action="image" title="图片">🖼</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn" data-action="ul" title="无序列表">•</button>
+                <button type="button" class="toolbar-btn" data-action="ol" title="有序列表">1.</button>
+                <button type="button" class="toolbar-btn" data-action="quote" title="引用">❝</button>
+                <button type="button" class="toolbar-btn" data-action="codeblock" title="代码块">{ }</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn" data-action="hr" title="分割线">—</button>
+                <button type="button" class="toolbar-btn" data-action="table" title="表格">⊞</button>
+              </div>
+              <textarea name="body" class="editor-area has-toolbar" id="md-editor" placeholder="开始写作...">${escHtml(body)}</textarea>
+            </div>
             <div class="preview-area" id="md-preview" style="display:none;"></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);margin-top:24px;padding-top:24px;">
@@ -486,14 +516,25 @@
           });
         }
 
-        // Tab support
+        // Tab support + keyboard shortcuts
         const editor = document.getElementById('md-editor');
         if (editor) {
           editor.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') { e.preventDefault(); const s = editor.selectionStart; editor.value = editor.value.substring(0, s) + '  ' + editor.value.substring(editor.selectionEnd); editor.selectionStart = editor.selectionEnd = s + 2; }
+            // Ctrl/Cmd shortcuts
+            if (e.ctrlKey || e.metaKey) {
+              if (e.key === 'b') { e.preventDefault(); toolbarAction('bold'); }
+              else if (e.key === 'i') { e.preventDefault(); toolbarAction('italic'); }
+              else if (e.key === 'k') { e.preventDefault(); toolbarAction('link'); }
+            }
           });
           editor.addEventListener('input', updatePreview);
         }
+
+        // Toolbar buttons
+        document.querySelectorAll('.toolbar-btn').forEach(btn => {
+          btn.addEventListener('click', () => toolbarAction(btn.dataset.action));
+        });
 
         // Editor tabs
         document.querySelectorAll('.editor-tab').forEach(tab => {
@@ -541,6 +582,42 @@
           }
         };
       }
+    }
+
+    function toolbarAction(action) {
+      const ed = document.getElementById('md-editor');
+      if (!ed) return;
+      const start = ed.selectionStart;
+      const end = ed.selectionEnd;
+      const sel = ed.value.substring(start, end);
+      const before = ed.value.substring(0, start);
+      const after = ed.value.substring(end);
+      let insert = '', cursorOffset = 0;
+
+      switch (action) {
+        case 'h1': insert = `# ${sel || '标题'}`; cursorOffset = sel ? 0 : -2; break;
+        case 'h2': insert = `## ${sel || '标题'}`; cursorOffset = sel ? 0 : -2; break;
+        case 'h3': insert = `### ${sel || '标题'}`; cursorOffset = sel ? 0 : -2; break;
+        case 'bold': insert = `**${sel || '加粗文字'}**`; cursorOffset = sel ? 0 : -2; break;
+        case 'italic': insert = `*${sel || '斜体文字'}*`; cursorOffset = sel ? 0 : -1; break;
+        case 'strike': insert = `~~${sel || '删除线'}~~`; cursorOffset = sel ? 0 : -2; break;
+        case 'code': insert = `\`${sel || 'code'}\``; cursorOffset = sel ? 0 : -1; break;
+        case 'link': insert = `[${sel || '链接文字'}](url)`; cursorOffset = sel ? -1 : -5; break;
+        case 'image': insert = `![${sel || 'alt'}](image-url)`; cursorOffset = sel ? -1 : -10; break;
+        case 'ul': insert = `- ${sel || '列表项'}`; cursorOffset = sel ? 0 : -3; break;
+        case 'ol': insert = `1. ${sel || '列表项'}`; cursorOffset = sel ? 0 : -3; break;
+        case 'quote': insert = `> ${sel || '引用内容'}`; cursorOffset = sel ? 0 : -4; break;
+        case 'codeblock': insert = `\`\`\`\n${sel || '// 代码'}\n\`\`\``; cursorOffset = sel ? 0 : -4; break;
+        case 'hr': insert = '\n---\n'; break;
+        case 'table': insert = '| 列1 | 列2 | 列3 |\n| --- | --- | --- |\n| 内容 | 内容 | 内容 |'; break;
+        default: return;
+      }
+
+      ed.value = before + insert + after;
+      const newPos = start + insert.length + cursorOffset;
+      ed.selectionStart = ed.selectionEnd = newPos;
+      ed.focus();
+      updatePreview();
     }
 
     function updatePreview() {
