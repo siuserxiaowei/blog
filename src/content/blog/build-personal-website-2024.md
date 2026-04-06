@@ -2,7 +2,7 @@
 title: "用 Astro 搭建个人网站的完整复盘"
 date: 2024-04-05
 description: "从零到上线，记录我用 Astro + Tailwind CSS 搭建个人网站的技术选型、设计思考和踩坑经验。"
-tags: [技术, 建站, Astro]
+tags: ["技术", "建站", "Astro"]
 draft: false
 ---
 
