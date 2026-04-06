@@ -536,6 +536,193 @@ h1, h2, h3, h4, h5, h6 {
   animation: scale-in 0.5s ease-out forwards;
 }
 
+/* 13. Magnetic hover — element follows cursor slightly */
+.magnetic-hover {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.magnetic-hover:hover {
+  transform: translate(var(--mx, 0), var(--my, 0));
+}
+
+/* 14. Morphing blob background */
+@keyframes morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50% { border-radius: 50% 60% 30% 60% / 30% 70% 60% 40%; }
+  75% { border-radius: 60% 30% 60% 40% / 70% 40% 50% 60%; }
+}
+.blob {
+  animation: morph 8s ease-in-out infinite;
+  background: radial-gradient(ellipse, rgba(201,169,110,0.15), transparent 70%);
+}
+
+/* 15. Typewriter caret glow */
+@keyframes caret-glow {
+  0%, 100% { text-shadow: 0 0 4px rgba(201,169,110,0.6); opacity: 1; }
+  50% { text-shadow: 0 0 12px rgba(201,169,110,0.9), 0 0 24px rgba(201,169,110,0.3); opacity: 0; }
+}
+.caret-glow {
+  animation: caret-glow 1s ease-in-out infinite;
+}
+
+/* 16. Neon underline — glowing line under text */
+.neon-underline {
+  position: relative;
+  display: inline-block;
+}
+.neon-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px rgba(201,169,110,0.6), 0 0 16px rgba(201,169,110,0.3);
+  border-radius: 1px;
+}
+
+/* 17. Reveal clip — slide-in with clip-path */
+@keyframes reveal-clip {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.reveal-clip {
+  animation: reveal-clip 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+/* 18. Parallax depth layers */
+.parallax-slow { transform: translateZ(-2px) scale(3); }
+.parallax-fast { transform: translateZ(-1px) scale(2); }
+
+/* 19. Hover lift with color shift */
+.lift-card {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.lift-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(201,169,110,0.2);
+  border-color: var(--color-accent);
+}
+
+/* 20. Stagger slide-in from left */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-left { animation: slide-in-left 0.6s ease-out forwards; }
+.slide-left-1 { animation-delay: 0.05s; opacity: 0; }
+.slide-left-2 { animation-delay: 0.1s; opacity: 0; }
+.slide-left-3 { animation-delay: 0.15s; opacity: 0; }
+.slide-left-4 { animation-delay: 0.2s; opacity: 0; }
+
+/* 21. Spotlight hover — radial glow follows pointer */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%);
+  transform: translate(var(--spot-x, -150px), var(--spot-y, -150px));
+  pointer-events: none;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* 22. Shake on hover — subtle attention grab */
+@keyframes shake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-2deg); }
+  40% { transform: rotate(2deg); }
+  60% { transform: rotate(-1deg); }
+  80% { transform: rotate(1deg); }
+}
+.shake-hover:hover {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* 23. Gradient shadow — colored shadow matching accent */
+.gold-shadow {
+  box-shadow: 0 8px 32px rgba(201,169,110,0.15), 0 2px 8px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+}
+.gold-shadow:hover {
+  box-shadow: 0 16px 48px rgba(201,169,110,0.25), 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 24. Text reveal — letter by letter appearance */
+@keyframes text-reveal {
+  from { opacity: 0; transform: translateY(100%) rotateX(-90deg); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); }
+}
+.text-reveal span {
+  display: inline-block;
+  opacity: 0;
+  animation: text-reveal 0.5s ease forwards;
+}
+
+/* 25. Frosted glass with noise */
+.frosted {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 8%, var(--border));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* 26. Marquee — infinite scroll text */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-inner {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+/* 27. Counter animation hook (JS driven) */
+.counter {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 28. Elastic scale on click */
+.elastic-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+.elastic-click {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 29. Gradient border glow — always visible, pulses */
+@keyframes border-glow {
+  0%, 100% { border-color: color-mix(in srgb, var(--color-accent) 30%, var(--border)); }
+  50% { border-color: color-mix(in srgb, var(--color-accent) 60%, var(--border)); }
+}
+.border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* 30. Stagger rotate-in — cards spiral in */
+@keyframes rotate-in {
+  from { opacity: 0; transform: rotate(-8deg) scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: rotate(0) scale(1) translateY(0); }
+}
+.rotate-in { animation: rotate-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
 /* Hero canvas is now rendered via JS in index.astro */
 
 /* Subtle grain texture overlay */

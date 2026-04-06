@@ -61,7 +61,7 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
         </div>
 
         <!-- Tagline -->
-        <p class="scroll-reveal mb-8 text-xs md:text-sm tracking-[0.2em] uppercase" style="font-family: var(--font-mono); color: var(--color-accent);">
+        <p class="scroll-reveal neon-underline mb-8 text-xs md:text-sm tracking-[0.2em] uppercase" style="font-family: var(--font-mono); color: var(--color-accent);">
           Keep Shipping, Keep Thinking.
         </p>
 
@@ -73,7 +73,7 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
-          <a href="#about" class="inline-flex items-center gap-2 px-6 py-3 text-sm tracking-wider uppercase rounded-lg border transition-all duration-300 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]" style="border-color: var(--border); color: var(--text-secondary);">
+          <a href="#about" class="elastic-click inline-flex items-center gap-2 px-6 py-3 text-sm tracking-wider uppercase rounded-lg border transition-all duration-300 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]" style="border-color: var(--border); color: var(--text-secondary);">
             <span data-i18n="hero.cta.about">了解更多</span>
           </a>
           <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
@@ -149,22 +149,22 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
 
         <!-- Right: Info Cards -->
         <div class="scroll-reveal grid grid-cols-2 gap-4">
-          <div class="glass-card shine-hover tilt-card p-5 rounded-xl">
+          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
             <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">01</div>
             <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card1.title">技术探索</h3>
             <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card1.desc">AI / 全栈开发 / 产品工程</p>
           </div>
-          <div class="glass-card shine-hover tilt-card p-5 rounded-xl">
+          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
             <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">02</div>
             <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card2.title">商业思考</h3>
             <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card2.desc">创业 / 产品策略 / 商业模式</p>
           </div>
-          <div class="glass-card shine-hover tilt-card p-5 rounded-xl">
+          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
             <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">03</div>
             <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card3.title">持续学习</h3>
             <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card3.desc">阅读 / 写作 / 跨领域探索</p>
           </div>
-          <div class="glass-card shine-hover tilt-card p-5 rounded-xl">
+          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
             <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">04</div>
             <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card4.title">创造价值</h3>
             <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card4.desc">用产品解决真实问题</p>
@@ -256,7 +256,7 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
 
     <!-- ==================== QUOTE ==================== -->
     <section class="mx-auto px-6 py-20 md:py-24 text-center" style="max-width: var(--container-max);">
-      <blockquote class="scroll-reveal max-w-xl mx-auto glass-card p-8 md:p-10 rounded-2xl">
+      <blockquote class="scroll-reveal max-w-xl mx-auto glass-card border-glow animate-float p-8 md:p-10 rounded-2xl">
         <p class="text-xl md:text-2xl italic leading-relaxed text-gradient" style="font-family: var(--font-heading);">
           "The best way to predict the future is to create it."
         </p>
@@ -297,19 +297,19 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
         </p>
 
         <div class="flex items-center justify-center gap-6">
-          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="group gradient-border glass-card flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
+          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="group gradient-border glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
             <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
             </svg>
             <span class="text-xs" style="color: var(--text-secondary);">GitHub</span>
           </a>
-          <a href="mailto:hi@siuserxiaowei.com" class="group gradient-border glass-card flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
+          <a href="mailto:hi@siuserxiaowei.com" class="group gradient-border glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
             <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <span class="text-xs" style="color: var(--text-secondary);">Email</span>
           </a>
-          <a href="/rss.xml" class="group gradient-border glass-card flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
+          <a href="/rss.xml" class="group gradient-border glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
             <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
             </svg>
@@ -461,6 +461,15 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     revealElements.forEach(el => revealObserver.observe(el));
+
+    // Spotlight effect — radial glow follows mouse on .spotlight cards
+    document.querySelectorAll('.spotlight').forEach(el => {
+      el.addEventListener('mousemove', e => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--spot-x', (e.clientX - rect.left - 150) + 'px');
+        el.style.setProperty('--spot-y', (e.clientY - rect.top - 150) + 'px');
+      });
+    });
 
     // Timeline active line & dots
     const timelineDots = document.querySelectorAll('[data-dot]');
