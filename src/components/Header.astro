@@ -63,6 +63,18 @@ const pageLinks = [
       <!-- Language Toggle -->
       <LangToggle />
 
+      <!-- Write Post -->
+      <a
+        href="/admin/"
+        class="p-2 rounded-full transition-colors duration-200 hover:bg-[var(--surface-2)]"
+        aria-label="写文章"
+        title="写文章"
+      >
+        <svg class="w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+        </svg>
+      </a>
+
       <!-- Theme Toggle -->
       <button
         onclick="toggleTheme()"
@@ -102,6 +114,10 @@ const pageLinks = [
           </a>
         ))
       )}
+      <a href="/admin/" class="flex items-center gap-2 text-sm tracking-wide py-2 transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--color-accent);">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
+        写文章
+      </a>
     </div>
   </div>
 </header>
