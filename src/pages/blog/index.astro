@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import BlogCard from '../../components/BlogCard.astro';
+import Newsletter from '../../components/Newsletter.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog'))
@@ -88,6 +89,11 @@ const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
           <p class="text-lg" style="color: var(--text-secondary);">暂无文章，即将更新。</p>
         </div>
       )}
+    </section>
+
+    <!-- Newsletter -->
+    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
+      <Newsletter compact />
     </section>
   </main>
 
