@@ -68,21 +68,37 @@ const readingTime = Math.max(1, Math.ceil(post.body!.length / 500));
       </div>
 
       <!-- Comments (Giscus) -->
+      <!--
+        启用步骤：
+        1. 去 https://github.com/siuserxiaowei/blog/settings 开启 Discussions
+        2. 去 https://github.com/apps/giscus 安装到仓库
+        3. 去 https://giscus.app 获取 data-repo-id 和 data-category-id
+        4. 填入下面的配置，取消注释即可
+      -->
       <div class="mt-16 pt-8 border-t" style="border-color: var(--border);">
         <h2 class="text-xl mb-6" style="font-family: var(--font-heading); color: var(--text);" data-i18n="blog.comments">评论</h2>
-        <div id="giscus-container"></div>
+        <div id="giscus-container">
+          <p class="text-sm" style="color: var(--text-secondary); font-family: var(--font-mono);">// 评论功能即将开放</p>
+        </div>
         <script is:inline>
           (function() {
+            // Giscus 配置 — 填入 repo-id 和 category-id 后自动启用
+            const REPO_ID = '';      // 从 giscus.app 获取
+            const CATEGORY_ID = '';  // 从 giscus.app 获取
+
+            if (!REPO_ID || !CATEGORY_ID) return; // 未配置则跳过
+
             function loadGiscus() {
               const container = document.getElementById('giscus-container');
               if (!container) return;
+              container.innerHTML = ''; // 清空占位文本
               const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark_dimmed';
               const script = document.createElement('script');
               script.src = 'https://giscus.app/client.js';
-              script.setAttribute('data-repo', 'siuserjy/siuserjy.github.io');
-              script.setAttribute('data-repo-id', '');
+              script.setAttribute('data-repo', 'siuserxiaowei/blog');
+              script.setAttribute('data-repo-id', REPO_ID);
               script.setAttribute('data-category', 'General');
-              script.setAttribute('data-category-id', '');
+              script.setAttribute('data-category-id', CATEGORY_ID);
               script.setAttribute('data-mapping', 'pathname');
               script.setAttribute('data-strict', '0');
               script.setAttribute('data-reactions-enabled', '1');
@@ -95,7 +111,6 @@ const readingTime = Math.max(1, Math.ceil(post.body!.length / 500));
               container.appendChild(script);
             }
 
-            // Update giscus theme when theme changes
             const obs = new MutationObserver(() => {
               const iframe = document.querySelector('.giscus-frame');
               if (iframe) {
