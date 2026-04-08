@@ -252,6 +252,43 @@
     .loading { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sec); margin-top: 10px; }
     .loading.visible { display: flex; }
 
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--text-sec); opacity: 0.5; pointer-events: none;
+    }
+    [contenteditable]:focus { border-color: var(--accent) !important; }
+
+    /* History section */
+    .history-section {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 24px; margin-bottom: 24px;
+    }
+    .history-section h3 {
+      font-family: var(--font-heading); font-size: 14px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      cursor: pointer; transition: all 0.15s; text-decoration: none; color: inherit;
+    }
+    .history-item:hover { border-color: var(--accent); }
+    .history-item .hi-title {
+      flex: 1; font-size: 13px; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .history-item .hi-meta {
+      font-size: 11px; color: var(--text-sec); font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+    .history-item .hi-del {
+      background: none; border: none; color: var(--text-sec); cursor: pointer;
+      font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: all 0.15s;
+    }
+    .history-item .hi-del:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+    .history-empty { font-size: 12px; color: var(--text-sec); text-align: center; padding: 12px; }
+
     @media (max-width: 640px) {
       .container { padding: 0 12px; }
       .images-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
@@ -282,18 +319,35 @@
       在公众号文章页面全选复制，回来这里粘贴，一键转换
     </p>
 
+    <!-- History -->
+    <div class="history-section" id="history-section">
+      <h3>
+        <span>历史记录</span>
+        <button class="btn btn-outline btn-sm" id="btn-clear-history" style="display:none;">清空全部</button>
+      </h3>
+      <div id="history-list"></div>
+    </div>
+
     <!-- Step 1: Paste -->
-    <div class="paste-zone" id="paste-zone" tabindex="0">
+    <div class="paste-zone" id="paste-zone">
       <div class="paste-zone-hint" id="paste-hint">
         <div class="icon">V</div>
         <h3>粘贴公众号文章</h3>
-        <p>打开微信公众号文章 → 在页面上 <kbd>Ctrl+A</kbd> 全选 → <kbd>Ctrl+C</kbd> 复制 → 回到这里 <kbd>Ctrl+V</kbd> 粘贴</p>
+        <p>打开微信公众号文章 → 在页面上 <kbd>Ctrl+A</kbd> 全选 → <kbd>Ctrl+C</kbd> 复制 → 点击下方输入框 → <kbd>Ctrl+V</kbd> 粘贴</p>
         <div class="steps">
-          <span><span class="num">1</span> 打开公众号文章</span>
+          <span><span class="num">1</span> 浏览器打开文章</span>
           <span><span class="num">2</span> Ctrl+A 全选</span>
           <span><span class="num">3</span> Ctrl+C 复制</span>
-          <span><span class="num">4</span> 点这里粘贴</span>
+          <span><span class="num">4</span> 在下方粘贴</span>
         </div>
+      </div>
+      <div id="paste-editor" contenteditable="true" style="min-height:120px;padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);margin-top:16px;outline:none;font-size:14px;color:var(--text-sec);line-height:1.6;max-height:300px;overflow-y:auto;cursor:text;" data-placeholder="点击这里，然后 Ctrl+V 粘贴文章内容..."></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-parse-paste" disabled>
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          开始转换
+        </button>
+        <button class="btn btn-outline btn-sm" id="btn-clear-paste" style="display:none;">清空</button>
       </div>
     </div>
 
@@ -335,7 +389,10 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             复制到剪贴板
           </button>
-          <button class="btn btn-danger btn-sm" id="btn-reset">重新粘贴</button>
+          <button class="btn btn-outline btn-sm" id="btn-reset">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            返回
+          </button>
         </div>
       </div>
 
@@ -366,21 +423,14 @@
     var parsedData = { title: '', text: '', images: [], richHtml: '' };
     var copyFormat = 'rich';
 
-    // ===== Paste zone =====
-    var pasteZone = document.getElementById('paste-zone');
+    // ===== Paste editor =====
+    var pasteEditor = document.getElementById('paste-editor');
+    var btnParsePaste = document.getElementById('btn-parse-paste');
+    var btnClearPaste = document.getElementById('btn-clear-paste');
+    var pastedHtmlCache = '';
 
-    // Click to focus so paste works
-    pasteZone.addEventListener('click', function() {
-      pasteZone.focus();
-    });
-
-    // Listen for paste on the whole document
-    document.addEventListener('paste', function(e) {
-      // Don't intercept paste in the URL input field
-      if (document.activeElement === document.getElementById('url-input')) return;
-      // Only handle if result not already shown
-      if (parsedData.richHtml) return;
-
+    // Capture raw HTML from paste event before browser sanitizes it
+    pasteEditor.addEventListener('paste', function(e) {
       var clipboardData = e.clipboardData || window.clipboardData;
       if (!clipboardData) return;
 
@@ -389,24 +439,49 @@
 
       console.log('[wx2x] 粘贴事件 - HTML长度:', html.length, '纯文本长度:', text.length);
 
-      // If user pasted a WeChat URL, auto-fill the URL input
+      // If pasted a URL, redirect to URL input
       if (text && text.match(/^https?:\/\/(mp\.weixin\.qq\.com|weixin\.qq\.com)/)) {
         e.preventDefault();
         document.getElementById('url-input').value = text;
         document.getElementById('url-input').focus();
-        toast('检测到公众号链接，已填入下方输入框，点击「解析链接」', 'ok');
-        // Scroll to URL section
+        toast('检测到公众号链接，已填入下方输入框', 'ok');
         document.getElementById('url-section').scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
+      // Store the raw HTML for later parsing
       if (html && html.length > 100) {
-        e.preventDefault();
-        parseFromPaste(html, text);
-      } else if (text && text.length > 100) {
-        e.preventDefault();
-        parseFromPlainText(text);
+        pastedHtmlCache = html;
       }
+
+      // Enable parse button after paste
+      setTimeout(function() {
+        if (pasteEditor.textContent.trim().length > 10) {
+          btnParsePaste.disabled = false;
+          btnClearPaste.style.display = '';
+        }
+      }, 100);
+    });
+
+    // Parse button
+    btnParsePaste.addEventListener('click', function() {
+      if (pastedHtmlCache && pastedHtmlCache.length > 100) {
+        parseFromPaste(pastedHtmlCache, pasteEditor.textContent.trim());
+      } else if (pasteEditor.innerHTML.length > 100) {
+        parseFromPaste(pasteEditor.innerHTML, pasteEditor.textContent.trim());
+      } else if (pasteEditor.textContent.trim().length > 50) {
+        parseFromPlainText(pasteEditor.textContent.trim());
+      } else {
+        toast('内容太少，请粘贴完整的文章', 'err');
+      }
+    });
+
+    // Clear paste editor
+    btnClearPaste.addEventListener('click', function() {
+      pasteEditor.innerHTML = '';
+      pastedHtmlCache = '';
+      btnParsePaste.disabled = true;
+      btnClearPaste.style.display = 'none';
     });
 
     // ===== Parse pasted HTML =====
@@ -652,7 +727,11 @@
       // Hide inputs, show result
       document.getElementById('paste-zone').style.display = 'none';
       document.getElementById('url-section').style.display = 'none';
+      document.getElementById('history-section').style.display = 'none';
       document.getElementById('result-section').classList.add('visible');
+
+      // Save to history
+      saveToHistory(parsedData);
 
       var wordCount = parsedData.text.replace(/\s/g, '').length;
       document.getElementById('stats-bar').innerHTML =
@@ -886,8 +965,107 @@
       document.getElementById('result-section').classList.remove('visible');
       document.getElementById('paste-zone').style.display = '';
       document.getElementById('url-section').style.display = '';
-      document.getElementById('paste-zone').focus();
+      document.getElementById('history-section').style.display = '';
+      // Clear paste editor
+      pasteEditor.innerHTML = '';
+      pastedHtmlCache = '';
+      btnParsePaste.disabled = true;
+      btnClearPaste.style.display = 'none';
+      renderHistory();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // ===== History =====
+    var HISTORY_KEY = 'wx2x_history';
+    var MAX_HISTORY = 20;
+
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+      catch(e) { return []; }
+    }
+
+    function saveToHistory(data) {
+      var history = getHistory();
+      // Don't save duplicates (same title)
+      var exists = history.findIndex(function(h) { return h.title === data.title; });
+      if (exists !== -1) history.splice(exists, 1);
+
+      history.unshift({
+        title: data.title,
+        text: data.text,
+        richHtml: data.richHtml,
+        images: data.images,
+        wordCount: data.text.replace(/\s/g, '').length,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toTimeString().split(' ')[0].substring(0, 5)
+      });
+
+      // Limit history size
+      if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+      catch(e) { /* storage full, ignore */ }
+
+      renderHistory();
+    }
+
+    function deleteFromHistory(idx) {
+      var history = getHistory();
+      history.splice(idx, 1);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderHistory();
+    }
+
+    function loadFromHistory(idx) {
+      var history = getHistory();
+      var item = history[idx];
+      if (!item) return;
+
+      parsedData = {
+        title: item.title,
+        text: item.text,
+        richHtml: item.richHtml,
+        images: item.images || []
+      };
+
+      renderResult();
+      toast('已加载历史记录', 'ok');
+    }
+
+    function renderHistory() {
+      var history = getHistory();
+      var container = document.getElementById('history-list');
+      var clearBtn = document.getElementById('btn-clear-history');
+
+      if (history.length === 0) {
+        container.innerHTML = '<div class="history-empty">暂无转换记录</div>';
+        clearBtn.style.display = 'none';
+        return;
+      }
+
+      clearBtn.style.display = '';
+      var html = '<div class="history-list">';
+      history.forEach(function(item, i) {
+        html += '<div class="history-item">';
+        html += '<span class="hi-title" onclick="loadFromHistory(' + i + ')">' + escHtml(item.title) + '</span>';
+        html += '<span class="hi-meta">' + (item.date || '') + ' ' + (item.time || '') + ' / ' + (item.wordCount || 0) + '字 / ' + ((item.images || []).length) + '图</span>';
+        html += '<button class="hi-del" onclick="event.stopPropagation();deleteFromHistory(' + i + ')" title="删除">x</button>';
+        html += '</div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Clear all history
+    document.getElementById('btn-clear-history').addEventListener('click', function() {
+      if (!confirm('确定清空所有历史记录？')) return;
+      localStorage.removeItem(HISTORY_KEY);
+      renderHistory();
+      toast('历史记录已清空', 'ok');
+    });
+
+    // Init history on page load
+    renderHistory();
 
     // ===== Helpers =====
     function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
