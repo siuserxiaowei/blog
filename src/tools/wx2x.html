@@ -43,41 +43,71 @@
       font-family: var(--font-heading); font-size: 28px; font-weight: 700;
       margin-bottom: 6px;
     }
-    .page-desc { font-size: 13px; color: var(--text-sec); margin-bottom: 28px; }
+    .page-desc { font-size: 13px; color: var(--text-sec); margin-bottom: 28px; line-height: 1.6; }
 
-    /* Input section */
-    .input-section {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-      padding: 24px; margin-bottom: 24px;
-    }
-    .input-section h2 {
-      font-family: var(--font-heading); font-size: 16px; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
     .step-badge {
       display: inline-flex; align-items: center; justify-content: center;
       width: 24px; height: 24px; border-radius: 50%; font-size: 12px; font-weight: 600;
       background: var(--accent); color: var(--bg); font-family: var(--font-mono);
     }
 
-    .input-tabs { display: flex; gap: 4px; margin-bottom: 14px; }
-    .input-tab {
-      padding: 6px 16px; border-radius: 6px; font-size: 12px;
-      cursor: pointer; background: transparent; border: 1px solid var(--border);
-      color: var(--text-sec); transition: all 0.15s;
+    /* Paste zone */
+    .paste-zone {
+      background: var(--surface); border: 2px dashed var(--border); border-radius: 12px;
+      padding: 48px 24px; text-align: center; cursor: pointer;
+      transition: all 0.3s; margin-bottom: 24px; position: relative;
     }
-    .input-tab.active { background: var(--surface-2); color: var(--accent); border-color: var(--accent); }
-
-    .input-field {
-      width: 100%; padding: 12px 14px; border-radius: 8px;
-      border: 1px solid var(--border); background: var(--surface-2);
-      color: var(--text); font-size: 14px; outline: none;
-      transition: border-color 0.2s; font-family: var(--font-body);
+    .paste-zone:hover, .paste-zone.drag-over {
+      border-color: var(--accent); background: var(--surface-2);
     }
-    .input-field:focus { border-color: var(--accent); }
-    .input-field::placeholder { color: var(--text-sec); opacity: 0.6; }
-    textarea.input-field { min-height: 180px; resize: vertical; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; }
+    .paste-zone.has-content {
+      border-style: solid; border-color: var(--border); padding: 0;
+      cursor: default; text-align: left;
+    }
+    .paste-zone-hint {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .paste-zone-hint .icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .paste-zone-hint h3 { font-family: var(--font-heading); font-size: 18px; }
+    .paste-zone-hint p { font-size: 12px; color: var(--text-sec); max-width: 400px; line-height: 1.6; }
+    .paste-zone-hint .steps {
+      display: flex; gap: 24px; margin-top: 8px; font-size: 12px; color: var(--text-sec);
+    }
+    .paste-zone-hint .steps span {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .paste-zone-hint .steps .num {
+      width: 20px; height: 20px; border-radius: 50%; font-size: 10px;
+      background: var(--accent); color: var(--bg); display: inline-flex;
+      align-items: center; justify-content: center; font-weight: 600;
+    }
+    .paste-zone-hint kbd {
+      display: inline-block; padding: 2px 6px; border-radius: 4px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 11px; color: var(--accent);
+    }
 
+    /* Pasted content preview */
+    .pasted-preview {
+      max-height: 300px; overflow-y: auto; padding: 20px; line-height: 1.8;
+      font-size: 14px; color: var(--text-sec);
+    }
+    .pasted-preview img { max-width: 100%; border-radius: 4px; margin: 4px 0; }
+    .pasted-preview h1, .pasted-preview h2, .pasted-preview h3 { color: var(--text); margin: 0.5em 0; }
+    .pasted-preview strong, .pasted-preview b { color: var(--text); }
+    .paste-zone-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; background: var(--surface-2); border-radius: 12px 12px 0 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .paste-zone-bar span { font-size: 12px; color: var(--text-sec); font-family: var(--font-mono); }
+
+    /* Buttons */
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 10px 20px; border-radius: 8px; font-size: 13px;
@@ -87,8 +117,11 @@
     .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,169,110,0.3); }
     .btn-outline { background: transparent; color: var(--text-sec); border: 1px solid var(--border); }
     .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 6px 12px; font-size: 11px; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-danger { background: transparent; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
 
     /* Result section */
     .result-section { display: none; }
@@ -100,7 +133,7 @@
     }
     .result-card h2 {
       font-family: var(--font-heading); font-size: 16px; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
 
     /* Article preview */
@@ -147,11 +180,6 @@
       background: rgba(10,10,11,0.8); border-radius: 4px;
       font-size: 11px; font-family: var(--font-mono); color: var(--accent);
     }
-    .img-card .img-size {
-      position: absolute; bottom: 6px; right: 6px; padding: 2px 8px;
-      background: rgba(10,10,11,0.8); border-radius: 4px;
-      font-size: 10px; font-family: var(--font-mono); color: var(--text-sec);
-    }
 
     .no-images { text-align: center; padding: 24px; color: var(--text-sec); font-size: 13px; }
 
@@ -159,31 +187,12 @@
     .stats-bar {
       display: flex; gap: 20px; padding: 12px 0; margin-bottom: 16px;
       border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-sec);
-      font-family: var(--font-mono);
+      font-family: var(--font-mono); flex-wrap: wrap;
     }
     .stats-bar span strong { color: var(--accent); }
 
-    /* Toast */
-    .toast {
-      position: fixed; top: 72px; right: 24px; padding: 12px 20px;
-      border-radius: 8px; font-size: 13px; z-index: 100; animation: slideIn 0.3s ease;
-    }
-    .toast-ok { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-    .toast-err { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } }
-
-    /* Loading */
-    .loading { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sec); margin-top: 14px; }
-    .loading.visible { display: flex; }
-    .spinner {
-      width: 16px; height: 16px; border: 2px solid var(--border);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     /* Copy format toggle */
-    .format-toggle { display: flex; gap: 4px; }
+    .format-toggle { display: flex; gap: 4px; margin-left: auto; }
     .format-btn {
       padding: 4px 12px; border-radius: 5px; font-size: 11px;
       cursor: pointer; background: transparent; border: 1px solid var(--border);
@@ -197,10 +206,58 @@
     }
     .copy-hint strong { color: var(--accent); }
 
+    /* Toast */
+    .toast {
+      position: fixed; top: 72px; right: 24px; padding: 12px 20px;
+      border-radius: 8px; font-size: 13px; z-index: 100; animation: slideIn 0.3s ease;
+    }
+    .toast-ok { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .toast-err { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } }
+
+    .spinner {
+      width: 16px; height: 16px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.6s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* URL input section */
+    .url-section {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 24px; margin-bottom: 24px;
+    }
+    .url-section h3 {
+      font-family: var(--font-heading); font-size: 14px; margin-bottom: 12px;
+      color: var(--text-sec); display: flex; align-items: center; gap: 8px;
+    }
+    .url-section .or-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 4px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      font-family: var(--font-mono); color: var(--text-sec);
+    }
+    .url-row {
+      display: flex; gap: 10px;
+    }
+    .url-row input {
+      flex: 1; padding: 10px 14px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface-2);
+      color: var(--text); font-size: 13px; outline: none;
+      transition: border-color 0.2s; font-family: var(--font-body);
+    }
+    .url-row input:focus { border-color: var(--accent); }
+    .url-row input::placeholder { color: var(--text-sec); opacity: 0.6; }
+    .url-hint { font-size: 11px; color: var(--text-sec); margin-top: 8px; line-height: 1.5; }
+    .url-hint a { color: var(--accent); }
+    .loading { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sec); margin-top: 10px; }
+    .loading.visible { display: flex; }
+
     @media (max-width: 640px) {
       .container { padding: 0 12px; }
       .images-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
       h1.page-title { font-size: 22px; }
+      .paste-zone-hint .steps { flex-direction: column; gap: 8px; }
+      .url-row { flex-direction: column; }
     }
   </style>
 </head>
@@ -220,44 +277,48 @@
 
   <div class="container">
     <h1 class="page-title">公众号 → X Articles</h1>
-    <p class="page-desc">把微信公众号文章转换成 X (Twitter) Articles 兼容格式，一键复制粘贴，图片打包下载</p>
+    <p class="page-desc">
+      把微信公众号文章转换成 X (Twitter) Articles 兼容格式<br/>
+      在公众号文章页面全选复制，回来这里粘贴，一键转换
+    </p>
 
-    <!-- Step 1: Input -->
-    <div class="input-section">
-      <h2><span class="step-badge">1</span> 输入文章</h2>
-      <div class="input-tabs">
-        <button class="input-tab active" data-input="url">粘贴链接</button>
-        <button class="input-tab" data-input="html">粘贴 HTML</button>
+    <!-- Step 1: Paste -->
+    <div class="paste-zone" id="paste-zone" tabindex="0">
+      <div class="paste-zone-hint" id="paste-hint">
+        <div class="icon">V</div>
+        <h3>粘贴公众号文章</h3>
+        <p>打开微信公众号文章 → 在页面上 <kbd>Ctrl+A</kbd> 全选 → <kbd>Ctrl+C</kbd> 复制 → 回到这里 <kbd>Ctrl+V</kbd> 粘贴</p>
+        <div class="steps">
+          <span><span class="num">1</span> 打开公众号文章</span>
+          <span><span class="num">2</span> Ctrl+A 全选</span>
+          <span><span class="num">3</span> Ctrl+C 复制</span>
+          <span><span class="num">4</span> 点这里粘贴</span>
+        </div>
       </div>
-      <div id="input-url">
-        <input type="text" class="input-field" id="url-input" placeholder="https://mp.weixin.qq.com/s/xxxxxxx" />
+    </div>
+
+    <!-- URL input (alternative) -->
+    <div class="url-section" id="url-section">
+      <h3><span class="or-badge">或</span> 输入公众号文章链接</h3>
+      <div class="url-row">
+        <input type="text" id="url-input" placeholder="https://mp.weixin.qq.com/s/xxxxxxx" />
+        <button class="btn btn-primary btn-sm" id="btn-fetch">解析链接</button>
       </div>
-      <div id="input-html" style="display:none;">
-        <textarea class="input-field" id="html-input" placeholder="在公众号文章页面右键 → 查看网页源代码 → 全选复制粘贴到这里"></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="btn-parse">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          开始解析
-        </button>
-        <button class="btn btn-outline" id="btn-clear">清空</button>
-      </div>
+      <p class="url-hint">通过 Jina Reader 抓取渲染后的文章内容（需能访问 r.jina.ai）</p>
       <div class="loading" id="loading">
-        <div class="spinner"></div>
+        <span class="spinner"></span>
         <span id="loading-text">正在获取文章...</span>
       </div>
     </div>
 
-    <!-- Step 2: Result -->
+    <!-- Step 2+3: Result -->
     <div class="result-section" id="result-section">
-      <!-- Stats -->
       <div class="stats-bar" id="stats-bar"></div>
 
       <!-- Converted content -->
       <div class="result-card">
         <h2>
           <span class="step-badge">2</span> 转换结果
-          <span style="flex:1;"></span>
           <div class="format-toggle">
             <button class="format-btn active" data-format="rich">富文本复制</button>
             <button class="format-btn" data-format="plain">纯文本复制</button>
@@ -265,15 +326,16 @@
         </h2>
         <div class="article-preview" id="article-preview"></div>
         <div class="copy-hint">
-          <strong>富文本复制</strong>：直接粘贴到 X Articles 编辑器，保留标题、加粗、列表、引用等格式<br/>
+          <strong>富文本复制</strong>：直接粘贴到 X Articles 编辑器，保留标题、加粗、列表、引用格式<br/>
           <strong>纯文本复制</strong>：去除所有格式，适合粘贴到任何地方<br/>
-          <strong>图片</strong>：需要在 X 编辑器中手动上传（在下方打包下载）
+          <strong>图片</strong>：X 不支持粘贴图片，需在编辑器中手动上传（下方可打包下载）
         </div>
         <div class="btn-row">
           <button class="btn btn-primary" id="btn-copy">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             复制到剪贴板
           </button>
+          <button class="btn btn-danger btn-sm" id="btn-reset">重新粘贴</button>
         </div>
       </div>
 
@@ -290,183 +352,183 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             打包下载全部图片 (ZIP)
           </button>
-          <button class="btn btn-outline" id="btn-copy-urls">复制图片链接列表</button>
+          <button class="btn btn-outline btn-sm" id="btn-copy-urls">复制图片链接</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ===== CORS Proxy =====
-    // WeChat blocks direct fetch; use public proxy
-    var PROXY_LIST = [
-      function(u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
-      function(u) { return 'https://corsproxy.io/?' + encodeURIComponent(u); },
-      function(u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); }
-    ];
+    // ===== Image proxy (bypass WeChat hotlink protection) =====
     var IMG_PROXY = function(u) { return 'https://images.weserv.nl/?url=' + encodeURIComponent(u); };
 
     // ===== State =====
-    var parsedData = { title: '', html: '', text: '', images: [], richHtml: '' };
+    var parsedData = { title: '', text: '', images: [], richHtml: '' };
     var copyFormat = 'rich';
 
-    // ===== Input tabs =====
-    document.querySelectorAll('.input-tab').forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        document.querySelectorAll('.input-tab').forEach(function(t) { t.classList.remove('active'); });
-        tab.classList.add('active');
-        var mode = tab.dataset.input;
-        document.getElementById('input-url').style.display = mode === 'url' ? '' : 'none';
-        document.getElementById('input-html').style.display = mode === 'html' ? '' : 'none';
-      });
+    // ===== Paste zone =====
+    var pasteZone = document.getElementById('paste-zone');
+
+    // Click to focus so paste works
+    pasteZone.addEventListener('click', function() {
+      pasteZone.focus();
     });
 
-    // ===== Format toggle =====
-    document.querySelectorAll('.format-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.format-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        copyFormat = btn.dataset.format;
-      });
-    });
+    // Listen for paste on the whole document
+    document.addEventListener('paste', function(e) {
+      // Only handle if result not already shown, or paste zone is focused
+      if (parsedData.richHtml && document.activeElement !== pasteZone) return;
 
-    // ===== Parse button =====
-    document.getElementById('btn-parse').addEventListener('click', function() {
-      var activeTab = document.querySelector('.input-tab.active').dataset.input;
-      if (activeTab === 'url') {
-        var url = document.getElementById('url-input').value.trim();
-        if (!url) { toast('请输入公众号文章链接', 'err'); return; }
-        fetchAndParse(url);
-      } else {
-        var html = document.getElementById('html-input').value.trim();
-        if (!html) { toast('请粘贴文章 HTML', 'err'); return; }
-        parseHTML(html);
+      var clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+
+      // Get HTML from clipboard (browser includes rich text as HTML)
+      var html = clipboardData.getData('text/html');
+      var text = clipboardData.getData('text/plain');
+
+      console.log('[wx2x] 粘贴事件 - HTML长度:', html.length, '纯文本长度:', text.length);
+
+      if (html && html.length > 100) {
+        e.preventDefault();
+        parseFromPaste(html, text);
+      } else if (text && text.length > 50) {
+        e.preventDefault();
+        // Plain text paste - just use it directly
+        parseFromPlainText(text);
       }
     });
 
-    // ===== Fetch article via CORS proxy =====
-    function fetchAndParse(url) {
-      showLoading('正在获取文章...');
-      tryFetch(url, 0);
-    }
-
-    function tryFetch(url, proxyIdx) {
-      if (proxyIdx >= PROXY_LIST.length) {
-        hideLoading();
-        toast('所有代理均失败，请尝试粘贴 HTML 方式', 'err');
-        return;
-      }
-      var proxyUrl = PROXY_LIST[proxyIdx](url);
-      fetch(proxyUrl)
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.text();
-        })
-        .then(function(html) {
-          hideLoading();
-          parseHTML(html);
-        })
-        .catch(function() {
-          tryFetch(url, proxyIdx + 1);
-        });
-    }
-
-    // ===== Parse HTML =====
-    function parseHTML(html) {
-      showLoading('正在解析文章...');
+    // ===== Parse pasted HTML =====
+    function parseFromPaste(html, plainText) {
+      console.log('[wx2x] 开始解析粘贴的HTML');
 
       try {
         var doc = new DOMParser().parseFromString(html, 'text/html');
 
-        // Extract title
-        var titleEl = doc.querySelector('#activity-name') || doc.querySelector('.rich_media_title') || doc.querySelector('h1');
-        var title = titleEl ? titleEl.textContent.trim() : '未知标题';
-
-        // Extract main content
+        // Try to find WeChat specific content first
         var contentEl = doc.querySelector('#js_content') || doc.querySelector('.rich_media_content');
+
+        // If not WeChat format, use the whole body
         if (!contentEl) {
-          hideLoading();
-          toast('未找到文章正文，请确认是公众号文章页面', 'err');
-          return;
+          contentEl = doc.body;
         }
+
+        // Extract title from WeChat or first heading or first bold text
+        var titleEl = doc.querySelector('#activity-name') || doc.querySelector('.rich_media_title');
+        var title = '';
+        if (titleEl) {
+          title = titleEl.textContent.trim();
+        } else {
+          // Try first h1/h2, or first line of plain text
+          var firstHeading = contentEl.querySelector('h1, h2');
+          if (firstHeading) {
+            title = firstHeading.textContent.trim();
+          } else {
+            // Use first line of plain text as title
+            title = (plainText || contentEl.textContent).split('\n').filter(function(l) { return l.trim(); })[0] || '未知标题';
+            if (title.length > 60) title = title.substring(0, 60) + '...';
+          }
+        }
+
+        console.log('[wx2x] 标题:', title);
 
         // Extract images
         var images = [];
         var imgEls = contentEl.querySelectorAll('img');
-        imgEls.forEach(function(img, i) {
+        var seenSrcs = {};
+        imgEls.forEach(function(img) {
           var src = img.getAttribute('data-src') || img.getAttribute('src') || '';
-          if (src && !src.startsWith('data:') && src.indexOf('res.wx.qq.com') === -1) {
-            images.push({
-              src: src,
-              proxySrc: IMG_PROXY(src),
-              alt: img.getAttribute('alt') || '',
-              index: images.length + 1
-            });
-          }
+          // Clean up src
+          if (src.startsWith('//')) src = 'https:' + src;
+
+          // Skip tiny images, data URIs, tracking pixels, WeChat UI assets
+          if (!src || src.startsWith('data:') || src.indexOf('res.wx.qq.com') !== -1) return;
+          if (img.width && img.width < 20) return;
+          if (img.height && img.height < 20) return;
+          if (seenSrcs[src]) return;
+          seenSrcs[src] = true;
+
+          images.push({
+            src: src,
+            proxySrc: src.indexOf('mmbiz.qpic.cn') !== -1 ? IMG_PROXY(src) : src,
+            index: images.length + 1
+          });
         });
 
+        console.log('[wx2x] 图片数量:', images.length);
+
         // Convert to X-compatible HTML
-        var richHtml = convertToXFormat(contentEl, title, images);
-        var plainText = convertToPlainText(contentEl, title);
+        var richHtml = convertToXFormat(contentEl, title);
+        var convertedText = convertToPlainText(contentEl, title);
 
         parsedData = {
           title: title,
-          html: contentEl.innerHTML,
-          text: plainText,
+          text: convertedText,
           images: images,
           richHtml: richHtml
         };
 
-        hideLoading();
         renderResult();
-        toast('解析成功！共 ' + images.length + ' 张图片', 'ok');
+        toast('解析成功！' + images.length + ' 张图片', 'ok');
 
       } catch (e) {
-        hideLoading();
+        console.error('[wx2x] 解析失败:', e);
         toast('解析失败：' + e.message, 'err');
       }
     }
 
+    // ===== Parse plain text paste =====
+    function parseFromPlainText(text) {
+      var lines = text.split('\n').filter(function(l) { return l.trim(); });
+      var title = lines[0] || '未知标题';
+      if (title.length > 60) title = title.substring(0, 60) + '...';
+
+      var richHtml = '<h1>' + escHtml(title) + '</h1>\n';
+      for (var i = 1; i < lines.length; i++) {
+        richHtml += '<p>' + escHtml(lines[i]) + '</p>\n';
+      }
+
+      parsedData = {
+        title: title,
+        text: text,
+        images: [],
+        richHtml: richHtml
+      };
+
+      renderResult();
+      toast('纯文本解析完成', 'ok');
+    }
+
     // ===== Convert to X Articles compatible format =====
-    function convertToXFormat(contentEl, title, images) {
-      // Clone to manipulate
+    function convertToXFormat(contentEl, title) {
       var clone = contentEl.cloneNode(true);
 
-      // Remove scripts, styles, hidden elements
-      clone.querySelectorAll('script, style, .qr_code_pc, .reward_area, [style*="display:none"], [style*="display: none"]').forEach(function(el) { el.remove(); });
+      // Remove noise
+      clone.querySelectorAll('script, style, noscript, .qr_code_pc, .reward_area, [style*="display:none"], [style*="display: none"]').forEach(function(el) { el.remove(); });
 
-      // Track image index
-      var imgIdx = 0;
-
-      // Process the DOM tree into clean HTML
       var html = '<h1>' + escHtml(title) + '</h1>\n';
-      html += processNode(clone, images, { imgIdx: 0 });
-
+      html += processNode(clone, { imgIdx: 0 });
       return html;
     }
 
-    function processNode(node, images, state) {
+    function processNode(node, state) {
       var html = '';
-
       for (var i = 0; i < node.childNodes.length; i++) {
         var child = node.childNodes[i];
 
         if (child.nodeType === 3) {
-          // Text node
           var text = child.textContent;
           if (text.trim()) html += escHtml(text);
           continue;
         }
-
         if (child.nodeType !== 1) continue;
 
         var tag = child.tagName.toLowerCase();
         var style = child.getAttribute('style') || '';
 
-        // Skip hidden
         if (style.indexOf('display:none') !== -1 || style.indexOf('display: none') !== -1) continue;
 
-        // Images → placeholder
+        // Images
         if (tag === 'img') {
           var src = child.getAttribute('data-src') || child.getAttribute('src') || '';
           if (src && !src.startsWith('data:') && src.indexOf('res.wx.qq.com') === -1) {
@@ -476,38 +538,33 @@
           continue;
         }
 
-        // Headings
         if (/^h[1-6]$/.test(tag)) {
-          var level = Math.min(parseInt(tag[1]), 3); // X only supports h1-h3 well
+          var level = Math.min(parseInt(tag[1]), 3);
           html += '<h' + level + '>' + getCleanText(child) + '</h' + level + '>\n';
           continue;
         }
 
-        // Strong / bold
         if (tag === 'strong' || tag === 'b') {
-          html += '<strong>' + processNode(child, images, state) + '</strong>';
+          html += '<strong>' + processNode(child, state) + '</strong>';
           continue;
         }
 
-        // Emphasis
         if (tag === 'em' || tag === 'i') {
-          html += '<em>' + processNode(child, images, state) + '</em>';
+          html += '<em>' + processNode(child, state) + '</em>';
           continue;
         }
 
-        // Links
         if (tag === 'a') {
           var href = child.getAttribute('href') || '';
-          var text = getCleanText(child);
-          if (href && text) {
-            html += '<a href="' + escAttr(href) + '">' + escHtml(text) + '</a>';
-          } else if (text) {
-            html += escHtml(text);
+          var aText = getCleanText(child);
+          if (href && aText && href.indexOf('javascript:') === -1) {
+            html += '<a href="' + escAttr(href) + '">' + escHtml(aText) + '</a>';
+          } else if (aText) {
+            html += escHtml(aText);
           }
           continue;
         }
 
-        // Lists
         if (tag === 'ul' || tag === 'ol') {
           html += '<' + tag + '>';
           child.querySelectorAll(':scope > li').forEach(function(li) {
@@ -517,28 +574,21 @@
           continue;
         }
 
-        // Blockquote
         if (tag === 'blockquote') {
-          html += '<blockquote>' + processNode(child, images, state) + '</blockquote>\n';
+          html += '<blockquote>' + processNode(child, state) + '</blockquote>\n';
           continue;
         }
 
-        // Paragraph-level: section, p, div
         if (tag === 'p' || tag === 'section' || tag === 'div') {
-          var inner = processNode(child, images, state);
+          var inner = processNode(child, state);
           if (inner.trim()) {
-            // Check if inner already contains block elements
-            if (inner.indexOf('<h') !== -1 || inner.indexOf('<p ') !== -1 || inner.indexOf('<ul') !== -1 ||
-                inner.indexOf('<ol') !== -1 || inner.indexOf('<blockquote') !== -1 ||
-                inner.indexOf('<p>') !== -1) {
+            if (inner.indexOf('<h') !== -1 || inner.indexOf('<p>') !== -1 || inner.indexOf('<p ') !== -1 ||
+                inner.indexOf('<ul') !== -1 || inner.indexOf('<ol') !== -1 || inner.indexOf('<blockquote') !== -1) {
               html += inner;
             } else {
-              // Detect if this looks like a heading (short text, bold style)
-              var isBoldSection = style.indexOf('font-weight') !== -1 && style.indexOf('bold') !== -1;
-              var isLargeText = style.indexOf('font-size') !== -1 && (style.indexOf('2') !== -1 || style.indexOf('1.') !== -1);
+              var isBold = style.indexOf('font-weight') !== -1 && (style.indexOf('bold') !== -1 || style.indexOf('700') !== -1);
               var innerText = inner.replace(/<[^>]+>/g, '').trim();
-
-              if ((isBoldSection || child.querySelector('strong, b')) && innerText.length < 50 && innerText.length > 0) {
+              if ((isBold || child.querySelector(':scope > strong, :scope > b')) && innerText.length < 50 && innerText.length > 0) {
                 html += '<h2>' + innerText + '</h2>\n';
               } else {
                 html += '<p>' + inner + '</p>\n';
@@ -548,10 +598,8 @@
           continue;
         }
 
-        // Spans and other inline elements — recurse
-        if (tag === 'span' || tag === 'label') {
-          var spanInner = processNode(child, images, state);
-          // Check for bold styling
+        if (tag === 'span' || tag === 'label' || tag === 'font') {
+          var spanInner = processNode(child, state);
           if (style.indexOf('font-weight') !== -1 && (style.indexOf('bold') !== -1 || style.indexOf('700') !== -1 || style.indexOf('600') !== -1)) {
             html += '<strong>' + spanInner + '</strong>';
           } else {
@@ -560,33 +608,20 @@
           continue;
         }
 
-        // Line break
-        if (tag === 'br') {
-          html += '<br/>';
-          continue;
-        }
+        if (tag === 'br') { html += '<br/>'; continue; }
+        if (tag === 'hr') { html += '<hr/>\n'; continue; }
 
-        // Horizontal rule
-        if (tag === 'hr') {
-          html += '<hr/>\n';
-          continue;
-        }
-
-        // Default: recurse
-        html += processNode(child, images, state);
+        html += processNode(child, state);
       }
-
       return html;
     }
 
-    function getCleanText(el) {
-      return el.textContent.trim();
-    }
+    function getCleanText(el) { return el.textContent.trim(); }
 
     // ===== Convert to plain text =====
     function convertToPlainText(contentEl, title) {
       var clone = contentEl.cloneNode(true);
-      clone.querySelectorAll('script, style, .qr_code_pc, .reward_area').forEach(function(el) { el.remove(); });
+      clone.querySelectorAll('script, style, noscript').forEach(function(el) { el.remove(); });
 
       var text = title + '\n\n';
       var imgIdx = 0;
@@ -600,7 +635,6 @@
             continue;
           }
           if (child.nodeType !== 1) continue;
-
           var tag = child.tagName.toLowerCase();
           if (tag === 'img') {
             var src = child.getAttribute('data-src') || child.getAttribute('src') || '';
@@ -611,36 +645,30 @@
             continue;
           }
           if (/^h[1-6]$/.test(tag)) { text += '\n\n' + child.textContent.trim() + '\n\n'; continue; }
-          if (tag === 'p' || tag === 'div' || tag === 'section') {
-            walk(child);
-            text += '\n\n';
-            continue;
-          }
+          if (tag === 'p' || tag === 'div' || tag === 'section') { walk(child); text += '\n\n'; continue; }
           if (tag === 'br') { text += '\n'; continue; }
           if (tag === 'li') { text += '  - ' + child.textContent.trim() + '\n'; continue; }
           if (tag === 'blockquote') { text += '\n> ' + child.textContent.trim() + '\n'; continue; }
           walk(child);
         }
       }
-
       walk(clone);
-
-      // Clean up excessive newlines
       return text.replace(/\n{3,}/g, '\n\n').trim();
     }
 
     // ===== Render result =====
     function renderResult() {
+      // Hide inputs, show result
+      document.getElementById('paste-zone').style.display = 'none';
+      document.getElementById('url-section').style.display = 'none';
       document.getElementById('result-section').classList.add('visible');
 
-      // Stats
       var wordCount = parsedData.text.replace(/\s/g, '').length;
       document.getElementById('stats-bar').innerHTML =
         '<span>标题: <strong>' + escHtml(parsedData.title) + '</strong></span>' +
         '<span>字数: <strong>' + wordCount + '</strong></span>' +
         '<span>图片: <strong>' + parsedData.images.length + '</strong></span>';
 
-      // Preview
       document.getElementById('article-preview').innerHTML = parsedData.richHtml;
 
       // Images
@@ -657,8 +685,8 @@
         imgActions.style.display = '';
         var grid = '<div class="images-grid">';
         parsedData.images.forEach(function(img) {
-          grid += '<div class="img-card" title="点击在新标签页打开" onclick="window.open(\'' + img.proxySrc + '\',\'_blank\')">';
-          grid += '<img src="' + img.proxySrc + '" loading="lazy" alt="图片' + img.index + '" onerror="this.parentElement.innerHTML=\'<div style=padding:20px;text-align:center;font-size:11px;color:var(--text-sec)>加载失败</div>\'" />';
+          grid += '<div class="img-card" title="点击查看大图" onclick="window.open(\'' + escAttr(img.proxySrc) + '\',\'_blank\')">';
+          grid += '<img src="' + escAttr(img.proxySrc) + '" loading="lazy" alt="图片' + img.index + '" onerror="this.style.display=\'none\'" />';
           grid += '<span class="img-index">#' + img.index + '</span>';
           grid += '</div>';
         });
@@ -666,25 +694,28 @@
         imgContainer.innerHTML = grid;
       }
 
-      // Scroll to result
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    // ===== Format toggle =====
+    document.querySelectorAll('.format-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.format-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        copyFormat = btn.dataset.format;
+      });
+    });
 
     // ===== Copy =====
     document.getElementById('btn-copy').addEventListener('click', function() {
       if (copyFormat === 'rich') {
-        // Copy as rich text (HTML) so X editor preserves formatting
         var blob = new Blob([parsedData.richHtml], { type: 'text/html' });
         var textBlob = new Blob([parsedData.text], { type: 'text/plain' });
         navigator.clipboard.write([
-          new ClipboardItem({
-            'text/html': blob,
-            'text/plain': textBlob
-          })
+          new ClipboardItem({ 'text/html': blob, 'text/plain': textBlob })
         ]).then(function() {
-          toast('富文本已复制！直接粘贴到 X Articles 编辑器', 'ok');
-        }).catch(function(e) {
-          // Fallback
+          toast('富文本已复制！直接粘贴到 X Articles', 'ok');
+        }).catch(function() {
           fallbackCopy(parsedData.text);
         });
       } else {
@@ -696,20 +727,16 @@
       navigator.clipboard.writeText(text).then(function() {
         toast('纯文本已复制！', 'ok');
       }).catch(function() {
-        // Last resort
         var ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
         toast('已复制！', 'ok');
       });
     }
 
     // ===== Copy image URLs =====
     document.getElementById('btn-copy-urls').addEventListener('click', function() {
-      var urls = parsedData.images.map(function(img, i) {
+      var urls = parsedData.images.map(function(img) {
         return '图片' + img.index + ': ' + img.src;
       }).join('\n');
       navigator.clipboard.writeText(urls).then(function() {
@@ -722,7 +749,7 @@
       if (!parsedData.images.length) return;
       var btn = this;
       btn.disabled = true;
-      btn.innerHTML = '<div class="spinner"></div> 正在打包...';
+      btn.innerHTML = '<span class="spinner"></span> 正在打包...';
 
       var zip = new JSZip();
       var folder = zip.folder(parsedData.title.substring(0, 30) || 'wx-images');
@@ -736,9 +763,7 @@
             var ext = blob.type.indexOf('png') !== -1 ? '.png' : blob.type.indexOf('gif') !== -1 ? '.gif' : '.jpg';
             folder.file('image-' + img.index + ext, blob);
           })
-          .catch(function() {
-            // Skip failed images
-          })
+          .catch(function() {})
           .finally(function() {
             done++;
             if (done === total) {
@@ -757,24 +782,92 @@
       });
     });
 
-    // ===== Clear =====
-    document.getElementById('btn-clear').addEventListener('click', function() {
-      document.getElementById('url-input').value = '';
-      document.getElementById('html-input').value = '';
+    // ===== URL fetch via Jina Reader =====
+    document.getElementById('btn-fetch').addEventListener('click', function() {
+      var url = document.getElementById('url-input').value.trim();
+      if (!url) { toast('请输入链接', 'err'); return; }
+      if (url.indexOf('mp.weixin.qq.com') === -1 && url.indexOf('weixin.qq.com') === -1) {
+        toast('请输入微信公众号文章链接', 'err'); return;
+      }
+      fetchViaJina(url);
+    });
+
+    document.getElementById('url-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('btn-fetch').click();
+    });
+
+    function fetchViaJina(url) {
+      var loading = document.getElementById('loading');
+      var loadingText = document.getElementById('loading-text');
+      var btn = document.getElementById('btn-fetch');
+      loading.classList.add('visible');
+      loadingText.textContent = '正在通过 Jina Reader 获取文章...';
+      btn.disabled = true;
+
+      // Try Jina Reader first (returns rendered markdown), then fallback to HTML proxy
+      var jinaUrl = 'https://r.jina.ai/' + url;
+      console.log('[wx2x] Jina URL:', jinaUrl);
+
+      fetch(jinaUrl, {
+        headers: { 'Accept': 'text/html', 'X-Return-Format': 'html' },
+        signal: AbortSignal.timeout(20000)
+      })
+      .then(function(res) {
+        console.log('[wx2x] Jina 响应:', res.status);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(html) {
+        console.log('[wx2x] Jina HTML长度:', html.length);
+        loading.classList.remove('visible');
+        btn.disabled = false;
+
+        // Parse the Jina-returned HTML
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var contentEl = doc.querySelector('#js_content') || doc.querySelector('.rich_media_content') || doc.querySelector('article') || doc.body;
+        var titleEl = doc.querySelector('#activity-name') || doc.querySelector('.rich_media_title') || doc.querySelector('h1') || doc.querySelector('title');
+        var title = titleEl ? titleEl.textContent.trim() : '未知标题';
+
+        var images = [];
+        var seenSrcs = {};
+        contentEl.querySelectorAll('img').forEach(function(img) {
+          var src = img.getAttribute('data-src') || img.getAttribute('src') || '';
+          if (src.startsWith('//')) src = 'https:' + src;
+          if (!src || src.startsWith('data:') || src.indexOf('res.wx.qq.com') !== -1) return;
+          if (seenSrcs[src]) return;
+          seenSrcs[src] = true;
+          images.push({
+            src: src,
+            proxySrc: src.indexOf('mmbiz.qpic.cn') !== -1 ? IMG_PROXY(src) : src,
+            index: images.length + 1
+          });
+        });
+
+        var richHtml = convertToXFormat(contentEl, title);
+        var convertedText = convertToPlainText(contentEl, title);
+
+        parsedData = { title: title, text: convertedText, images: images, richHtml: richHtml };
+        renderResult();
+        toast('解析成功！' + images.length + ' 张图片', 'ok');
+      })
+      .catch(function(err) {
+        console.error('[wx2x] Jina 失败:', err);
+        loading.classList.remove('visible');
+        btn.disabled = false;
+        toast('获取失败：' + (err.name === 'TimeoutError' ? '请求超时，请检查网络或使用粘贴方式' : err.message), 'err');
+      });
+    }
+
+    // ===== Reset =====
+    document.getElementById('btn-reset').addEventListener('click', function() {
+      parsedData = { title: '', text: '', images: [], richHtml: '' };
       document.getElementById('result-section').classList.remove('visible');
-      parsedData = { title: '', html: '', text: '', images: [], richHtml: '' };
+      document.getElementById('paste-zone').style.display = '';
+      document.getElementById('url-section').style.display = '';
+      document.getElementById('paste-zone').focus();
     });
 
     // ===== Helpers =====
-    function showLoading(text) {
-      document.getElementById('loading').classList.add('visible');
-      document.getElementById('loading-text').textContent = text;
-      document.getElementById('btn-parse').disabled = true;
-    }
-    function hideLoading() {
-      document.getElementById('loading').classList.remove('visible');
-      document.getElementById('btn-parse').disabled = false;
-    }
     function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function escAttr(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function toast(msg, type) {
@@ -784,11 +877,6 @@
       document.body.appendChild(el);
       setTimeout(function() { el.remove(); }, 3500);
     }
-
-    // ===== Enter to parse =====
-    document.getElementById('url-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') document.getElementById('btn-parse').click();
-    });
   </script>
 </body>
 </html>
