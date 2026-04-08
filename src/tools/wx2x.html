@@ -596,8 +596,10 @@
         if (tag === 'img') {
           var src = child.getAttribute('data-src') || child.getAttribute('src') || '';
           if (src && !src.startsWith('data:') && src.indexOf('res.wx.qq.com') === -1) {
+            if (src.startsWith('//')) src = 'https:' + src;
+            var proxySrc = src.indexOf('mmbiz.qpic.cn') !== -1 ? IMG_PROXY(src) : src;
             state.imgIdx++;
-            html += '<p class="img-placeholder">[图片 ' + state.imgIdx + ' — 需在 X 编辑器手动上传]</p>\n';
+            html += '<img src="' + escAttr(proxySrc) + '" alt="图片' + state.imgIdx + '" style="max-width:100%;border-radius:6px;margin:0.8em 0;" />\n';
           }
           continue;
         }
