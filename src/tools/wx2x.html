@@ -351,17 +351,39 @@
       </div>
     </div>
 
-    <!-- URL input (alternative) -->
+    <!-- Bookmarklet (one-click) -->
     <div class="url-section" id="url-section">
-      <h3><span class="or-badge">或</span> 输入公众号文章链接</h3>
-      <div class="url-row">
-        <input type="text" id="url-input" placeholder="https://mp.weixin.qq.com/s/xxxxxxx" />
-        <button class="btn btn-primary btn-sm" id="btn-fetch">解析链接</button>
+      <h3><span class="or-badge">推荐</span> 一键提取（书签栏工具）</h3>
+      <p style="font-size:13px;color:var(--text-sec);line-height:1.6;margin-bottom:14px;">
+        把下面的按钮<strong style="color:var(--accent);">拖到浏览器书签栏</strong>，以后在公众号文章页面点一下就自动提取内容跳转过来。
+      </p>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <a id="bookmarklet-btn" href="#" onclick="return false;" style="
+          display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;
+          background:var(--accent);color:var(--bg);font-size:13px;font-weight:600;
+          text-decoration:none;cursor:grab;user-select:none;
+          box-shadow:0 2px 8px rgba(201,169,110,0.3);
+        ">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+          发到X
+        </a>
+        <span style="font-size:11px;color:var(--text-sec);">← 拖这个到书签栏</span>
       </div>
-      <p class="url-hint">注意：微信文章内容由 JS 动态渲染，部分代理可能无法获取。如果失败，请用上方<strong>粘贴方式</strong>（在浏览器中打开文章 → Ctrl+A 全选 → Ctrl+C → 回来 Ctrl+V）</p>
-      <div class="loading" id="loading">
-        <span class="spinner"></span>
-        <span id="loading-text">正在获取文章...</span>
+      <p class="url-hint" style="margin-top:12px;">
+        <strong>使用方法：</strong>打开任意公众号文章 → 点击书签栏的「发到X」→ 自动提取并跳转到本页<br/>
+        如果拖不动，右键书签栏 → 添加书签 → 名称填「发到X」→ 网址栏粘贴下方代码
+      </p>
+      <div style="margin-top:8px;position:relative;">
+        <input type="text" id="bookmarklet-code" readonly style="
+          width:100%;padding:8px 60px 8px 12px;border-radius:6px;font-size:11px;
+          border:1px solid var(--border);background:var(--surface-2);color:var(--text-sec);
+          font-family:var(--font-mono);outline:none;cursor:text;
+        " />
+        <button onclick="document.getElementById('bookmarklet-code').select();document.execCommand('copy');toast('已复制书签代码','ok');" style="
+          position:absolute;right:4px;top:4px;padding:4px 10px;border-radius:4px;
+          background:var(--surface);border:1px solid var(--border);color:var(--text-sec);
+          font-size:11px;cursor:pointer;
+        ">复制</button>
       </div>
     </div>
 
@@ -439,13 +461,10 @@
 
       console.log('[wx2x] 粘贴事件 - HTML长度:', html.length, '纯文本长度:', text.length);
 
-      // If pasted a URL, redirect to URL input
+      // If pasted a URL, inform user to use bookmarklet
       if (text && text.match(/^https?:\/\/(mp\.weixin\.qq\.com|weixin\.qq\.com)/)) {
         e.preventDefault();
-        document.getElementById('url-input').value = text;
-        document.getElementById('url-input').focus();
-        toast('检测到公众号链接，已填入下方输入框', 'ok');
-        document.getElementById('url-section').scrollIntoView({ behavior: 'smooth' });
+        toast('检测到链接——请用书签栏「发到X」工具，或在文章页面 Ctrl+A 全选后复制粘贴', 'err');
         return;
       }
 
@@ -852,93 +871,20 @@
       });
     });
 
-    // ===== URL fetch =====
-    var FETCH_PROXIES = [
-      function(u) { return 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(u); },
-      function(u) { return 'https://corsproxy.io/?' + encodeURIComponent(u); },
-      function(u) { return 'https://r.jina.ai/' + u; }
-    ];
+    // ===== Bookmarklet =====
+    // The bookmarklet extracts content from the WeChat article page DOM
+    // and opens our tool with the data in the URL hash
+    var TOOL_URL = location.origin + '/tools/wx2x';
+    // Bookmarklet: copies article HTML to clipboard, then opens our tool page
+    // User just needs to Ctrl+V on the tool page
+    var bookmarkletCode = "javascript:void(function(){var c=document.querySelector('#js_content')||document.querySelector('.rich_media_content');if(!c){alert('未找到公众号文章内容');return;}var t=(document.querySelector('#activity-name')||document.querySelector('.rich_media_title')||{textContent:''}).textContent.trim();var h='<h1>'+t+'</h1>'+c.innerHTML;var b=new Blob([h],{type:'text/html'});var b2=new Blob([c.textContent],{type:'text/plain'});navigator.clipboard.write([new ClipboardItem({'text/html':b,'text/plain':b2})]).then(function(){alert('文章已复制！正在跳转到转换工具...');open('" + TOOL_URL + "','_blank');}).catch(function(){var r=document.createRange();r.selectNodeContents(c);var s=window.getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();alert('文章已复制！正在跳转，请在工具页点击输入框后 Ctrl+V 粘贴');open('" + TOOL_URL + "','_blank');});}())";
 
-    document.getElementById('btn-fetch').addEventListener('click', function() {
-      var url = document.getElementById('url-input').value.trim();
-      if (!url) { toast('请输入链接', 'err'); return; }
-      if (url.indexOf('mp.weixin.qq.com') === -1 && url.indexOf('weixin.qq.com') === -1) {
-        toast('请输入微信公众号文章链接', 'err'); return;
-      }
-      fetchArticle(url);
-    });
+    // Set bookmarklet href
+    document.getElementById('bookmarklet-btn').href = bookmarkletCode;
+    document.getElementById('bookmarklet-code').value = bookmarkletCode;
 
-    document.getElementById('url-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') document.getElementById('btn-fetch').click();
-    });
-
-    function fetchArticle(url) {
-      var loading = document.getElementById('loading');
-      var loadingText = document.getElementById('loading-text');
-      var btn = document.getElementById('btn-fetch');
-      loading.classList.add('visible');
-      btn.disabled = true;
-
-      tryProxy(url, 0, loading, loadingText, btn);
-    }
-
-    function tryProxy(url, idx, loading, loadingText, btn) {
-      if (idx >= FETCH_PROXIES.length) {
-        loading.classList.remove('visible');
-        btn.disabled = false;
-        toast('所有代理均无法获取文章内容（微信文章需要JS渲染），请使用粘贴方式', 'err');
-        return;
-      }
-
-      var proxyUrl = FETCH_PROXIES[idx](url);
-      loadingText.textContent = '尝试代理 #' + (idx + 1) + '...';
-      console.log('[wx2x] 尝试代理 #' + (idx + 1) + ':', proxyUrl);
-
-      fetch(proxyUrl, { redirect: 'follow', signal: AbortSignal.timeout(15000) })
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.text();
-        })
-        .then(function(html) {
-          console.log('[wx2x] 代理 #' + (idx + 1) + ' 返回 HTML 长度:', html.length);
-
-          var doc = new DOMParser().parseFromString(html, 'text/html');
-
-          // WeChat hides content with visibility:hidden, but it's in the DOM
-          // Also try removing visibility:hidden to expose content
-          var contentEl = doc.querySelector('#js_content');
-          if (contentEl) {
-            contentEl.removeAttribute('style');
-            contentEl.style.visibility = 'visible';
-          }
-          if (!contentEl) contentEl = doc.querySelector('.rich_media_content');
-          if (!contentEl) contentEl = doc.querySelector('article');
-
-          // Check if content actually has text
-          if (!contentEl || contentEl.textContent.trim().length < 50) {
-            console.log('[wx2x] 代理 #' + (idx + 1) + ' 内容不足，尝试下一个');
-            tryProxy(url, idx + 1, loading, loadingText, btn);
-            return;
-          }
-
-          var titleEl = doc.querySelector('#activity-name') || doc.querySelector('.rich_media_title') || doc.querySelector('h1');
-          var title = titleEl ? titleEl.textContent.trim() : '未知标题';
-
-          var images = extractImages(contentEl);
-          var richHtml = convertToXFormat(contentEl, title);
-          var convertedText = convertToPlainText(contentEl, title);
-
-          parsedData = { title: title, text: convertedText, images: images, richHtml: richHtml };
-          loading.classList.remove('visible');
-          btn.disabled = false;
-          renderResult();
-          toast('解析成功！' + images.length + ' 张图片', 'ok');
-        })
-        .catch(function(err) {
-          console.log('[wx2x] 代理 #' + (idx + 1) + ' 失败:', err.message);
-          tryProxy(url, idx + 1, loading, loadingText, btn);
-        });
-    }
+    // No URL hash receiver needed - bookmarklet copies to clipboard,
+    // user pastes on this page via Ctrl+V
 
     function extractImages(contentEl) {
       var images = [];
