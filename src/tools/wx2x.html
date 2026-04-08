@@ -392,9 +392,9 @@
         </h2>
         <div class="article-preview" id="article-preview"></div>
         <div class="copy-hint">
-          <strong>富文本复制</strong>：直接粘贴到 X Articles 编辑器，保留标题、加粗、列表、引用格式<br/>
-          <strong>纯文本复制</strong>：去除所有格式，适合粘贴到任何地方<br/>
-          <strong>图片</strong>：X 不支持粘贴图片，需在编辑器中手动上传（下方可打包下载）
+          <strong>富文本复制</strong>：粘贴到 X Articles 编辑器，保留标题、加粗、列表、引用格式<br/>
+          <strong>图片位置</strong>：复制后文中会出现 <code>@@@IMG_1@@@</code> 等标记，在 X 编辑器中找到标记位置，删除标记文字，手动插入对应图片<br/>
+          <strong>代码块</strong>：自动转换为引用格式（X Articles 不支持代码块）
         </div>
         <div class="btn-row">
           <button class="btn btn-primary" id="btn-copy">
@@ -617,11 +617,12 @@
           continue;
         }
 
-        // Code blocks: <pre> containing code
+        // Code blocks: <pre> → convert to <blockquote> (X Articles doesn't support <pre><code>)
         if (tag === 'pre') {
           var codeText = child.textContent.trim();
           if (codeText) {
-            html += '<pre><code>' + escHtml(codeText) + '</code></pre>\n';
+            var codeLines = codeText.split('\n').map(function(l) { return escHtml(l); }).join('<br>');
+            html += '<blockquote>' + codeLines + '</blockquote>\n';
           }
           continue;
         }
@@ -811,11 +812,11 @@
       var div = document.createElement('div');
       div.innerHTML = richHtml;
 
-      // Replace images with position markers
+      // Replace images with @@@IMG_N@@@ text markers (same format as x-article-publisher skill)
       div.querySelectorAll('img').forEach(function(img) {
         var idx = img.getAttribute('data-img-idx') || '';
         var marker = document.createElement('p');
-        marker.innerHTML = '<strong>[插入图片 ' + idx + ']</strong>';
+        marker.textContent = '@@@IMG_' + idx + '@@@';
         img.replaceWith(marker);
       });
 
