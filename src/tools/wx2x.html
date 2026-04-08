@@ -776,15 +776,41 @@
       });
     });
 
+    // ===== Generate clean HTML for X Articles editor =====
+    // X Articles only supports: h1, h2, h3, p, strong, em, a, ul, ol, li, blockquote, br
+    // No img, no style, no class, no custom attributes
+    function generateCleanHtml(richHtml) {
+      var div = document.createElement('div');
+      div.innerHTML = richHtml;
+
+      // Remove all images (X doesn't support pasted images)
+      div.querySelectorAll('img').forEach(function(img) { img.remove(); });
+
+      // Remove all style/class attributes recursively
+      div.querySelectorAll('*').forEach(function(el) {
+        el.removeAttribute('style');
+        el.removeAttribute('class');
+        el.removeAttribute('data-src');
+      });
+
+      // Clean up empty paragraphs
+      div.querySelectorAll('p').forEach(function(p) {
+        if (!p.textContent.trim()) p.remove();
+      });
+
+      return div.innerHTML;
+    }
+
     // ===== Copy =====
     document.getElementById('btn-copy').addEventListener('click', function() {
       if (copyFormat === 'rich') {
-        var blob = new Blob([parsedData.richHtml], { type: 'text/html' });
+        var cleanHtml = generateCleanHtml(parsedData.richHtml);
+        var blob = new Blob([cleanHtml], { type: 'text/html' });
         var textBlob = new Blob([parsedData.text], { type: 'text/plain' });
         navigator.clipboard.write([
           new ClipboardItem({ 'text/html': blob, 'text/plain': textBlob })
         ]).then(function() {
-          toast('富文本已复制！直接粘贴到 X Articles', 'ok');
+          toast('已复制！粘贴到 X Articles 编辑器，图片需手动插入', 'ok');
         }).catch(function() {
           fallbackCopy(parsedData.text);
         });
