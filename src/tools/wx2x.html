@@ -157,6 +157,19 @@
     .article-preview li { margin-bottom: 0.3em; }
     .article-preview img { max-width: 100%; border-radius: 6px; margin: 0.8em 0; }
     .article-preview a { color: var(--accent); }
+    .article-preview pre {
+      background: #1e1e2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px; overflow-x: auto; margin: 1em 0;
+    }
+    .article-preview pre code {
+      font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+      color: #cdd6f4; background: none; padding: 0;
+    }
+    .article-preview code {
+      font-family: var(--font-mono); font-size: 0.88em;
+      background: var(--surface); padding: 2px 6px; border-radius: 4px; color: var(--accent);
+    }
+    .article-preview pre code { font-size: 13px; }
     .article-preview .img-placeholder {
       display: flex; align-items: center; gap: 8px; padding: 12px 16px;
       background: var(--surface); border: 1px dashed var(--border); border-radius: 8px;
@@ -592,15 +605,30 @@
 
         if (style.indexOf('display:none') !== -1 || style.indexOf('display: none') !== -1) continue;
 
-        // Images
+        // Images — show inline in preview, mark position for copy
         if (tag === 'img') {
           var src = child.getAttribute('data-src') || child.getAttribute('src') || '';
           if (src && !src.startsWith('data:') && src.indexOf('res.wx.qq.com') === -1) {
             if (src.startsWith('//')) src = 'https:' + src;
             var proxySrc = src.indexOf('mmbiz.qpic.cn') !== -1 ? IMG_PROXY(src) : src;
             state.imgIdx++;
-            html += '<img src="' + escAttr(proxySrc) + '" alt="图片' + state.imgIdx + '" style="max-width:100%;border-radius:6px;margin:0.8em 0;" />\n';
+            html += '<img src="' + escAttr(proxySrc) + '" alt="图片' + state.imgIdx + '" data-img-idx="' + state.imgIdx + '" style="max-width:100%;border-radius:6px;margin:0.8em 0;" />\n';
           }
+          continue;
+        }
+
+        // Code blocks: <pre> containing code
+        if (tag === 'pre') {
+          var codeText = child.textContent.trim();
+          if (codeText) {
+            html += '<pre><code>' + escHtml(codeText) + '</code></pre>\n';
+          }
+          continue;
+        }
+
+        // Inline code
+        if (tag === 'code') {
+          html += '<code>' + escHtml(child.textContent) + '</code>';
           continue;
         }
 
@@ -783,14 +811,20 @@
       var div = document.createElement('div');
       div.innerHTML = richHtml;
 
-      // Remove all images (X doesn't support pasted images)
-      div.querySelectorAll('img').forEach(function(img) { img.remove(); });
+      // Replace images with position markers
+      div.querySelectorAll('img').forEach(function(img) {
+        var idx = img.getAttribute('data-img-idx') || '';
+        var marker = document.createElement('p');
+        marker.innerHTML = '<strong>[插入图片 ' + idx + ']</strong>';
+        img.replaceWith(marker);
+      });
 
-      // Remove all style/class attributes recursively
+      // Remove all style/class/data attributes recursively
       div.querySelectorAll('*').forEach(function(el) {
         el.removeAttribute('style');
         el.removeAttribute('class');
         el.removeAttribute('data-src');
+        el.removeAttribute('data-img-idx');
       });
 
       // Clean up empty paragraphs
