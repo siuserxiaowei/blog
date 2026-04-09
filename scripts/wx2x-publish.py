@@ -162,6 +162,10 @@ def html_to_clean_x_html(raw_html: str, title: str, images: list, img_dir: str) 
     clean = re.sub(r'<(script|style|noscript)[^>]*>.*?</\1>', '', raw_html, flags=re.DOTALL | re.IGNORECASE)
     # Remove hidden elements
     clean = re.sub(r'<[^>]*display:\s*none[^>]*>.*?</[^>]+>', '', clean, flags=re.DOTALL)
+    # Clean HTML entities
+    clean = clean.replace('&nbsp;', ' ')
+    clean = clean.replace('&#160;', ' ')
+    clean = re.sub(r'&amp;nbsp;', ' ', clean)
 
     # Build clean HTML
     lines = []
@@ -361,65 +365,110 @@ def publish_to_x(title: str, html: str, images: list, headless: bool = False):
     with sync_playwright() as p:
         # Use persistent context to keep login state
         user_data_dir = os.path.expanduser("~/.wx2x-browser-data")
-        browser = p.chromium.launch_persistent_context(
-            user_data_dir,
-            headless=headless,
-            args=["--disable-blink-features=AutomationControlled"],
-            viewport={"width": 1280, "height": 900},
-        )
+
+        # Detect proxy from environment
+        proxy_url = os.environ.get("http_proxy") or os.environ.get("HTTP_PROXY") or os.environ.get("https_proxy")
+        launch_opts = {
+            "headless": headless,
+            "args": ["--disable-blink-features=AutomationControlled"],
+            "viewport": {"width": 1280, "height": 900},
+            "timeout": 60000,
+        }
+        if proxy_url:
+            launch_opts["proxy"] = {"server": proxy_url}
+            print(f"  🌐 使用代理: {proxy_url}", file=sys.stderr)
+
+        browser = p.chromium.launch_persistent_context(user_data_dir, **launch_opts)
 
         page = browser.pages[0] if browser.pages else browser.new_page()
 
         # Navigate to X Articles editor
         print("  📝 打开 X Articles 编辑器...", file=sys.stderr)
-        page.goto("https://x.com/compose/articles", wait_until="networkidle", timeout=30000)
+        page.goto("https://x.com/compose/articles", wait_until="domcontentloaded", timeout=60000)
+        time.sleep(5)
+
+        # Check if logged in - wait for user to log in if needed
+        current_url = page.url
+        print(f"  当前页面: {current_url}", file=sys.stderr)
+
+        if "login" in current_url.lower() or "i/flow" in current_url.lower() or "compose/articles" not in current_url.lower():
+            print("\n  ⚠️  需要先登录 X！请在打开的浏览器中登录你的账号。", file=sys.stderr)
+            print("  登录完成后，手动打开 https://x.com/compose/articles", file=sys.stderr)
+            print("  然后回到这里按 Enter 继续...", file=sys.stderr)
+            input()
+            # Refresh current page state
+            page = browser.pages[-1] if browser.pages else browser.new_page()
+            current_url = page.url
+            if "compose/articles" not in current_url:
+                page.goto("https://x.com/compose/articles", wait_until="domcontentloaded", timeout=60000)
+                time.sleep(5)
+
+        # Wait for editor to be ready
+        print("  等待编辑器加载...", file=sys.stderr)
         time.sleep(3)
 
-        # Check if logged in
-        if "login" in page.url.lower() or "i/flow" in page.url.lower():
-            print("\n  ⚠️  需要先登录 X！请在打开的浏览器中登录你的账号。", file=sys.stderr)
-            print("  登录完成后按 Enter 继续...", file=sys.stderr)
-            input()
-            page.goto("https://x.com/compose/articles", wait_until="networkidle", timeout=30000)
-            time.sleep(3)
+        # Take screenshot for debugging
+        page.screenshot(path="/tmp/wx2x_debug.png")
+        print("  截图已保存: /tmp/wx2x_debug.png", file=sys.stderr)
 
         # Click "Create" if needed
         try:
-            create_btn = page.locator('text="Create"').or_(page.locator('text="创建"'))
+            create_btn = page.locator('text="Create"').or_(page.locator('text="创建"')).or_(page.locator('[data-testid="createButton"]'))
             if create_btn.count() > 0:
                 create_btn.first.click()
-                time.sleep(2)
+                time.sleep(3)
+                print("  点击了创建按钮", file=sys.stderr)
         except:
             pass
 
-        # Fill title
+        # Fill title - try multiple selectors
         print("  📌 填入标题...", file=sys.stderr)
-        try:
-            title_input = page.locator('[placeholder="Title"], [placeholder="添加标题"], [data-testid="editor-title"]').first
-            title_input.click()
-            title_input.fill(title)
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"  Warning: Could not find title field: {e}", file=sys.stderr)
+        title_filled = False
+        for selector in ['[placeholder="Title"]', '[placeholder="添加标题"]', '[data-testid="editor-title"]',
+                         '[data-testid="articleTitleTextarea"]', 'textarea', '[contenteditable="true"]']:
+            try:
+                el = page.locator(selector).first
+                if el.is_visible(timeout=2000):
+                    el.click()
+                    el.fill(title)
+                    title_filled = True
+                    print(f"  标题已填入 (via {selector})", file=sys.stderr)
+                    break
+            except:
+                continue
+
+        if not title_filled:
+            print("  ⚠️ 未找到标题输入框，请手动填入标题", file=sys.stderr)
 
         # Paste HTML content
         print("  📋 粘贴文章内容...", file=sys.stderr)
         copy_html_to_clipboard_mac(html)
-        time.sleep(0.5)
+        time.sleep(1)
 
-        # Click on editor body
-        try:
-            editor = page.locator('[data-testid="composer"], [role="textbox"]').last
-            editor.click()
-            time.sleep(0.5)
-        except:
-            # Try clicking any contenteditable
-            page.locator('[contenteditable="true"]').last.click()
-            time.sleep(0.5)
+        # Find and click editor body - try multiple approaches
+        editor_clicked = False
+        for selector in ['[data-testid="composer"]', '[data-testid="articleBodyTextarea"]',
+                         '[role="textbox"]', '[contenteditable="true"]']:
+            try:
+                els = page.locator(selector)
+                # Use last match (body editor, not title)
+                el = els.last if els.count() > 1 else els.first
+                if el.is_visible(timeout=2000):
+                    el.click()
+                    editor_clicked = True
+                    print(f"  编辑器已定位 (via {selector})", file=sys.stderr)
+                    break
+            except:
+                continue
+
+        if not editor_clicked:
+            print("  ⚠️ 未找到编辑器，请手动点击编辑器区域后按 Enter...", file=sys.stderr)
+            input()
 
         # Paste
         page.keyboard.press("Meta+v")
-        time.sleep(2)
+        print("  内容已粘贴", file=sys.stderr)
+        time.sleep(3)
 
         # Insert images (reverse order to maintain positions)
         if images:
