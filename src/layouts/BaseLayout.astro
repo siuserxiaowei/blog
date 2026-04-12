@@ -222,12 +222,33 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <slot />
   </div>
 
-  <!-- ===== Back to Top ===== -->
-  <button id="back-to-top" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-    </svg>
-  </button>
+  <!-- ===== Floating Dock (inspired by qianzhu.me) ===== -->
+  <div class="floating-dock" id="floating-dock" style="opacity: 0; transition: opacity 0.4s ease;">
+    <!-- Theme toggle -->
+    <button class="dock-btn" onclick="toggleTheme()" aria-label="切换主题" id="dock-theme-btn">
+      <svg class="w-5 h-5 dock-dark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <svg class="w-5 h-5 dock-light-icon" style="display:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+      <span class="dock-tooltip">切换主题</span>
+    </button>
+    <!-- Tools -->
+    <a href="/tools/wx2x" class="dock-btn" aria-label="工具箱">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <span class="dock-tooltip">工具箱</span>
+    </a>
+    <!-- Back to top -->
+    <button class="dock-btn" id="dock-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部" style="opacity:0; pointer-events:none; transition: opacity 0.3s ease;">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+      <span class="dock-tooltip">回到顶部</span>
+    </button>
+  </div>
 
   <!-- ====== Scripts ====== -->
 
@@ -384,14 +405,32 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     })();
   </script>
 
-  <!-- Back to Top visibility -->
+  <!-- Floating dock visibility + theme icons -->
   <script is:inline>
     (function() {
-      const btt = document.getElementById('back-to-top');
-      if (!btt) return;
+      const dock = document.getElementById('floating-dock');
+      const topBtn = document.getElementById('dock-top-btn');
+      if (!dock) return;
+
+      // Show dock after scroll
       window.addEventListener('scroll', () => {
-        btt.classList.toggle('visible', window.scrollY > 400);
+        dock.style.opacity = window.scrollY > 200 ? '1' : '0';
+        if (topBtn) {
+          const show = window.scrollY > 400;
+          topBtn.style.opacity = show ? '1' : '0';
+          topBtn.style.pointerEvents = show ? 'auto' : 'none';
+        }
       });
+
+      // Dock theme icons
+      function updateDockIcons() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        document.querySelectorAll('.dock-dark-icon').forEach(el => el.style.display = theme === 'dark' ? 'block' : 'none');
+        document.querySelectorAll('.dock-light-icon').forEach(el => el.style.display = theme === 'light' ? 'block' : 'none');
+      }
+      updateDockIcons();
+      const obs = new MutationObserver(updateDockIcons);
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     })();
   </script>
 
@@ -438,9 +477,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         revealEls.forEach(el => obs.observe(el));
       }
 
-      // Re-init back to top
-      const btt = document.getElementById('back-to-top');
-      if (btt) btt.classList.toggle('visible', window.scrollY > 400);
+      // Re-init floating dock visibility
+      const dock = document.getElementById('floating-dock');
+      if (dock) dock.style.opacity = window.scrollY > 200 ? '1' : '0';
 
       // Scroll to top on navigation
       window.scrollTo(0, 0);
