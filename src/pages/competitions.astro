@@ -232,61 +232,271 @@ const sCount = enriched.filter(c => c.tier === 'S').length;
 const dataJSON = JSON.stringify(enriched);
 ---
 
-<BaseLayout title="AI 硬件比赛雷达 · siuser小伟" description="AI 硬件方案商的产业型赛事调研看板，含截止倒计时、匹配度、参赛策略。">
+<BaseLayout title="AI 硬件比赛雷达 · siuser小伟" description="AI 硬件方案商的产业型赛事调研看板。">
   <Header />
 
-  <main class="cp-page">
-    <div class="cp-wrap">
+  <main class="min-h-screen pt-24 pb-20" style="background:#f8fafc;color:#0f172a;font-family:Inter,'PingFang SC',system-ui,sans-serif;">
+    <div class="max-w-7xl mx-auto px-6">
 
-      <div class="cp-head">
+      <!-- 顶部标题 + 统计 -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <p class="cp-eyebrow">Competition Radar · 2026-04-14</p>
-          <h1 class="cp-title">AI 硬件比赛 <span>对比调研看板</span></h1>
-          <p class="cp-subtitle">面向 AI 硬件方案商 / 早期硬件创业团队的产业型赛事数据库。重点看「能不能拿订单、能不能上量、能不能拿政府/资本背书」。学生科创赛已剔除。</p>
+          <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-blue-600 mb-2">Competition Radar · 2026-04-14</p>
+          <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight" style="color:#0f172a;">
+            AI 硬件比赛 <span class="text-blue-600">对比调研看板</span>
+          </h1>
+          <p class="text-sm leading-relaxed mt-3 max-w-2xl" style="color:#64748b;">面向 AI 硬件方案商 / 早期硬件创业团队的产业型赛事数据库。重点看「能不能拿订单、能不能上量、能不能拿政府/资本背书」。</p>
         </div>
-        <div class="cp-stats">
-          <div class="cp-stat"><b>{enriched.length}</b><span>赛事总数</span></div>
-          <div class="cp-stat danger"><b>{sCount}</b><span>S 级强推</span></div>
-          <div class="cp-stat warn"><b>{urgentCount}</b><span>14 天紧急</span></div>
-          <div class="cp-stat dim"><b>{expiredCount}</b><span>已过期</span></div>
+        <div class="flex gap-3 flex-wrap">
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-slate-900">{enriched.length}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">赛事总数</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-rose-600">{sCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">S 级强推</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-amber-600">{urgentCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">14 天紧急</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-slate-400 line-through">{expiredCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">已过期</div>
+          </div>
         </div>
       </div>
 
-      <div class="cp-banner">
-        <div class="cp-banner-blob1"></div>
-        <div class="cp-banner-blob2"></div>
-        <div class="cp-banner-inner">
-          <div class="cp-banner-main">
-            <div class="cp-banner-tag">● 核心结论 · 团队当前优先建议</div>
-            <h2>主攻：嘉立创星火大赛</h2>
-            <p>方案商最稀缺的不是奖金证书，而是「订单 + 上量通道 + 政策资金」。星火大赛与方案商模型最贴合，非开源机制保护核心 IP，资源偏向量产与产业落地。京东 JoyInside 已于昨日 (4/13) 截止，外滩/AttraX 这类只做曝光的可作为副线丰富品牌叙事。</p>
-            <div class="cp-banner-pills">
-              <span>主攻 · 嘉立创星火</span>
-              <span>政策 · 创客中国 + 中国创新创业大赛</span>
-              <span>渠道 · 小米生态链</span>
+      <!-- 顶部蓝色结论横幅 -->
+      <div class="relative overflow-hidden rounded-[2rem] p-8 md:p-10 text-white shadow-2xl mb-10" style="background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#4338ca 100%);box-shadow:0 25px 50px -15px rgba(37,99,235,.4);">
+        <div class="absolute top-0 right-0 w-72 h-72 rounded-full -mr-32 -mt-32 blur-3xl" style="background:rgba(255,255,255,.1);"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 rounded-full -ml-24 -mb-24 blur-2xl" style="background:rgba(147,197,253,.2);"></div>
+        <div class="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+          <div class="flex-1 space-y-5">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border" style="background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3);backdrop-filter:blur(8px);">
+              <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
+              核心结论 · 团队当前优先建议
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight text-white">主攻：嘉立创星火大赛</h2>
+            <p class="text-base md:text-lg leading-relaxed max-w-3xl" style="color:rgba(219,234,254,.95);">方案商最稀缺的不是奖金证书，而是「订单 + 上量通道 + 政策资金」。星火大赛与方案商模型最贴合，非开源机制保护核心 IP，资源偏向量产与产业落地。京东 JoyInside 已于昨日 (4/13) 截止，外滩/AttraX 这类只做曝光的可作为副线丰富品牌叙事。</p>
+            <div class="flex flex-wrap gap-3 pt-1">
+              <span class="px-4 py-2 rounded-2xl border text-sm font-bold text-white" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);">主攻 · 嘉立创星火</span>
+              <span class="px-4 py-2 rounded-2xl border text-sm font-bold text-white" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);">政策 · 创客中国 + 中国创新创业大赛</span>
+              <span class="px-4 py-2 rounded-2xl border text-sm font-bold text-white" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25);">渠道 · 小米生态链</span>
             </div>
           </div>
-          <div class="cp-banner-aside">
-            <p class="cp-aside-label">14 天紧急清单</p>
-            <ul id="urgent-list"></ul>
+          <div class="w-full md:w-72 rounded-3xl p-6 border" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);backdrop-filter:blur(20px);">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style="color:#bfdbfe;">14 天紧急清单</p>
+            <ul class="space-y-2.5">
+              {enriched.filter(c=>c.status.kind==='urgent').sort((a,b)=>a.status.days-b.status.days).map(c=>(
+                <li class="flex items-center justify-between gap-2">
+                  <button data-jump={c.id} class="text-left flex-1 text-white font-bold text-sm hover:underline">{c.name}</button>
+                  <span class="text-xs font-mono" style="color:#fde68a;">{c.status.days}d</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
 
-      <div class="cp-filters" id="filter-bar"></div>
-
-      <div class="cp-layout">
-        <aside class="cp-side">
-          <div class="cp-side-head">
-            <h3>赛事列表</h3>
-            <span id="list-count"></span>
-          </div>
-          <div id="comp-list" class="cp-list"></div>
-        </aside>
-        <section class="cp-detail" id="comp-detail"></section>
+      <!-- 筛选条 -->
+      <div class="flex flex-wrap gap-2 items-center mb-8">
+        <button data-fcat="全部" class="filter-cat px-4 py-2 rounded-full text-xs font-bold bg-blue-600 text-white">全部</button>
+        {[...new Set(enriched.map(c=>c.cat))].map(cat=>(
+          <button data-fcat={cat} class="filter-cat px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">{cat}</button>
+        ))}
+        <span class="mx-2 text-slate-300">|</span>
+        <button data-ftier="全部" class="filter-tier px-4 py-2 rounded-full text-xs font-bold bg-blue-600 text-white">全部等级</button>
+        {['S','A','B'].map(t=>(
+          <button data-ftier={t} class="filter-tier px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">{t} 级</button>
+        ))}
       </div>
 
-      <div class="cp-foot">数据更新于 2026-04-14 · 报名时间以主办方公告为准 · 团队内部决策参考</div>
+      <!-- 双栏布局 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- 左侧列表 -->
+        <aside class="lg:col-span-1 space-y-4">
+          <div class="flex items-center justify-between px-2">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">赛事列表</h3>
+            <span id="list-count" class="text-xs font-bold text-slate-400">{enriched.length} 个项目</span>
+          </div>
+          <div class="space-y-3 max-h-[1200px] overflow-y-auto pr-2">
+            {enriched.map(c=>(
+              <button
+                data-id={c.id}
+                data-cat={c.cat}
+                data-tier={c.tier}
+                data-status={c.status.kind}
+                data-match={c.match}
+                class:list={[
+                  "cp-list-item w-full text-left p-5 rounded-2xl border-2 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+                  c.status.kind === 'expired' ? 'border-slate-100 opacity-55' : 'border-slate-100'
+                ]}
+              >
+                <div class="flex justify-between items-start gap-2 mb-2">
+                  <h4 class="text-base font-black text-slate-800 leading-tight">{c.name}</h4>
+                  <span class:list={[
+                    "px-2.5 py-0.5 rounded-full text-[11px] font-extrabold whitespace-nowrap",
+                    c.tier === 'S' && "bg-rose-100 text-rose-700",
+                    c.tier === 'A' && "bg-blue-100 text-blue-700",
+                    c.tier === 'B' && "bg-cyan-100 text-cyan-700",
+                  ]}>{c.tier} 级</span>
+                </div>
+                <div class="flex gap-1.5 flex-wrap mb-3">
+                  <span class:list={[
+                    "px-2.5 py-0.5 rounded-full text-[11px] font-bold",
+                    c.status.kind === 'expired' && "bg-slate-200 text-slate-500 line-through",
+                    c.status.kind === 'urgent' && "bg-amber-100 text-amber-700 animate-pulse",
+                    c.status.kind === 'ongoing' && "bg-emerald-100 text-emerald-700",
+                    c.status.kind === 'upcoming' && "bg-slate-100 text-slate-500",
+                  ]}>{c.status.label}</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600">{c.cat}</span>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed font-medium mb-3 line-clamp-2">{c.desc}</p>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400 font-bold">匹配度</span>
+                  <span class="font-black text-blue-600 text-lg">{c.match.toFixed(1)} <span class="text-slate-300 text-xs font-bold">/ 10</span></span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <!-- 右侧详情面板 -->
+        <section class="lg:col-span-2 space-y-6">
+          {enriched.map((c, i)=>(
+            <div data-detail={c.id} class:list={["detail-panel space-y-6", i !== 0 && "hidden"]}>
+              <!-- 头部卡片 -->
+              <div class="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl shadow-slate-200/50">
+                <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
+                  <div class="space-y-4 flex-1 min-w-0">
+                    <div class="flex flex-wrap gap-2">
+                      <span class:list={[
+                        "px-3 py-1 rounded-full text-xs font-extrabold",
+                        c.tier === 'S' && "bg-rose-100 text-rose-700",
+                        c.tier === 'A' && "bg-blue-100 text-blue-700",
+                        c.tier === 'B' && "bg-cyan-100 text-cyan-700",
+                      ]}>{c.tier} 级</span>
+                      <span class:list={[
+                        "px-3 py-1 rounded-full text-xs font-bold",
+                        c.status.kind === 'expired' && "bg-slate-200 text-slate-500 line-through",
+                        c.status.kind === 'urgent' && "bg-amber-100 text-amber-700 animate-pulse",
+                        c.status.kind === 'ongoing' && "bg-emerald-100 text-emerald-700",
+                        c.status.kind === 'upcoming' && "bg-slate-100 text-slate-500",
+                      ]}>{c.status.label}</span>
+                      <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">主办方信用 {c.rel}</span>
+                      <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">{c.cat}</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">{c.fullName}</h2>
+                    <div class="flex flex-wrap gap-y-2 gap-x-6 text-sm font-bold text-slate-500">
+                      <span>📍 {c.loc}</span>
+                      <span>📅 {c.date}</span>
+                      <span>🏛 {c.org}</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-center justify-center bg-slate-900 rounded-[2rem] p-6 min-w-[140px] shadow-2xl">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-1">匹配度</span>
+                    <span class="text-5xl font-black text-white leading-none">{c.match.toFixed(1)}</span>
+                    <span class="text-xs text-slate-500 mt-1">/ 10.0</span>
+                    <div class="w-12 h-1 bg-blue-500 mt-3 rounded-full"></div>
+                    <span class="text-xs text-blue-300 font-bold mt-2">{c.suit}</span>
+                  </div>
+                </div>
+
+                <!-- 时间轴 -->
+                <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 uppercase tracking-[0.18em] mb-6">
+                  <span class="w-1 h-5 bg-blue-600 rounded-full"></span>关键时间节点
+                </h4>
+                <div class="relative pt-6 pb-4 mb-8">
+                  <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-100 rounded-full -translate-y-1/2"></div>
+                  <div class="relative flex justify-between gap-2">
+                    {c.timeline.map(n=>{
+                      const past = new Date(n.date) < new Date('2026-04-14');
+                      return (
+                        <div class="flex flex-col items-center flex-1 min-w-0">
+                          <div class:list={[
+                            "w-5 h-5 rounded-full border-4 border-white shadow",
+                            past && "bg-slate-300",
+                            !past && n.critical && "bg-rose-500 ring-4 ring-rose-100 scale-125",
+                            !past && !n.critical && "bg-blue-500 ring-4 ring-blue-100",
+                          ]}></div>
+                          <p class:list={["text-[11px] font-black text-center mt-3 mb-0.5", n.critical ? "text-slate-900" : "text-slate-400"]}>{n.event}</p>
+                          <small class="text-[10px] font-mono text-slate-500">{n.date}</small>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 uppercase tracking-[0.18em] mb-3">
+                      <span class="w-1 h-5 bg-blue-600 rounded-full"></span>赛事定位
+                    </h4>
+                    <p class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100 font-medium">{c.desc}</p>
+                  </div>
+                  <div>
+                    <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 uppercase tracking-[0.18em] mb-3">
+                      <span class="w-1 h-5 bg-blue-600 rounded-full"></span>参赛打法
+                    </h4>
+                    <p class="text-sm text-blue-900 leading-relaxed bg-blue-50 p-4 rounded-2xl border border-blue-100 font-bold">{c.strategy}</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 uppercase tracking-[0.18em] mb-3">
+                      <span class="w-1 h-5 bg-blue-600 rounded-full"></span>核心奖励 / 资源
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                      {c.rewards.map(r=>(
+                        <span class="text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100 px-3 py-1.5 rounded-lg">{r}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 uppercase tracking-[0.18em] mb-3">
+                      <span class="w-1 h-5 bg-blue-600 rounded-full"></span>必胜卖点
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                      {c.winning.map(w=>(
+                        <span class="text-[11px] font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">{w}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 优势 / 难点 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50">
+                  <h4 class="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">✓ 优势</h4>
+                  <ul class="space-y-2">
+                    {c.pros.map(p=>(
+                      <li class="flex gap-2 text-sm font-bold text-slate-700"><span class="text-emerald-500">●</span>{p}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50">
+                  <h4 class="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-4">⚠ 难点 / 风险</h4>
+                  <ul class="space-y-2">
+                    {c.cons.map(p=>(
+                      <li class="flex gap-2 text-sm font-bold text-slate-700"><span class="text-amber-500">●</span>{p}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <a href={c.url} target="_blank" rel="noopener" class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-black text-base py-5 rounded-[2rem] shadow-2xl shadow-blue-200/50 transition-all hover:-translate-y-1">
+                访问官方报名页 →
+              </a>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <div class="text-center text-xs text-slate-400 pt-12 mt-12 border-t border-slate-200">数据更新于 2026-04-14 · 报名时间以主办方公告为准 · 团队内部决策参考</div>
 
     </div>
   </main>
@@ -295,297 +505,82 @@ const dataJSON = JSON.stringify(enriched);
 </BaseLayout>
 
 <style is:global>
-  :root { --cp-blue:#2563eb; --cp-blue-dark:#1d4ed8; }
-  body:has(.cp-page) { background:#f8fafc !important; }
+  body:has(.cp-page-marker) { background:#f8fafc !important; }
+  /* 选中态高亮（动态加 class，需要静态存在让 Tailwind 抓到） */
+  .cp-list-item.is-active { border-color:#2563eb !important; box-shadow:0 20px 40px -20px rgba(37,99,235,.35); transform:translateY(-2px); }
+  .cp-list-item.is-active h4 { color:#2563eb !important; }
 </style>
 
-<style>
-  .cp-page { min-height:100vh; padding:96px 0 80px; background:#f8fafc; color:#0f172a; font-family:'Inter','PingFang SC',system-ui,sans-serif; }
-  .cp-page *,.cp-page *::before,.cp-page *::after { box-sizing:border-box; }
-  .cp-wrap { max-width:1280px; margin:0 auto; padding:0 24px; }
+<div class="cp-page-marker hidden"></div>
 
-  .cp-head { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:32px; }
-  .cp-eyebrow { font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:var(--cp-blue); margin:0 0 8px; }
-  .cp-title { font-size:48px; font-weight:900; line-height:1.05; letter-spacing:-1.5px; margin:0; color:#0f172a; }
-  .cp-title span { color:var(--cp-blue); }
-  .cp-subtitle { color:#64748b; font-size:14px; line-height:1.65; max-width:640px; margin:14px 0 0; }
+<script is:inline>
+  (function(){
+    let selectedId = document.querySelector('[data-id]')?.dataset.id;
+    let fCat = '全部', fTier = '全部';
 
-  .cp-stats { display:flex; gap:12px; flex-wrap:wrap; }
-  .cp-stat { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:14px 20px; box-shadow:0 1px 3px rgba(0,0,0,.04); min-width:88px; }
-  .cp-stat b { display:block; font-size:26px; font-weight:900; color:#0f172a; line-height:1; }
-  .cp-stat span { display:block; font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:.12em; font-weight:800; margin-top:6px; }
-  .cp-stat.danger b { color:#dc2626; }
-  .cp-stat.warn b { color:#d97706; }
-  .cp-stat.dim b { color:#94a3b8; text-decoration:line-through; }
+    const items = Array.from(document.querySelectorAll('[data-id]'));
+    const panels = Array.from(document.querySelectorAll('[data-detail]'));
+    const countEl = document.getElementById('list-count');
 
-  .cp-banner { position:relative; overflow:hidden; border-radius:32px; padding:40px; color:#fff; box-shadow:0 25px 50px -15px rgba(37,99,235,.35); background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#4338ca 100%); margin-bottom:32px; }
-  .cp-banner-blob1 { position:absolute; top:-100px; right:-100px; width:280px; height:280px; background:rgba(255,255,255,.1); border-radius:50%; filter:blur(60px); }
-  .cp-banner-blob2 { position:absolute; bottom:-80px; left:-80px; width:200px; height:200px; background:rgba(147,197,253,.2); border-radius:50%; filter:blur(40px); }
-  .cp-banner-inner { position:relative; display:flex; gap:32px; align-items:flex-start; flex-wrap:wrap; }
-  .cp-banner-main { flex:1; min-width:280px; }
-  .cp-banner-tag { display:inline-block; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); padding:6px 16px; border-radius:999px; font-size:12px; font-weight:700; backdrop-filter:blur(8px); margin-bottom:18px; color:#fff; }
-  .cp-banner h2 { font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-1px; margin:0 0 16px; color:#fff; }
-  .cp-banner p { font-size:15px; line-height:1.7; color:rgba(219,234,254,.95); margin:0 0 20px; max-width:680px; }
-  .cp-banner-pills { display:flex; gap:10px; flex-wrap:wrap; }
-  .cp-banner-pills span { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); padding:8px 16px; border-radius:14px; font-size:13px; font-weight:700; color:#fff; }
-  .cp-banner-aside { width:280px; background:rgba(255,255,255,.1); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.2); border-radius:24px; padding:22px; }
-  .cp-aside-label { font-size:10px; font-weight:900; letter-spacing:.2em; text-transform:uppercase; color:#bfdbfe; margin:0 0 14px; }
-  .cp-banner-aside ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
-  .cp-banner-aside li { display:flex; justify-content:space-between; gap:8px; align-items:center; }
-  .cp-banner-aside li button { background:none; border:none; color:#fff; font-weight:700; font-size:14px; cursor:pointer; padding:0; text-align:left; flex:1; font-family:inherit; }
-  .cp-banner-aside li button:hover { text-decoration:underline; }
-  .cp-banner-aside li span { color:#fde68a; font-size:12px; font-family:ui-monospace,monospace; }
+    function applySelect(){
+      items.forEach(it => it.classList.toggle('is-active', it.dataset.id === selectedId));
+      panels.forEach(p => p.classList.toggle('hidden', p.dataset.detail !== selectedId));
+    }
 
-  .cp-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:24px; }
-  .cp-filters .sep { color:#cbd5e1; padding:0 4px; }
-  .cp-chip { padding:8px 16px; border-radius:999px; font-size:13px; font-weight:700; background:#f1f5f9; color:#475569; cursor:pointer; border:1px solid transparent; transition:.2s; font-family:inherit; }
-  .cp-chip:hover { background:#e2e8f0; }
-  .cp-chip.active { background:var(--cp-blue); color:#fff; }
+    function applyFilter(){
+      let visible = 0;
+      items.forEach(it => {
+        const ok = (fCat === '全部' || it.dataset.cat === fCat) && (fTier === '全部' || it.dataset.tier === fTier);
+        it.classList.toggle('hidden', !ok);
+        if (ok) visible++;
+      });
+      countEl.textContent = visible + ' 个项目';
+      // 如果当前选中的被筛掉，自动选第一个可见项
+      const cur = items.find(it => it.dataset.id === selectedId);
+      if (cur && cur.classList.contains('hidden')) {
+        const first = items.find(it => !it.classList.contains('hidden'));
+        if (first) { selectedId = first.dataset.id; applySelect(); }
+      }
+    }
 
-  .cp-layout { display:grid; grid-template-columns:1fr 2fr; gap:32px; }
-  @media (max-width:1024px){ .cp-layout { grid-template-columns:1fr; } }
+    items.forEach(it => it.addEventListener('click', () => { selectedId = it.dataset.id; applySelect(); }));
 
-  .cp-side-head { display:flex; justify-content:space-between; align-items:center; padding:0 8px; margin-bottom:14px; }
-  .cp-side-head h3 { font-size:11px; font-weight:900; color:#94a3b8; letter-spacing:.2em; text-transform:uppercase; margin:0; }
-  .cp-side-head span { font-size:12px; font-weight:700; color:#94a3b8; }
-  .cp-list { display:flex; flex-direction:column; gap:12px; max-height:1100px; overflow-y:auto; padding-right:8px; }
-  .cp-list::-webkit-scrollbar { width:6px; }
-  .cp-list::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
-
-  .cp-item { width:100%; text-align:left; padding:18px; border-radius:18px; background:#fff; border:2px solid #f1f5f9; cursor:pointer; transition:all .25s; font-family:inherit; }
-  .cp-item:hover { transform:translateY(-2px); border-color:#e2e8f0; box-shadow:0 8px 16px -8px rgba(0,0,0,.08); }
-  .cp-item.active { border-color:var(--cp-blue); box-shadow:0 20px 40px -20px rgba(37,99,235,.35); transform:translateY(-2px); }
-  .cp-item.active .cp-item-name { color:var(--cp-blue); }
-  .cp-item.expired { opacity:.55; }
-  .cp-item-row1 { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px; }
-  .cp-item-name { font-size:16px; font-weight:900; color:#1e293b; line-height:1.3; }
-  .cp-item-row2 { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
-  .cp-item-desc { font-size:12px; color:#64748b; line-height:1.55; font-weight:500; margin:0 0 12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .cp-item-bot { display:flex; justify-content:space-between; align-items:center; font-size:11px; }
-  .cp-item-bot .lbl { color:#94a3b8; font-weight:700; }
-  .cp-item-bot .val { font-size:18px; font-weight:900; color:var(--cp-blue); }
-  .cp-item-bot .val small { color:#cbd5e1; font-size:11px; font-weight:700; }
-
-  .cp-badge { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; }
-  .cp-bd-S { background:#fee2e2; color:#b91c1c; }
-  .cp-bd-A { background:#dbeafe; color:#1d4ed8; }
-  .cp-bd-B { background:#cffafe; color:#0e7490; }
-  .cp-bd-cat { background:#f1f5f9; color:#475569; }
-  .cp-bd-rel { background:#dcfce7; color:#15803d; }
-  .cp-st-expired { background:#e5e7eb; color:#6b7280; text-decoration:line-through; }
-  .cp-st-urgent { background:#fef3c7; color:#b45309; animation:cpPulse 1.6s infinite; }
-  .cp-st-ongoing { background:#dcfce7; color:#15803d; }
-  .cp-st-upcoming { background:#f1f5f9; color:#475569; }
-  @keyframes cpPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
-
-  .cp-detail { animation:cpFade .35s ease; }
-  @keyframes cpFade { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-
-  .cp-card { background:#fff; border-radius:32px; padding:36px; box-shadow:0 25px 50px -25px rgba(0,0,0,.1); margin-bottom:24px; }
-  .cp-card h2.cp-fname { font-size:32px; font-weight:900; line-height:1.15; letter-spacing:-.5px; margin:14px 0; color:#0f172a; }
-  .cp-meta-row { display:flex; gap:6px; flex-wrap:wrap; }
-  .cp-meta-info { display:flex; gap:24px; flex-wrap:wrap; font-size:13px; font-weight:700; color:#64748b; margin-top:8px; }
-
-  .cp-card-row { display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:32px; }
-  .cp-score-box { background:#0f172a; border-radius:32px; padding:24px; display:flex; flex-direction:column; align-items:center; min-width:140px; box-shadow:0 20px 40px -20px rgba(0,0,0,.3); }
-  .cp-score-box .lbl { font-size:10px; font-weight:900; color:#64748b; letter-spacing:.25em; text-transform:uppercase; margin-bottom:4px; }
-  .cp-score-box .val { font-size:48px; font-weight:900; color:#fff; line-height:1; }
-  .cp-score-box .max { font-size:12px; color:#475569; margin-top:4px; }
-  .cp-score-box .bar { width:48px; height:4px; background:var(--cp-blue); border-radius:999px; margin:12px 0 8px; }
-  .cp-score-box .suit { font-size:12px; color:#93c5fd; font-weight:700; }
-
-  .cp-section-h { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:900; color:#0f172a; letter-spacing:.18em; text-transform:uppercase; margin:0 0 14px; }
-  .cp-section-h::before { content:''; width:4px; height:18px; background:var(--cp-blue); border-radius:999px; }
-
-  .cp-timeline { position:relative; padding:24px 0 8px; margin-bottom:28px; }
-  .cp-timeline-line { position:absolute; top:50%; left:0; right:0; height:4px; background:#f1f5f9; border-radius:999px; transform:translateY(-50%); }
-  .cp-timeline-nodes { position:relative; display:flex; justify-content:space-between; }
-  .cp-tnode { display:flex; flex-direction:column; align-items:center; flex:1; padding:0 4px; min-width:0; }
-  .cp-tdot { width:20px; height:20px; border-radius:50%; border:4px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.1); background:#cbd5e1; }
-  .cp-tdot.upcoming { background:#3b82f6; box-shadow:0 0 0 6px rgba(59,130,246,.18); }
-  .cp-tdot.critical { background:#ef4444; box-shadow:0 0 0 6px rgba(239,68,68,.18); transform:scale(1.15); }
-  .cp-tnode p { font-size:11px; font-weight:900; color:#94a3b8; text-align:center; margin:12px 0 2px; }
-  .cp-tnode p.crit { color:#0f172a; }
-  .cp-tnode small { font-size:10px; color:#94a3b8; font-family:ui-monospace,monospace; }
-
-  .cp-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
-  @media (max-width:720px){ .cp-grid2 { grid-template-columns:1fr; } }
-
-  .cp-block { background:#f8fafc; border:1px solid #f1f5f9; border-radius:18px; padding:18px; }
-  .cp-block.blue { background:#eff6ff; border-color:#dbeafe; }
-  .cp-block p { font-size:13px; color:#475569; line-height:1.7; margin:0; font-weight:500; }
-  .cp-block.blue p { color:#1e3a8a; font-weight:700; }
-
-  .cp-rewards { display:flex; flex-wrap:wrap; gap:8px; }
-  .cp-rwd { font-size:12px; font-weight:700; background:#fff1f2; color:#be123c; border:1px solid #ffe4e6; padding:6px 12px; border-radius:10px; }
-  .cp-wpoints { display:flex; flex-wrap:wrap; gap:6px; }
-  .cp-wpoint { font-size:11px; font-weight:700; background:#e0e7ff; color:#3730a3; padding:4px 10px; border-radius:999px; }
-
-  .cp-pc-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
-  @media (max-width:720px){ .cp-pc-grid { grid-template-columns:1fr; } }
-  .cp-pc { background:#fff; border-radius:24px; padding:22px; box-shadow:0 12px 24px -16px rgba(0,0,0,.08); }
-  .cp-pc h4 { font-size:11px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; margin:0 0 14px; }
-  .cp-pc.pros h4 { color:#059669; }
-  .cp-pc.cons h4 { color:#d97706; }
-  .cp-pc ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
-  .cp-pc li { font-size:13px; font-weight:700; color:#334155; display:flex; gap:10px; }
-  .cp-pc.pros li::before { content:'●'; color:#10b981; }
-  .cp-pc.cons li::before { content:'●'; color:#f59e0b; }
-
-  .cp-cta { display:block; text-align:center; background:var(--cp-blue); color:#fff; font-weight:900; font-size:16px; padding:22px; border-radius:24px; text-decoration:none; box-shadow:0 20px 40px -15px rgba(37,99,235,.4); transition:.2s; }
-  .cp-cta:hover { background:var(--cp-blue-dark); transform:translateY(-2px); }
-
-  .cp-foot { text-align:center; font-size:12px; color:#94a3b8; padding:48px 0 0; margin-top:48px; border-top:1px solid #e2e8f0; }
-</style>
-
-<script is:inline define:vars={{ dataJSON }}>
-  const data = JSON.parse(dataJSON);
-  const cats = ['全部', ...new Set(data.map(d => d.cat))];
-  let fCat='全部', fTier='全部', selectedId=data[0].id;
-
-  const tierBadge = (t)=>`<span class="cp-badge cp-bd-${t}">${t} 级</span>`;
-  const statusBadge = (s)=>`<span class="cp-badge cp-st-${s.kind}">${s.label}</span>`;
-
-  const urgentEl = document.getElementById('urgent-list');
-  data.filter(d=>d.status.kind==='urgent').sort((a,b)=>a.status.days-b.status.days).forEach(d=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<button data-jump="${d.id}">${d.name}</button><span>${d.status.days}d</span>`;
-    urgentEl.appendChild(li);
-  });
-  urgentEl.querySelectorAll('button').forEach(b=>{
-    b.onclick = ()=>{ selectedId = b.dataset.jump; render(); document.getElementById('comp-detail').scrollIntoView({behavior:'smooth',block:'start'}); };
-  });
-
-  function renderFilters(){
-    const bar = document.getElementById('filter-bar'); bar.innerHTML = '';
-    cats.forEach(c=>{
-      const b = document.createElement('button');
-      b.className = 'cp-chip'+(fCat===c?' active':'');
-      b.textContent = c;
-      b.onclick = ()=>{ fCat=c; render(); };
-      bar.appendChild(b);
+    document.querySelectorAll('.filter-cat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        fCat = btn.dataset.fcat;
+        document.querySelectorAll('.filter-cat').forEach(b => {
+          const active = b.dataset.fcat === fCat;
+          b.classList.toggle('bg-blue-600', active);
+          b.classList.toggle('text-white', active);
+          b.classList.toggle('bg-slate-100', !active);
+          b.classList.toggle('text-slate-600', !active);
+        });
+        applyFilter();
+      });
     });
-    const sep = document.createElement('span'); sep.className='sep'; sep.textContent='|'; bar.appendChild(sep);
-    ['全部','S','A','B'].forEach(t=>{
-      const b = document.createElement('button');
-      b.className = 'cp-chip'+(fTier===t?' active':'');
-      b.textContent = t==='全部'?'全部等级':(t+' 级');
-      b.onclick = ()=>{ fTier=t; render(); };
-      bar.appendChild(b);
+
+    document.querySelectorAll('.filter-tier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        fTier = btn.dataset.ftier;
+        document.querySelectorAll('.filter-tier').forEach(b => {
+          const active = b.dataset.ftier === fTier;
+          b.classList.toggle('bg-blue-600', active);
+          b.classList.toggle('text-white', active);
+          b.classList.toggle('bg-slate-100', !active);
+          b.classList.toggle('text-slate-600', !active);
+        });
+        applyFilter();
+      });
     });
-  }
 
-  function renderList(){
-    const order = { urgent:0, ongoing:1, upcoming:2, expired:3 };
-    const list = data.filter(d=>(fCat==='全部'||d.cat===fCat)&&(fTier==='全部'||d.tier===fTier))
-      .sort((a,b)=>{ const so=order[a.status.kind]-order[b.status.kind]; return so!==0?so:b.match-a.match; });
-    document.getElementById('list-count').textContent = `${list.length} 个项目`;
-    const el = document.getElementById('comp-list'); el.innerHTML = '';
-    list.forEach(d=>{
-      const div = document.createElement('button');
-      div.className = `cp-item ${selectedId===d.id?'active':''} ${d.status.kind==='expired'?'expired':''}`;
-      div.innerHTML = `
-        <div class="cp-item-row1">
-          <div class="cp-item-name">${d.name}</div>
-          ${tierBadge(d.tier)}
-        </div>
-        <div class="cp-item-row2">${statusBadge(d.status)}<span class="cp-badge cp-bd-cat">${d.cat}</span></div>
-        <p class="cp-item-desc">${d.desc}</p>
-        <div class="cp-item-bot">
-          <span class="lbl">匹配度</span>
-          <span class="val">${d.match.toFixed(1)} <small>/ 10</small></span>
-        </div>
-      `;
-      div.onclick = ()=>{ selectedId=d.id; render(); };
-      el.appendChild(div);
+    document.querySelectorAll('[data-jump]').forEach(b => {
+      b.addEventListener('click', () => {
+        selectedId = b.dataset.jump;
+        applySelect();
+        document.querySelector('[data-detail="'+selectedId+'"]')?.scrollIntoView({behavior:'smooth',block:'start'});
+      });
     });
-  }
 
-  function renderDetail(){
-    const d = data.find(x=>x.id===selectedId) || data[0];
-    const today = new Date('2026-04-14');
-    const el = document.getElementById('comp-detail');
-    el.innerHTML = `
-      <div class="cp-card">
-        <div class="cp-card-row">
-          <div style="flex:1;min-width:280px;">
-            <div class="cp-meta-row">
-              ${tierBadge(d.tier)}
-              ${statusBadge(d.status)}
-              <span class="cp-badge cp-bd-rel">主办方信用 ${d.rel}</span>
-              <span class="cp-badge cp-bd-cat">${d.cat}</span>
-            </div>
-            <h2 class="cp-fname">${d.fullName}</h2>
-            <div class="cp-meta-info">
-              <span>📍 ${d.loc}</span>
-              <span>📅 ${d.date}</span>
-              <span>🏛 ${d.org}</span>
-            </div>
-          </div>
-          <div class="cp-score-box">
-            <span class="lbl">匹配度</span>
-            <span class="val">${d.match.toFixed(1)}</span>
-            <span class="max">/ 10.0</span>
-            <div class="bar"></div>
-            <span class="suit">${d.suit}</span>
-          </div>
-        </div>
-
-        <h4 class="cp-section-h">关键时间节点</h4>
-        <div class="cp-timeline">
-          <div class="cp-timeline-line"></div>
-          <div class="cp-timeline-nodes">
-            ${d.timeline.map(n=>{
-              const past = new Date(n.date) < today;
-              const cls = past ? '' : (n.critical ? 'critical' : 'upcoming');
-              return `<div class="cp-tnode">
-                <div class="cp-tdot ${cls}"></div>
-                <p class="${n.critical?'crit':''}">${n.event}</p>
-                <small>${n.date}</small>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <div class="cp-grid2">
-          <div>
-            <h4 class="cp-section-h">赛事定位</h4>
-            <div class="cp-block"><p>${d.desc}</p></div>
-          </div>
-          <div>
-            <h4 class="cp-section-h">参赛打法</h4>
-            <div class="cp-block blue"><p>${d.strategy}</p></div>
-          </div>
-        </div>
-
-        <div class="cp-grid2">
-          <div>
-            <h4 class="cp-section-h">核心奖励 / 资源</h4>
-            <div class="cp-rewards">${d.rewards.map(r=>`<span class="cp-rwd">${r}</span>`).join('')}</div>
-          </div>
-          <div>
-            <h4 class="cp-section-h">必胜卖点</h4>
-            <div class="cp-wpoints">${d.winning.map(w=>`<span class="cp-wpoint">${w}</span>`).join('')}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cp-pc-grid">
-        <div class="cp-pc pros">
-          <h4>✓ 优势</h4>
-          <ul>${d.pros.map(p=>`<li>${p}</li>`).join('')}</ul>
-        </div>
-        <div class="cp-pc cons">
-          <h4>⚠ 难点 / 风险</h4>
-          <ul>${d.cons.map(p=>`<li>${p}</li>`).join('')}</ul>
-        </div>
-      </div>
-
-      <a class="cp-cta" href="${d.url}" target="_blank" rel="noopener">访问官方报名页 →</a>
-    `;
-  }
-
-  function render(){ renderFilters(); renderList(); renderDetail(); }
-  render();
+    applySelect();
+  })();
 </script>
-</BaseLayout>
