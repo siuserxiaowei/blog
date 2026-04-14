@@ -1,0 +1,790 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// AI 硬件方案商比赛雷达 · 2026-04 调研
+// deadlineISO 用于计算到期状态：expired / urgent(<14d) / ongoing(<60d) / upcoming
+const competitions = [
+  {
+    id: 'spark',
+    name: '嘉立创星火大赛',
+    fullName: '2026「星火」全球硬件创新大赛',
+    org: '嘉立创 · 深圳福田区政府',
+    rel: 'A',
+    loc: '深圳福田',
+    date: '报名 1/30 - 4/30 · 决赛 7 月下旬',
+    deadlineISO: '2026-04-30',
+    tier: 'S', cat: '工程量产', match: 9.5, suit: '很高',
+    desc: '非开源赛事，对有自研方案、算法、结构、供应链 know-how 的团队最友好。资源极度偏向工程、试产、量产、产业落地。',
+    strategy: '把产品讲成「关键硬件能力 + 工程闭环 + 可产业化的非开源核心方案」。',
+    audience: '机器人硬件、AI 终端、边缘计算、早期硬件创业团队',
+    rewards: ['金奖 30 万 / 项 (现金)', '银奖 10 万 / 项', '前 100 套免费试产服务', '2 万嘉立创制造额度'],
+    pros: ['奖金现金含量高', '嘉立创制造资源真实', 'IP 保护机制明确', '政府背书强'],
+    cons: ['竞争极其激烈', '对工程闭环要求严苛'],
+    winning: ['工程可实现性', '量产成本控制', '核心硬件 IP 创新', '产业落地价值'],
+    timeline: [
+      { event: '报名截止', date: '2026-04-30', critical: true },
+      { event: '海选评审', date: '2026-05-06', critical: false },
+      { event: '工程加速营', date: '2026-06-09', critical: false },
+      { event: '总决赛', date: '2026-07-20', critical: true },
+    ],
+    url: 'https://www.jlc-bbs.com/spark-competition/home',
+  },
+  {
+    id: 'jd',
+    name: '京东 JoyInside',
+    fullName: '京东 JoyInside「AI 终端新物种」硬件创新黑客松',
+    org: '京东 JoyInside · 宿迁市政府',
+    rel: 'A', loc: '宿迁（决赛路演）',
+    date: '提交截止 4/13 · 决赛 4/26-4/27',
+    deadlineISO: '2026-04-13',
+    tier: 'S', cat: '渠道变现', match: 8.8, suit: '高',
+    desc: '「从创意到货架」链条最短的赛事。京东零售直接包销是核心诱惑，适合消费级、桌面陪伴、家庭终端类产品。',
+    strategy: '把产品讲成「能卖、能上架、能变爆品」的 AI 终端，强调 30 秒能演示出爆点。',
+    audience: '消费级 AI 硬件、需要渠道与零售验证的小团队',
+    rewards: ['冠军 20 万 (现金)', '亚军 10 万', '京东零售直接包销', '百万级生态曝光'],
+    pros: ['京东渠道直通', '零售包销承诺', '品牌背书强'],
+    cons: ['强 C 端商业化导向', '不适合做底层方案/平台'],
+    winning: ['爆品潜力', 'C 端用户体验', '零售价格竞争力', '品牌传播力'],
+    timeline: [
+      { event: '初赛提交截止', date: '2026-04-13', critical: true },
+      { event: '初赛评审', date: '2026-04-14', critical: false },
+      { event: '决赛路演', date: '2026-04-26', critical: true },
+    ],
+    url: 'https://docs.watcha.cn/post/jingdong-0326/',
+  },
+  {
+    id: 'cmake',
+    name: '创客中国',
+    fullName: '创客中国 全国中小企业创新创业大赛（智能硬件赛道）',
+    org: '工信部 · 中国中小企业发展促进中心',
+    rel: 'A+', loc: '全国分赛区',
+    date: '每年 4 - 11 月',
+    deadlineISO: '2026-06-30',
+    tier: 'S', cat: '政府政策', match: 9.2, suit: '很高',
+    desc: '工信部口径中小企业赛事的天花板。对已有产品和初步营收的方案商最友好，省赛+国赛+行业赛三级联动，地方有真金白银配套。',
+    strategy: '主打「已经在卖、客户清单清晰、能稳定交付」，把税收/补贴/入库列入路演价值。',
+    audience: '已有产品/营收的硬件团队，方案商尤其受用',
+    rewards: ['全国一等 50 万', '地方配套补贴', '专精特新入库通道', '政策对接'],
+    pros: ['工信部官方背书', '地方补贴可兑现', '重视落地不只看炫技', '和方案商商业模式贴合'],
+    cons: ['流程长、材料多', '总决赛标准趋向严肃企业风'],
+    winning: ['真实营收数据', '客户清单', '量产能力', '专精特新潜质'],
+    timeline: [
+      { event: '省赛报名', date: '2026-04-30', critical: true },
+      { event: '省赛复赛', date: '2026-06-30', critical: false },
+      { event: '行业总决赛', date: '2026-09-30', critical: true },
+      { event: '全国总决赛', date: '2026-11-30', critical: true },
+    ],
+    url: 'https://cmake.chinasme.org.cn/',
+  },
+  {
+    id: 'cxcyds',
+    name: '中国创新创业大赛',
+    fullName: '中国创新创业大赛 · 电子信息行业总决赛',
+    org: '科技部 · 财政部 · 教育部',
+    rel: 'A+', loc: '全国',
+    date: '每年 4 - 10 月',
+    deadlineISO: '2026-06-15',
+    tier: 'S', cat: '政府政策', match: 9.0, suit: '很高',
+    desc: '科技部口径硬科技大赛，电子信息+先进制造是 AI 硬件团队主战场。获奖直接对接地方政府资金、税收、人才政策。',
+    strategy: '突出「硬科技壁垒+研发投入+知识产权」，财务数据对得上科技型中小企业入库标准。',
+    audience: '已注册公司、有研发投入和专利的硬科技团队',
+    rewards: ['百万奖金', '地方政策包', '科技部信用背书'],
+    pros: ['科技部背书，含金量最高', '政策资金兑现率高', '对接科技型中小企业入库'],
+    cons: ['对公司财务/专利门槛较高', '早期 demo 阶段不太合适'],
+    winning: ['硬科技壁垒', '研发投入', '知识产权数量', '财务规范度'],
+    timeline: [
+      { event: '省赛报名', date: '2026-05-15', critical: true },
+      { event: '复赛', date: '2026-07-15', critical: false },
+      { event: '总决赛', date: '2026-10-30', critical: true },
+    ],
+    url: 'https://www.cxcyds.com/',
+  },
+  {
+    id: 'sz',
+    name: '深创赛',
+    fullName: '中国深圳创新创业大赛 国际赛 / 国内赛',
+    org: '深圳市科创委',
+    rel: 'A+', loc: '深圳',
+    date: '每年 5 - 11 月',
+    deadlineISO: '2026-07-15',
+    tier: 'S', cat: '政府政策', match: 8.7, suit: '很高',
+    desc: '深圳本地最有含金量的赛事之一，含「电子信息」「先进制造」等行业决赛。落户深圳/拿政府孵化最直接的入口。',
+    strategy: '主打「方案商扎根深圳，需要供应链+政策落地」，可顺势谈房租减免与人才补贴。',
+    audience: '想落户深圳/福田/南山/宝安的硬件团队',
+    rewards: ['现金奖', '落户深圳通道', '政府办公场地减免', '区级配套资金'],
+    pros: ['供应链最强城市背书', '落户政策极为友好', '对硬件团队偏爱'],
+    cons: ['和深圳本地团队竞争激烈', '对落户深圳有意才值得打'],
+    winning: ['深圳落户意向', '团队完整度', '供应链贴近度'],
+    timeline: [
+      { event: '报名启动', date: '2026-05-01', critical: false },
+      { event: '行业决赛', date: '2026-09-30', critical: true },
+      { event: '总决赛', date: '2026-11-15', critical: true },
+    ],
+    url: 'https://www.szszy.org/',
+  },
+  {
+    id: 'gba',
+    name: '大湾区创新创业大赛',
+    fullName: '粤港澳大湾区高价值创新创业大赛',
+    org: '广东省科技厅 · 港澳科创署',
+    rel: 'A', loc: '广州 / 深圳 / 香港',
+    date: '每年 4 - 10 月',
+    deadlineISO: '2026-06-30',
+    tier: 'S', cat: '政府政策', match: 8.9, suit: '很高',
+    desc: '湾区方向最适合硬件团队的地方赛，叠加专利布局奖励，广州/深圳团队天然加分。和广州 OPC 政策叠加可拿到额外补贴。',
+    strategy: '主打「立足湾区、辐射港澳、国产替代」，把广州落地说成战略价值。',
+    audience: '广州/深圳本地硬件团队、跨境项目',
+    rewards: ['现金奖', '专利培育资助', '湾区落户补贴', '创投对接'],
+    pros: ['大湾区背书', '可叠加 OPC 等地方政策', '专利布局有额外奖励'],
+    cons: ['流程偏重、材料量大'],
+    winning: ['专利布局', '湾区战略价值', '港澳合作潜质'],
+    timeline: [
+      { event: '报名启动', date: '2026-04-15', critical: false },
+      { event: '复赛', date: '2026-07-30', critical: true },
+      { event: '总决赛', date: '2026-10-15', critical: true },
+    ],
+    url: 'https://www.gdstc.gd.gov.cn/',
+  },
+  {
+    id: 'builderx',
+    name: 'BuilderX',
+    fullName: 'BuilderX × CSDN 智能硬件挑战赛',
+    org: 'CSDN · 湖南湘江新区',
+    rel: 'A-', loc: '湖南长沙智谷',
+    date: '报名 4/1 - 4/30 · 线下 5/9-5/10',
+    deadlineISO: '2026-04-30',
+    tier: 'A', cat: '产业落地', match: 8.0, suit: '高',
+    desc: '重视样机完成度、商业计划和量产转化。落地长沙的资源极其优厚（工位、贷款、先用后付）。',
+    strategy: '拿已有样机 + 商业计划书，打「落地长沙 + 快速量产」故事。',
+    audience: '已有样机、想拿地方孵化与量产资源的团队',
+    rewards: ['最高 1.5 万产品奖', '3 年免费工位（20 人内）', '20 万落地资金扶持'],
+    pros: ['落地政策极其优厚', '对接量产供应链快', '开发者生态深厚'],
+    cons: ['现金奖金较低', '品牌影响力偏开发者圈'],
+    winning: ['样机成熟度', '商业计划完整度', '落地长沙意愿', '行业痛点解决'],
+    timeline: [
+      { event: '线上报名截止', date: '2026-04-30', critical: true },
+      { event: '资格获取', date: '2026-04-15', critical: false },
+      { event: '线下路演', date: '2026-05-09', critical: true },
+    ],
+    url: 'https://builderx.csdn.net/hardwarehack',
+  },
+  {
+    id: 'bund',
+    name: '外滩大会 AI 科创赛',
+    fullName: '外滩大会 AI 科创赛 · 人工智能硬件科创大赛',
+    org: 'GeekPark · 蚂蚁 Inclusion',
+    rel: 'A+', loc: '上海黄浦世博园',
+    date: '报名 7/1 启动 · 决赛 9/10',
+    deadlineISO: '2026-08-04',
+    tier: 'A', cat: '创投曝光', match: 7.8, suit: '中高',
+    desc: '城市级曝光、创投对接、生活场景 AI 硬件。适合想在上海拿更高层级科技曝光的团队。',
+    strategy: '把产品讲成「AI 真正重做一个生活场景」，社会价值/公益叙事一定要有。',
+    audience: '想做城市级曝光、创投对接的生活场景硬件团队',
+    rewards: ['冠军 10 万 (现金)', '总奖池 28.5 万', 'Creator 舞台展示'],
+    pros: ['品牌溢价极高', '顶级创投资源', '社会价值叙事友好'],
+    cons: ['2026 规则未公开', '竞争极其激烈'],
+    winning: ['社会价值/公益性', 'AI Native 体验', '生活场景重构', '技术先进性'],
+    timeline: [
+      { event: '启动报名', date: '2026-07-01', critical: false },
+      { event: '初赛截止', date: '2026-08-04', critical: true },
+      { event: '决赛路演', date: '2026-09-10', critical: true },
+    ],
+    url: 'https://www.inclusionconf.com/zh/competition/hardware/',
+  },
+  {
+    id: '36kr',
+    name: '36氪 WISE 新硬件之王',
+    fullName: '36氪 WISE 新硬件之王评选',
+    org: '36氪',
+    rel: 'A', loc: '北京',
+    date: '每年 9 - 12 月',
+    deadlineISO: '2026-10-15',
+    tier: 'A', cat: '创投曝光', match: 7.5, suit: '中高',
+    desc: '36氪一年一度的硬件评选，更接近「榜单+评奖」模式，但媒体曝光和投资人触达极佳。',
+    strategy: '准备好融资 BP 和增长数据，路径是公关稿+投资人 deck，不是 demo。',
+    audience: '已融资/正在融资、需要媒体曝光的硬件团队',
+    rewards: ['36氪年度榜单', '媒体专访', '投资人对接'],
+    pros: ['媒体覆盖广', '投资人精准', '公关物料收益高'],
+    cons: ['现金奖薄', '对早期产品不友好'],
+    winning: ['增长数据', '融资背书', '媒体故事'],
+    timeline: [
+      { event: '提名开启', date: '2026-09-01', critical: false },
+      { event: '评选截止', date: '2026-10-15', critical: true },
+      { event: 'WISE 大会', date: '2026-12-10', critical: true },
+    ],
+    url: 'https://www.36kr.com/',
+  },
+  {
+    id: 'huawei',
+    name: '华为开发者大赛',
+    fullName: 'Huawei Developer Competition · 鸿蒙 / 昇腾 / 鲲鹏',
+    org: '华为',
+    rel: 'A+', loc: '全球分赛区',
+    date: '每年 5 - 12 月',
+    deadlineISO: '2026-08-31',
+    tier: 'A', cat: '工程量产', match: 8.2, suit: '高',
+    desc: '和华为生态绑定的硬件团队不能错过。鸿蒙智联+昇腾边缘+鲲鹏服务器三套体系都有命题，奖池百万级。',
+    strategy: '挑一个细分赛道把方案做深，路径是「拿奖→认证→进生态白名单→拿订单」。',
+    audience: '愿意绑定华为生态的硬件团队',
+    rewards: ['百万总奖池', '华为认证', '生态白名单', '商务对接'],
+    pros: ['华为生态资源真实', '商务转化路径清晰'],
+    cons: ['技术栈强绑定', '非华为生态项目不适合'],
+    winning: ['鸿蒙/昇腾/鲲鹏 适配', '生态价值', '商业可复制'],
+    timeline: [
+      { event: '报名开启', date: '2026-05-15', critical: false },
+      { event: '区赛', date: '2026-08-31', critical: true },
+      { event: '全球总决赛', date: '2026-12-10', critical: true },
+    ],
+    url: 'https://developer.huawei.com/consumer/cn/activity/',
+  },
+  {
+    id: 'mi',
+    name: '小米生态链',
+    fullName: '小米生态链产品孵化招募',
+    org: '小米生态链',
+    rel: 'A+', loc: '北京 / 武汉 / 深圳',
+    date: '全年滚动',
+    deadlineISO: '2026-12-31',
+    tier: 'A', cat: '渠道变现', match: 8.0, suit: '高',
+    desc: '严格说不是比赛而是产品孵化招募，但路径相同：项目评审 → 小米投资/包销 → 上有品/小米商城。AI 硬件方案商最直接的「拿订单」路径之一。',
+    strategy: '准备 BOM、量产可行性、市场预估三件套，重点说服小米品类经理。',
+    audience: '消费级 IoT/AI 硬件方案商',
+    rewards: ['小米投资', '米家 / 有品上架', '亿级渠道资源'],
+    pros: ['渠道与订单转化最直接', '品控/供应链支持强'],
+    cons: ['要让出股权或品牌', 'BOM 成本控制要求严'],
+    winning: ['BOM 成本', '品类空缺度', '小米品牌契合'],
+    timeline: [
+      { event: '滚动招募', date: '2026-12-31', critical: false },
+    ],
+    url: 'https://iot.mi.com/',
+  },
+  {
+    id: 'oh',
+    name: '鸿蒙生态创新大赛',
+    fullName: 'OpenHarmony 生态创新大赛',
+    org: '开放原子开源基金会',
+    rel: 'A', loc: '全国',
+    date: '每年 5 - 11 月',
+    deadlineISO: '2026-07-31',
+    tier: 'A', cat: '工程量产', match: 7.8, suit: '中高',
+    desc: '国产操作系统生态的硬件比赛，鸿蒙智联认证产品有机会进入华为/三方渠道，2026 年政策力度仍在加大。',
+    strategy: '把现有方案适配 OpenHarmony，挑选政企客户友好的子赛道。',
+    audience: '愿意做鸿蒙适配的硬件方案商',
+    rewards: ['现金奖', '鸿蒙智联认证', '渠道对接'],
+    pros: ['政策红利期', '和政企采购匹配'],
+    cons: ['生态仍在建设', '技术栈学习成本'],
+    winning: ['鸿蒙适配深度', '政企应用价值'],
+    timeline: [
+      { event: '报名启动', date: '2026-05-15', critical: false },
+      { event: '初赛截止', date: '2026-07-31', critical: true },
+      { event: '总决赛', date: '2026-11-15', critical: true },
+    ],
+    url: 'https://www.openharmony.cn/',
+  },
+  {
+    id: 'ces',
+    name: 'CES Innovation Awards',
+    fullName: 'CES Innovation Awards 全球消费电子创新奖',
+    org: '美国消费技术协会 CTA',
+    rel: 'A+', loc: '美国拉斯维加斯',
+    date: '每年 9 月报名 · 1 月颁奖',
+    deadlineISO: '2026-09-15',
+    tier: 'A', cat: '国际曝光', match: 7.5, suit: '中高',
+    desc: '全球消费电子最权威的创新评选，拿到 CES Innovation Awards 是出海团队最有效的「品牌标签」。',
+    strategy: '花点钱做参赛物料+英文 demo 视频，瞄准细分类目的 Honoree。',
+    audience: '出海或想做国际背书的 AI 硬件团队',
+    rewards: ['CES 官方背书', '全球媒体覆盖', 'Honoree 标签'],
+    pros: ['国际品牌溢价高', '出海销售提升'],
+    cons: ['报名费数千美元', '物料制作成本高'],
+    winning: ['创新性', '工业设计', '全球市场潜力'],
+    timeline: [
+      { event: '报名截止', date: '2026-09-15', critical: true },
+      { event: 'Honoree 公布', date: '2026-11-10', critical: true },
+      { event: 'CES 大会', date: '2027-01-06', critical: false },
+    ],
+    url: 'https://www.ces.tech/innovation-awards/',
+  },
+  {
+    id: 'reddot',
+    name: 'Red Dot / iF / Good Design',
+    fullName: 'Red Dot · iF · 日本 Good Design 设计奖',
+    org: 'Red Dot · iF · JDP',
+    rel: 'A', loc: '德国 / 日本',
+    date: '全年滚动',
+    deadlineISO: '2026-11-30',
+    tier: 'A', cat: '国际曝光', match: 7.0, suit: '中',
+    desc: '对硬件外观和工业设计要求高的产品可冲，拿奖后包装/电商详情页都能直接溢价。',
+    strategy: '找个工业设计配合，把产品的形态语言讲成系统化设计语言。',
+    audience: '外观/手感强的消费 AI 硬件',
+    rewards: ['设计奖标签', '全球设计圈曝光'],
+    pros: ['销售页背书', '出海加分'],
+    cons: ['报名费高', '和方案商核心壁垒不直接相关'],
+    winning: ['工业设计', '形态创新', '细节工艺'],
+    timeline: [
+      { event: '报名截止', date: '2026-11-30', critical: true },
+    ],
+    url: 'https://www.red-dot.org/',
+  },
+  {
+    id: 'hax',
+    name: 'HAX 加速器',
+    fullName: 'HAX (SOSV) Hardware Accelerator',
+    org: 'SOSV',
+    rel: 'A+', loc: '深圳 · 纽瓦克',
+    date: '全年滚动招募',
+    deadlineISO: '2026-12-31',
+    tier: 'A', cat: '创投曝光', match: 8.0, suit: '高',
+    desc: '全球最知名硬件加速器，深圳办公室就在华强北。被选中获得现金投资+硬件加速服务+全球渠道。',
+    strategy: '准备一份英文 BP，强调团队可量产能力和差异化定位。',
+    audience: '早中期硬件团队，有量产潜力',
+    rewards: ['USD 25 万投资', '加速器服务', '全球网络'],
+    pros: ['现金投资+硬件资源双重', '品牌国际化'],
+    cons: ['需要让出股权', '门槛高'],
+    winning: ['团队', '量产能力', '差异化'],
+    timeline: [
+      { event: '滚动招募', date: '2026-12-31', critical: false },
+    ],
+    url: 'https://hax.co/',
+  },
+  {
+    id: 'hackaday',
+    name: 'Hackaday Prize',
+    fullName: 'Hackaday Prize 全球开源硬件大奖',
+    org: 'Hackaday · Supplyframe',
+    rel: 'A', loc: '线上',
+    date: '每年 3 - 10 月',
+    deadlineISO: '2026-10-20',
+    tier: 'A', cat: '国际曝光', match: 6.8, suit: '中',
+    desc: '全球最具影响力的开源硬件大奖赛，AI/可持续/辅助科技是常见赛道。开源项目友好。',
+    strategy: '挑可持续/辅助科技/教育方向，开源部分代码换曝光。',
+    audience: '愿意开源部分项目的硬件团队',
+    rewards: ['USD 5 万 +', '全球极客曝光'],
+    pros: ['国际背书', '硬件极客圈认可度高'],
+    cons: ['要求开源', '商业化路径间接'],
+    winning: ['开源完整度', '社会价值', 'Hack 创意'],
+    timeline: [
+      { event: '阶段截止', date: '2026-07-12', critical: false },
+      { event: '总决截止', date: '2026-10-20', critical: true },
+    ],
+    url: 'https://hackaday.io/prize',
+  },
+  {
+    id: 'maker',
+    name: 'Maker Faire 中国',
+    fullName: 'Maker Faire Shenzhen / Beijing',
+    org: 'Make Media · DFRobot 等',
+    rel: 'B+', loc: '深圳/北京',
+    date: '每年秋季',
+    deadlineISO: '2026-09-30',
+    tier: 'B', cat: '社区创意', match: 6.0, suit: '中',
+    desc: '非比赛但有 Maker Awards，是 AI 硬件原型对外曝光、招募社区共创者的最佳场合。',
+    strategy: '做 demo 展位+社交媒体素材，主要目标是认知和招人。',
+    audience: '早期产品阶段、需要 demo 反馈的团队',
+    rewards: ['Maker Awards', '社区曝光'],
+    pros: ['创客圈认可', '素材产出高'],
+    cons: ['产业转化弱'],
+    winning: ['现场互动', 'demo 完成度'],
+    timeline: [
+      { event: '展位招募', date: '2026-09-30', critical: true },
+    ],
+    url: 'https://makerfaire.com/',
+  },
+  {
+    id: 'attrax',
+    name: 'AttraX 黑客松',
+    fullName: 'AttraX「春潮·Spring」深圳 OpenClaw 黑客松',
+    org: 'AttraX (清北学生社区)',
+    rel: 'B+', loc: '深圳 IBREWTOWN',
+    date: '4/23 - 4/26',
+    deadlineISO: '2026-04-22',
+    tier: 'B', cat: '社区创意', match: 6.5, suit: '中',
+    desc: '强社区、强创意、强现场氛围。适合拿来「涨名气、招人、拍传播素材」。',
+    strategy: '做一个「让现场的人马上围过来」的作品，主打物理交互和 Wow Factor。',
+    audience: 'AI Native 创客、交互/装置/机器人/内容体验项目',
+    rewards: ['六位数奖池', '万象系商场 LED 大屏曝光', '海外黑客松直通'],
+    pros: ['创意氛围极佳', '适合社交媒体出圈', '海外交流机会'],
+    cons: ['产业转化链路弱', '非官方严肃体系'],
+    winning: ['新奇交互', 'Wow Factor', 'AI Native 表达', '快速成型'],
+    timeline: [
+      { event: '活动开始', date: '2026-04-23', critical: true },
+      { event: '活动结束', date: '2026-04-26', critical: false },
+    ],
+    url: 'https://mp.weixin.qq.com/s/6thlbW8tShcHHsa23Y-WSA',
+  },
+  {
+    id: 'hackster',
+    name: 'Hackster.io AI 系列赛',
+    fullName: 'Hackster.io AI Hardware Contests',
+    org: 'Hackster · Avnet',
+    rel: 'B+', loc: '线上',
+    date: '全年多场',
+    deadlineISO: '2026-12-31',
+    tier: 'B', cat: '国际曝光', match: 6.5, suit: '中',
+    desc: '全球 AI 硬件创客主战场，常年有 NVIDIA Jetson / Edge Impulse / Seeed XIAO 等冠名赛。',
+    strategy: '挑感兴趣的子赛道周末刷一个项目，拿曝光和赞助硬件。',
+    audience: '小团队/个人，愿意写英文项目页',
+    rewards: ['开发板赞助', 'USD 现金', '国际社区曝光'],
+    pros: ['低门槛', '持续有新赛'],
+    cons: ['奖金分散', '商业化弱'],
+    winning: ['项目页质量', '英文表达'],
+    timeline: [
+      { event: '滚动开放', date: '2026-12-31', critical: false },
+    ],
+    url: 'https://www.hackster.io/contests',
+  },
+  {
+    id: 'seeed',
+    name: 'Seeed Studio 系列赛',
+    fullName: '矽递 Seeed XIAO / Wio 系列竞赛',
+    org: 'Seeed Studio 矽递',
+    rel: 'B+', loc: '线上 / 深圳',
+    date: '全年不定期',
+    deadlineISO: '2026-12-31',
+    tier: 'B', cat: '社区创意', match: 6.0, suit: '中',
+    desc: '国产创客硬件大厂出品，XIAO ESP32S3 Sense 是热门 AI 摄像头方案的明星板。',
+    strategy: '绑定 Seeed 模块做 demo 蹭流量。',
+    audience: '创客和教育方向团队',
+    rewards: ['现金', '硬件赞助'],
+    pros: ['国内对接方便', '硬件资源直给'],
+    cons: ['奖项小'],
+    winning: ['XIAO 模块创新使用'],
+    timeline: [
+      { event: '滚动开放', date: '2026-12-31', critical: false },
+    ],
+    url: 'https://www.seeedstudio.com/contest',
+  },
+  {
+    id: 'geekpark',
+    name: '极客公园 IF X',
+    fullName: '极客公园 IF X · 年度创新者',
+    org: '极客公园 GeekPark',
+    rel: 'A', loc: '北京',
+    date: '每年 1 月',
+    deadlineISO: '2027-01-15',
+    tier: 'A', cat: '创投曝光', match: 7.2, suit: '中高',
+    desc: '国内最权威的产品/科技媒体年会评选，AI 硬件「年度新物种」类目近三年含金量持续上升。本届已结束，下一轮 2027/01。',
+    strategy: '用产品故事+创始人 IP 双线作战，强调对消费电子边界的拓展。',
+    audience: '有产品故事和创始人表达力的团队',
+    rewards: ['年度创新者称号', 'IF 大会舞台', '科技圈传播'],
+    pros: ['品牌故事溢价高', '创始人 IP 友好'],
+    cons: ['不发现金', '规则灵活、靠人脉'],
+    winning: ['创始人故事', '产品定义力'],
+    timeline: [
+      { event: '提名开启', date: '2026-11-01', critical: false },
+      { event: '颁奖大会', date: '2027-01-15', critical: true },
+    ],
+    url: 'https://www.geekpark.net/',
+  },
+];
+
+const TODAY = new Date('2026-04-14');
+function statusOf(iso) {
+  const d = new Date(iso);
+  const days = Math.ceil((d.getTime() - TODAY.getTime()) / 86400000);
+  if (days < 0) return { kind: 'expired', days, label: '已截止' };
+  if (days <= 14) return { kind: 'urgent', days, label: `${days} 天后截止` };
+  if (days <= 60) return { kind: 'ongoing', days, label: `${days} 天后截止` };
+  return { kind: 'upcoming', days, label: `${days} 天后` };
+}
+const enriched = competitions.map(c => ({ ...c, status: statusOf(c.deadlineISO) }));
+const expiredCount = enriched.filter(c => c.status.kind === 'expired').length;
+const urgentCount = enriched.filter(c => c.status.kind === 'urgent').length;
+const sCount = enriched.filter(c => c.tier === 'S').length;
+
+const dataJSON = JSON.stringify(enriched);
+---
+
+<BaseLayout title="AI 硬件比赛雷达 · siuser小伟" description="面向 AI 硬件方案商的产业型赛事对比看板，包含截止倒计时、匹配度评分、参赛策略、优势/难点。">
+  <Header />
+
+  <main class="comp-root min-h-screen pt-24 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+      <!-- 顶部信息条 -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 mb-2">Competition Radar · 2026-04-14</p>
+          <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+            AI 硬件比赛<span class="text-blue-600">对比调研看板</span>
+          </h1>
+          <p class="text-slate-500 mt-3 max-w-2xl text-sm leading-relaxed">
+            面向 AI 硬件方案商 / 早期硬件创业团队的产业型赛事数据库。重点看「能不能拿订单、能不能上量、能不能拿政府/资本背书」。学生科创赛已剔除。
+          </p>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-slate-900">{enriched.length}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">赛事总数</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-rose-600">{sCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">S 级强推</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-amber-600">{urgentCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">14 天内紧急</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div class="text-2xl font-black text-slate-400 line-through">{expiredCount}</div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">已过期</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 顶部结论横幅 -->
+      <div class="relative overflow-hidden rounded-[2rem] p-8 md:p-10 text-white shadow-2xl shadow-blue-200/40" style="background: linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#4338ca 100%);">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-300/20 rounded-full -ml-24 -mb-24 blur-2xl"></div>
+        <div class="relative z-10 flex flex-col md:flex-row gap-10 items-start">
+          <div class="flex-1 space-y-5">
+            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-xs font-bold border border-white/30">
+              <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
+              <span>核心结论 · 团队当前优先建议</span>
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight">主攻：嘉立创星火大赛</h2>
+            <p class="text-blue-50 text-base md:text-lg max-w-3xl leading-relaxed">
+              方案商最稀缺的不是奖金证书，而是「订单 + 上量通道 + 政策资金」。星火大赛与方案商模型最贴合，非开源机制保护核心 IP，资源偏向量产与产业落地。京东 JoyInside 已于昨日 (4/13) 截止，外滩/AttraX 这类只做曝光的可作为副线丰富品牌叙事。
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <span class="bg-white/15 px-4 py-2 rounded-2xl border border-white/20 text-sm font-bold">主攻 · 嘉立创星火</span>
+              <span class="bg-white/15 px-4 py-2 rounded-2xl border border-white/20 text-sm font-bold">政策 · 创客中国 + 中国创新创业大赛</span>
+              <span class="bg-white/15 px-4 py-2 rounded-2xl border border-white/20 text-sm font-bold">渠道 · 小米生态链</span>
+            </div>
+          </div>
+          <div class="w-full md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20">
+            <p class="text-blue-200 text-[10px] font-black uppercase tracking-[0.2em] mb-3">14 天紧急清单</p>
+            <ul class="space-y-2 text-sm" id="urgent-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 筛选 -->
+      <div class="flex flex-wrap gap-2 items-center" id="filter-bar"></div>
+
+      <!-- 主体：sidebar + detail -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- 左侧列表 -->
+        <aside class="lg:col-span-4 space-y-4">
+          <div class="flex items-center justify-between px-2">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">赛事列表</h3>
+            <span id="list-count" class="text-xs font-bold text-slate-400"></span>
+          </div>
+          <div id="comp-list" class="space-y-3 max-h-[1100px] overflow-y-auto pr-2"></div>
+        </aside>
+
+        <!-- 右侧详情 -->
+        <section class="lg:col-span-8" id="comp-detail"></section>
+      </div>
+
+      <!-- 页脚说明 -->
+      <div class="pt-12 mt-12 border-t border-slate-200 text-center text-xs text-slate-400">
+        数据更新于 2026-04-14 · 报名时间以主办方公告为准 · 团队内部决策参考资料
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* 强制本页使用浅色主题，覆盖站点暗色 CSS 变量 */
+  .comp-root { background: #f8fafc; color: #0f172a; }
+  .comp-root * { font-family: 'Inter','PingFang SC',system-ui,sans-serif; }
+  .comp-root h1, .comp-root h2, .comp-root h3, .comp-root h4 { color: #0f172a; }
+  .comp-root .scroll-thin::-webkit-scrollbar { width: 6px; }
+  .comp-root .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+  /* 卡片 hover 与切换动画 */
+  .comp-list-item { transition: all .25s ease; }
+  .comp-list-item:hover { transform: translateY(-2px); }
+  .comp-list-item.active { border-color: #2563eb !important; box-shadow: 0 20px 40px -20px rgba(37,99,235,0.3); transform: translateY(-2px); }
+  .comp-list-item.active .item-name { color: #2563eb !important; }
+
+  .comp-detail-anim { animation: fadeSlide .35s ease; }
+  @keyframes fadeSlide { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+
+  .badge { display:inline-flex; align-items:center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .b-S { background:#fee2e2; color:#b91c1c; }
+  .b-A { background:#dbeafe; color:#1d4ed8; }
+  .b-B { background:#cffafe; color:#0e7490; }
+  .b-expired { background:#e5e7eb; color:#6b7280; text-decoration:line-through; }
+  .b-urgent { background:#fef3c7; color:#b45309; animation: pulse 1.6s infinite; }
+  .b-ongoing { background:#dcfce7; color:#15803d; }
+  .b-upcoming { background:#f1f5f9; color:#475569; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  .filter-chip { padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; background:#f1f5f9; color:#475569; cursor:pointer; transition:.2s; border:1px solid transparent; }
+  .filter-chip:hover { background:#e2e8f0; }
+  .filter-chip.active { background:#2563eb; color:white; }
+</style>
+
+<script is:inline define:vars={{ dataJSON }}>
+  const data = JSON.parse(dataJSON);
+  const cats = ['全部', ...new Set(data.map(d => d.cat))];
+  let fCat = '全部', fTier = '全部', selectedId = data[0].id;
+
+  const tierBadge = (t) => `<span class="badge b-${t}">${t} 级</span>`;
+  const statusBadge = (s) => `<span class="badge b-${s.kind}">${s.label}</span>`;
+  const fmtRewards = (rs) => rs.map(r => `<span class="inline-block text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100 px-3 py-1.5 rounded-lg">${r}</span>`).join(' ');
+
+  // 紧急清单（14天内）
+  const urgentEl = document.getElementById('urgent-list');
+  data.filter(d => d.status.kind === 'urgent').sort((a,b)=>a.status.days-b.status.days).forEach(d => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between gap-2';
+    li.innerHTML = `<button class="text-left flex-1 hover:underline text-white font-bold" data-jump="${d.id}">${d.name}</button><span class="text-amber-200 text-xs font-mono">${d.status.days}d</span>`;
+    urgentEl.appendChild(li);
+  });
+  urgentEl.querySelectorAll('button').forEach(b => b.onclick = () => { selectedId = b.dataset.jump; render(); window.scrollTo({ top: document.getElementById('comp-detail').offsetTop - 80, behavior: 'smooth' }); });
+
+  // 筛选条
+  function renderFilters() {
+    const bar = document.getElementById('filter-bar'); bar.innerHTML = '';
+    cats.forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'filter-chip' + (fCat === c ? ' active' : '');
+      b.textContent = c;
+      b.onclick = () => { fCat = c; render(); };
+      bar.appendChild(b);
+    });
+    const sep = document.createElement('span'); sep.className = 'mx-2 text-slate-300'; sep.textContent = '|'; bar.appendChild(sep);
+    ['全部','S','A','B'].forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'filter-chip' + (fTier === t ? ' active' : '');
+      b.textContent = t === '全部' ? '全部等级' : (t + ' 级');
+      b.onclick = () => { fTier = t; render(); };
+      bar.appendChild(b);
+    });
+  }
+
+  function renderList() {
+    const list = data.filter(d => (fCat === '全部' || d.cat === fCat) && (fTier === '全部' || d.tier === fTier));
+    list.sort((a,b) => {
+      const order = { expired: 3, upcoming: 2, ongoing: 1, urgent: 0 };
+      const so = order[a.status.kind] - order[b.status.kind];
+      if (so !== 0) return so;
+      return b.match - a.match;
+    });
+    const el = document.getElementById('comp-list'); el.innerHTML = '';
+    document.getElementById('list-count').textContent = `${list.length} 个项目`;
+    list.forEach(d => {
+      const div = document.createElement('button');
+      div.className = `comp-list-item w-full text-left p-5 rounded-2xl border-2 bg-white border-slate-100 ${selectedId === d.id ? 'active' : ''} ${d.status.kind === 'expired' ? 'opacity-60' : ''}`;
+      div.innerHTML = `
+        <div class="flex justify-between items-start gap-2 mb-2">
+          <h4 class="item-name text-base font-black text-slate-800">${d.name}</h4>
+          ${tierBadge(d.tier)}
+        </div>
+        <div class="flex gap-1.5 flex-wrap mb-3">${statusBadge(d.status)}<span class="badge bg-slate-100 text-slate-600">${d.cat}</span></div>
+        <p class="text-xs text-slate-500 leading-relaxed line-clamp-2 font-medium mb-3">${d.desc}</p>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400 font-bold">匹配度</span>
+          <span class="font-black text-blue-600 text-base">${d.match.toFixed(1)} <span class="text-slate-300 text-xs">/10</span></span>
+        </div>
+      `;
+      div.onclick = () => { selectedId = d.id; render(); };
+      el.appendChild(div);
+    });
+  }
+
+  function renderDetail() {
+    const d = data.find(x => x.id === selectedId) || data[0];
+    const el = document.getElementById('comp-detail');
+    el.innerHTML = `
+      <div class="comp-detail-anim space-y-6">
+        <!-- 头部卡片 -->
+        <div class="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl shadow-slate-200/50">
+          <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
+            <div class="space-y-4 flex-1">
+              <div class="flex flex-wrap gap-2">
+                ${tierBadge(d.tier)}
+                ${statusBadge(d.status)}
+                <span class="badge bg-emerald-100 text-emerald-700">主办方信用 ${d.rel}</span>
+                <span class="badge bg-slate-100 text-slate-600">${d.cat}</span>
+              </div>
+              <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight">${d.fullName}</h2>
+              <div class="flex flex-wrap gap-y-2 gap-x-6 text-sm text-slate-500 font-bold">
+                <span>📍 ${d.loc}</span>
+                <span>📅 ${d.date}</span>
+                <span>🏛 ${d.org}</span>
+              </div>
+            </div>
+            <div class="flex flex-col items-center justify-center bg-slate-900 rounded-[2rem] p-6 min-w-[140px] shadow-xl">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-1">匹配度</span>
+              <span class="text-5xl font-black text-white leading-none">${d.match.toFixed(1)}</span>
+              <span class="text-xs text-slate-500 mt-1">/ 10.0</span>
+              <div class="w-12 h-1 bg-blue-500 mt-3 rounded-full"></div>
+              <span class="text-xs text-blue-300 font-bold mt-2">${d.suit}</span>
+            </div>
+          </div>
+
+          <!-- 时间轴 -->
+          <div class="mb-8">
+            <h4 class="flex items-center gap-2 text-xs font-black text-slate-900 mb-6 uppercase tracking-[0.2em]">
+              <span class="w-1.5 h-5 bg-blue-600 rounded-full"></span>关键时间节点
+            </h4>
+            <div class="relative pt-6">
+              <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-100 rounded-full"></div>
+              <div class="flex justify-between relative z-10">
+                ${d.timeline.map(n => {
+                  const past = new Date(n.date) < new Date('2026-04-14');
+                  const cls = past ? 'bg-slate-300' : (n.critical ? 'bg-rose-500 ring-4 ring-rose-100 scale-125' : 'bg-blue-500 ring-4 ring-blue-100');
+                  return `<div class="flex flex-col items-center min-w-0 px-2 flex-1">
+                    <div class="w-5 h-5 rounded-full ${cls} border-4 border-white shadow"></div>
+                    <p class="mt-3 text-[11px] font-black ${n.critical ? 'text-slate-900' : 'text-slate-400'} text-center">${n.event}</p>
+                    <p class="text-[10px] font-mono text-slate-500">${n.date}</p>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section>
+              <h4 class="text-xs font-black text-slate-900 mb-3 uppercase tracking-[0.15em]">📌 赛事定位</h4>
+              <p class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">${d.desc}</p>
+            </section>
+            <section>
+              <h4 class="text-xs font-black text-slate-900 mb-3 uppercase tracking-[0.15em]">🎯 参赛打法</h4>
+              <p class="text-sm text-blue-800 font-bold leading-relaxed bg-blue-50 p-4 rounded-2xl border border-blue-100">${d.strategy}</p>
+            </section>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <section>
+              <h4 class="text-xs font-black text-slate-900 mb-3 uppercase tracking-[0.15em]">🎁 核心奖励 / 资源</h4>
+              <div class="flex flex-wrap gap-2">${fmtRewards(d.rewards)}</div>
+            </section>
+            <section>
+              <h4 class="text-xs font-black text-slate-900 mb-3 uppercase tracking-[0.15em]">⚡ 必胜卖点</h4>
+              <div class="flex flex-wrap gap-2">${d.winning.map(w => `<span class="badge bg-indigo-100 text-indigo-700">${w}</span>`).join('')}</div>
+            </section>
+          </div>
+        </div>
+
+        <!-- pros & cons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50">
+            <h4 class="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">✓ 优势</h4>
+            <ul class="space-y-2">${d.pros.map(p => `<li class="flex gap-2 text-sm text-slate-700 font-bold"><span class="text-emerald-500">●</span>${p}</li>`).join('')}</ul>
+          </div>
+          <div class="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50">
+            <h4 class="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-4">⚠ 难点 / 风险</h4>
+            <ul class="space-y-2">${d.cons.map(p => `<li class="flex gap-2 text-sm text-slate-700 font-bold"><span class="text-amber-500">●</span>${p}</li>`).join('')}</ul>
+          </div>
+        </div>
+
+        <a href="${d.url}" target="_blank" rel="noopener" class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-blue-200/50 transition-all hover:-translate-y-1">
+          访问官方报名页 →
+        </a>
+      </div>
+    `;
+  }
+
+  function render() { renderFilters(); renderList(); renderDetail(); }
+  render();
+</script>
+</BaseLayout>
