@@ -144,7 +144,7 @@ const competitions = [
     winning:['开源完整度','社会价值','Hack 创意'],
     timeline:[{event:'Green Powered 截止',date:'2026-04-24',critical:true},{event:'更多主题持续开放',date:'2026-10-20',critical:false}],
     url:'https://hackaday.io/contests' },
-  { id:'maker', name:'Maker Faire Shenzhen', fullName:'Maker Faire Shenzhen 深圳国际创客周', org:'柴火创客空间 · Seeed Studio', rel:'B+', loc:'深圳南山万科设计公社', date:'每年 11 月', deadlineISO:'2026-09-30', tier:'B', cat:'社区创意', match:6.0, suit:'中',
+  { id:'maker', name:'Maker Faire Shenzhen', fullName:'Maker Faire Shenzhen 深圳国际创客周', org:'柴火创客空间 · Seeed Studio', rel:'B+', loc:'深圳南山万科设计公社', date:'每年 11 月', deadlineISO:'2026-09-30', tier:'B', cat:'行业活动', match:6.0, suit:'中',
     desc:'2025 年主题「AI Robotics」，每年 11 月在深圳南山举办。非比赛但有 Maker Awards，是 AI 硬件原型展示+社区连接最佳场合。',
     strategy:'做 demo 展位+社交媒体素材，主要目标是认知和招人。',
     audience:'早期产品阶段、需要 demo 反馈的团队',
@@ -164,6 +164,16 @@ const competitions = [
     winning:['项目页质量','英文表达','创意性'],
     timeline:[{event:'Arduino+Qualcomm 赛截止',date:'2026-08-30',critical:true},{event:'更多赛事持续开放',date:'2026-12-31',critical:false}],
     url:'https://www.hackster.io/contests' },
+  { id:'builderx', name:'BuilderX 构建者大会', fullName:'1024 AI 构建者大会 Builder X · AI 硬件工作坊', org:'CSDN · 湖南湘江新区', rel:'A-', loc:'长沙智谷（湘江新区）', date:'每年 10 月 24-25 日', deadlineISO:'2026-10-24', tier:'B', cat:'行业活动', match:7.5, suit:'高',
+    desc:'CSDN 年度 1024 程序员节核心活动，2025 年超 15 万人报名。含 9 大专场，其中「具身智能与 AI 硬件开发实践」和「小智 AI 硬件工作坊」直接面向硬件开发者。非比赛，是行业交流+动手工坊。',
+    strategy:'参加 AI 硬件工作坊，现场展示产品 demo，和开发者/潜在客户面对面交流，积累社区影响力。',
+    audience:'AI 硬件开发者、方案商、想接触开发者社区的团队',
+    rewards:['免费参会','动手工坊','开发者社区曝光','湘江新区产业资源对接'],
+    pros:['CSDN 开发者社区覆盖广','免费参加','长沙智谷产业资源','动手实操氛围好'],
+    cons:['非竞赛无奖金','偏开发者圈层','需提前报名抢名额'],
+    winning:['产品 demo 展示','社区互动','技术分享'],
+    timeline:[{event:'报名开放(参考)',date:'2026-09-15',critical:false},{event:'大会举办',date:'2026-10-24',critical:true}],
+    url:'https://1024.csdn.net/' },
 ];
 
 const TODAY = new Date('2026-04-16');
@@ -182,7 +192,7 @@ const sCount = enriched.filter(c => c.tier === 'S').length;
 const dataJSON = JSON.stringify(enriched);
 ---
 
-<BaseLayout title="AI 硬件比赛雷达 · siuser小伟" description="AI 硬件方案商的产业型赛事调研看板。">
+<BaseLayout title="AI 硬件比赛与活动雷达 · siuser小伟" description="AI 硬件方案商的赛事与行业活动调研看板。">
   <Header />
 
   <main class="min-h-screen pt-24 pb-20" style="background:#f8fafc;color:#0f172a;font-family:Inter,'PingFang SC',system-ui,sans-serif;">
@@ -193,9 +203,9 @@ const dataJSON = JSON.stringify(enriched);
         <div>
           <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-blue-600 mb-2">Competition Radar · 2026-04-16</p>
           <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight" style="color:#0f172a;">
-            AI 硬件比赛 <span class="text-blue-600">对比调研看板</span>
+            AI 硬件赛事与活动 <span class="text-blue-600">调研看板</span>
           </h1>
-          <p class="text-sm leading-relaxed mt-3 max-w-2xl" style="color:#64748b;">面向 AI 硬件方案商 / 早期硬件创业团队的产业型赛事数据库。重点看「能不能拿订单、能不能上量、能不能拿政府/资本背书」。</p>
+          <p class="text-sm leading-relaxed mt-3 max-w-2xl" style="color:#64748b;">面向 AI 硬件方案商 / 早期硬件创业团队的赛事与行业活动数据库。重点看「能不能拿订单、能不能上量、能不能拿政府/资本背书」。</p>
         </div>
         <div class="flex gap-3 flex-wrap">
           <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
