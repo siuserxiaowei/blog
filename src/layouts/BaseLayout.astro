@@ -266,13 +266,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <!-- Loading screen: letter-by-letter text + auto dismiss -->
   <script is:inline>
     (function() {
+      const ls = document.getElementById('loading-screen');
+      // Skip loading screen on repeat visits within session
+      if (ls && sessionStorage.getItem('loaded')) {
+        ls.style.display = 'none';
+        return;
+      }
+
       const text = 'SIUSER BLOG';
       const el = document.getElementById('loading-text');
       if (el) {
         text.split('').forEach((ch, i) => {
           const span = document.createElement('span');
           span.textContent = ch === ' ' ? '\u00A0' : ch;
-          span.style.animationDelay = (0.3 + i * 0.06) + 's';
+          span.style.animationDelay = (0.2 + i * 0.04) + 's';
           el.appendChild(span);
         });
       }
@@ -281,16 +288,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       function dismiss() {
         if (dismissed) return;
         dismissed = true;
-        const ls = document.getElementById('loading-screen');
+        sessionStorage.setItem('loaded', '1');
         if (ls) {
           ls.classList.add('loaded');
-          setTimeout(() => { ls.style.display = 'none'; }, 600);
+          setTimeout(() => { ls.style.display = 'none'; }, 400);
         }
       }
 
-      // Dismiss after load + small delay, or force after 3s
-      window.addEventListener('load', () => setTimeout(dismiss, 800));
-      setTimeout(dismiss, 3000);
+      // DCL fires much earlier than window.load on heavy pages
+      if (document.readyState !== 'loading') {
+        dismiss();
+      } else {
+        document.addEventListener('DOMContentLoaded', dismiss);
+      }
+      // Hard fallback
+      setTimeout(dismiss, 1500);
     })();
   </script>
 
