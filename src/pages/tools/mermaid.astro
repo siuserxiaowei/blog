@@ -1,0 +1,62 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Mermaid 预览" description="实时渲染 Mermaid 流程图 / 时序图 / 类图,可下载 SVG" category="开发辅助" icon="📐">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      {[['流程图','flowchart TD\n  A[开始] --> B{判断}\n  B -->|是| C[操作 1]\n  B -->|否| D[操作 2]\n  C --> E[结束]\n  D --> E'],['时序图','sequenceDiagram\n  Alice->>Bob: 你好\n  Bob-->>Alice: 收到\n  Alice->>Bob: 再见'],['饼图','pie title 分布\n  \"A\" : 40\n  \"B\" : 30\n  \"C\" : 30'],['甘特图','gantt\n  title 项目\n  section 设计\n  原型 : 2026-04-01, 7d\n  评审 : 7d']].map(([n,c])=>(
+        <button class="tool-btn preset" data-c={c}>{n}</button>
+      ))}
+      <button class="tool-btn tool-btn-ghost" id="btn-svg">下载 SVG</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">预览</label>
+        <div id="preview" style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; min-height: 360px; padding: 1rem; overflow: auto;"></div>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待 Mermaid 加载</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', themeVariables: { primaryColor: '#c9a96e', primaryTextColor: '#f5f5f4', lineColor: '#c9a96e', background: '#0a0a0b' } });
+  window._mermaid = mermaid;
+</script>
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  let timer;
+  async function render(){
+    if (!window._mermaid) { setTimeout(render, 200); return; }
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try {
+        const { svg } = await window._mermaid.render('mm-' + Date.now(), $('input').value);
+        $('preview').innerHTML = svg;
+        window._svg = svg;
+        setStatus('✓ 已渲染','ok');
+      } catch(e){ setStatus('✗ '+e.message.split('\n')[0],'err'); }
+    }, 300);
+  }
+
+  $('input').addEventListener('input', render);
+  document.querySelectorAll('.preset').forEach(b => b.onclick = () => { $('input').value = b.dataset.c; render(); });
+  $('btn-svg').onclick = () => {
+    if (!window._svg) return;
+    const blob = new Blob([window._svg], {type:'image/svg+xml'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  };
+  document.querySelector('.preset').click();
+  setTimeout(render, 500);
+})();
+</script>

@@ -1,0 +1,70 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="文本行处理" description="去重、排序、反转、过滤、加前后缀,批量处理文本行" category="文本处理" icon="≡">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn" data-op="sort">排序 A-Z</button>
+      <button class="tool-btn" data-op="rsort">排序 Z-A</button>
+      <button class="tool-btn" data-op="dedupe">去重</button>
+      <button class="tool-btn" data-op="reverse">反转顺序</button>
+      <button class="tool-btn" data-op="trim">去空白</button>
+      <button class="tool-btn" data-op="empty">删空行</button>
+      <button class="tool-btn" data-op="random">随机洗牌</button>
+      <button class="tool-btn" data-op="number">加行号</button>
+    </div>
+    <div class="tool-toolbar mt-2">
+      <input id="prefix" placeholder="前缀" class="tool-input" style="max-width: 140px;" />
+      <input id="suffix" placeholder="后缀" class="tool-input" style="max-width: 140px;" />
+      <input id="filter" placeholder="只保留含...的行" class="tool-input" style="max-width: 180px;" />
+      <button class="tool-btn" data-op="apply">应用</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入（每行一条）</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 320px;"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出 <span id="stats" style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.7rem;"></span></label>
+        <textarea id="output" class="tool-textarea" style="min-height: 320px;" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const ops = {
+    sort: l => [...l].sort(),
+    rsort: l => [...l].sort().reverse(),
+    dedupe: l => [...new Set(l)],
+    reverse: l => [...l].reverse(),
+    trim: l => l.map(s=>s.trim()),
+    empty: l => l.filter(s=>s.trim()),
+    random: l => { const a=[...l]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; },
+    number: l => l.map((s,i)=>`${(i+1).toString().padStart(String(l.length).length,' ')}. ${s}`),
+    apply: l => {
+      const p = $('prefix').value, s = $('suffix').value, f = $('filter').value;
+      let r = l;
+      if (f) r = r.filter(line => line.includes(f));
+      if (p || s) r = r.map(line => p + line + s);
+      return r;
+    }
+  };
+
+  document.querySelectorAll('[data-op]').forEach(b => b.onclick = () => {
+    const lines = $('input').value.split('\n');
+    const out = ops[b.dataset.op](lines);
+    $('output').value = out.join('\n');
+    $('stats').textContent = `${lines.length} → ${out.length} 行`;
+  });
+
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('input').value = 'apple\nbanana\napple\ncherry\nbanana\ndate';
+  document.querySelector('[data-op="dedupe"]').click();
+})();
+</script>

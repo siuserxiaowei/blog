@@ -1,0 +1,81 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="温度 / 百分比" description="温度单位换算 + 百分比常用计算" category="开发辅助" icon="🌡️">
+  <div class="tool-card mb-6">
+    <label class="tool-label">温度</label>
+    <div class="grid md:grid-cols-3 gap-3">
+      <div><label class="tool-label">摄氏 °C</label><input id="c" type="number" value="25" class="tool-input" step="0.1" /></div>
+      <div><label class="tool-label">华氏 °F</label><input id="f" type="number" class="tool-input" step="0.1" /></div>
+      <div><label class="tool-label">开尔文 K</label><input id="k" type="number" class="tool-input" step="0.1" /></div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">百分比计算</label>
+    <div class="space-y-4">
+      <div class="p-3 rounded-lg" style="background: var(--bg); border: 1px solid var(--border);">
+        <p class="text-xs mb-2" style="color: var(--text-secondary);">A 占 B 的百分比</p>
+        <div class="flex items-center gap-2 flex-wrap">
+          <input id="p1a" type="number" class="tool-input" value="50" style="max-width: 120px;" />
+          <span style="color: var(--text-secondary);">/</span>
+          <input id="p1b" type="number" class="tool-input" value="200" style="max-width: 120px;" />
+          <span style="color: var(--text-secondary);">=</span>
+          <code id="p1r" class="text-lg" style="color: var(--color-accent); font-family: var(--font-mono);">25%</code>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-lg" style="background: var(--bg); border: 1px solid var(--border);">
+        <p class="text-xs mb-2" style="color: var(--text-secondary);">求 N 的 X%</p>
+        <div class="flex items-center gap-2 flex-wrap">
+          <input id="p2a" type="number" class="tool-input" value="200" style="max-width: 120px;" />
+          <span style="color: var(--text-secondary);">的</span>
+          <input id="p2b" type="number" class="tool-input" value="15" style="max-width: 100px;" />
+          <span style="color: var(--text-secondary);">% =</span>
+          <code id="p2r" class="text-lg" style="color: var(--color-accent); font-family: var(--font-mono);">30</code>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-lg" style="background: var(--bg); border: 1px solid var(--border);">
+        <p class="text-xs mb-2" style="color: var(--text-secondary);">从 A 到 B 增长百分比</p>
+        <div class="flex items-center gap-2 flex-wrap">
+          <input id="p3a" type="number" class="tool-input" value="100" style="max-width: 120px;" />
+          <span style="color: var(--text-secondary);">→</span>
+          <input id="p3b" type="number" class="tool-input" value="125" style="max-width: 120px;" />
+          <span style="color: var(--text-secondary);">=</span>
+          <code id="p3r" class="text-lg" style="color: var(--color-accent); font-family: var(--font-mono);">+25%</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const num = el => parseFloat(el.value) || 0;
+  const fmt = n => isFinite(n) ? +n.toFixed(2) : '∞';
+
+  function syncTemp(src){
+    const c = num($('c')), f = num($('f')), k = num($('k'));
+    if (src === 'c'){ $('f').value = fmt(c*9/5+32); $('k').value = fmt(c+273.15); }
+    else if (src === 'f'){ $('c').value = fmt((f-32)*5/9); $('k').value = fmt((f-32)*5/9+273.15); }
+    else { $('c').value = fmt(k-273.15); $('f').value = fmt((k-273.15)*9/5+32); }
+  }
+  $('c').addEventListener('input', () => syncTemp('c'));
+  $('f').addEventListener('input', () => syncTemp('f'));
+  $('k').addEventListener('input', () => syncTemp('k'));
+  syncTemp('c');
+
+  function p(){
+    $('p1r').textContent = fmt(num($('p1a'))/num($('p1b'))*100) + '%';
+    $('p2r').textContent = fmt(num($('p2a')) * num($('p2b'))/100);
+    const d = num($('p3b')) - num($('p3a'));
+    const pct = (d/num($('p3a')))*100;
+    $('p3r').textContent = (pct >= 0 ? '+':'') + fmt(pct) + '%';
+  }
+  ['p1a','p1b','p2a','p2b','p3a','p3b'].forEach(id => $(id).addEventListener('input', p));
+  p();
+})();
+</script>

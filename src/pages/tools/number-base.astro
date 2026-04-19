@@ -1,0 +1,79 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="进制转换" description="二进制 / 八进制 / 十进制 / 十六进制 任意互转,支持自定义基数" category="开发辅助" icon="🔢">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="tool-label">输入</label>
+        <input id="num" class="tool-input" placeholder="42" value="42" style="font-family: var(--font-mono); font-size: 1.1rem;" />
+      </div>
+      <div>
+        <label class="tool-label">来源进制</label>
+        <select id="from" class="tool-select">
+          <option value="2">二进制 (2)</option>
+          <option value="8">八进制 (8)</option>
+          <option value="10" selected>十进制 (10)</option>
+          <option value="16">十六进制 (16)</option>
+          <option value="custom">自定义...</option>
+        </select>
+        <input id="from-custom" class="tool-input mt-2 hidden" type="number" min="2" max="36" placeholder="2-36" />
+      </div>
+    </div>
+
+    <label class="tool-label">所有进制（点击复制)</label>
+    <div class="grid md:grid-cols-2 gap-3" id="results"></div>
+
+    <div class="mt-6">
+      <label class="tool-label">自定义进制</label>
+      <div class="flex gap-3 items-end">
+        <div class="flex-1">
+          <input id="cb" type="number" min="2" max="36" value="36" class="tool-input" />
+        </div>
+        <code id="custom-out" class="flex-1 tool-input" style="font-family: var(--font-mono); display: flex; align-items: center;">—</code>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const bases = [
+    ['BIN', 2, ''],
+    ['OCT', 8, ''],
+    ['DEC', 10, ''],
+    ['HEX', 16, '0x']
+  ];
+
+  $('from').onchange = () => $('from-custom').classList.toggle('hidden', $('from').value !== 'custom');
+
+  function convert(){
+    let from = $('from').value;
+    if (from === 'custom') from = parseInt($('from-custom').value) || 10;
+    else from = parseInt(from);
+    const v = $('num').value.trim();
+    if (!v) { document.querySelectorAll('[data-out]').forEach(e=>e.textContent='—'); return; }
+    let n;
+    try { n = parseInt(v, from); if (isNaN(n)) throw new Error(); }
+    catch(e){ window.toolToast('无效输入','err'); return; }
+
+    const wrap = $('results'); wrap.innerHTML = '';
+    bases.forEach(([label, base, prefix]) => {
+      const out = prefix + (n >>> 0).toString(base).toUpperCase();
+      const d = document.createElement('div');
+      d.className = 'tool-meta-item cursor-pointer';
+      d.innerHTML = `<div class="k">${label} (base ${base})</div><div class="v" data-out style="font-size: 1.1rem;">${out}</div>`;
+      d.onclick = () => window.toolCopy(out);
+      wrap.appendChild(d);
+    });
+
+    const cb = parseInt($('cb').value) || 36;
+    if (cb >= 2 && cb <= 36) $('custom-out').textContent = n.toString(cb).toUpperCase();
+  }
+
+  ['num','from','from-custom','cb'].forEach(id => $(id).addEventListener('input', convert));
+  convert();
+})();
+</script>

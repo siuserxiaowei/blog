@@ -1,0 +1,57 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="SVG 占位图" description="生成自定义尺寸、配色、文字的 SVG 占位图" category="颜色图像" icon="🟦">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-3 gap-3 mb-3">
+      <div><label class="tool-label">宽</label><input id="w" type="number" value="800" class="tool-input" /></div>
+      <div><label class="tool-label">高</label><input id="h" type="number" value="600" class="tool-input" /></div>
+      <div><label class="tool-label">文字</label><input id="text" class="tool-input" value="800 × 600" /></div>
+      <div><label class="tool-label">背景</label><input id="bg" type="color" value="#c9a96e" class="tool-input" style="height: 42px; padding: 4px;" /></div>
+      <div><label class="tool-label">文字颜色</label><input id="fg" type="color" value="#ffffff" class="tool-input" style="height: 42px; padding: 4px;" /></div>
+      <div><label class="tool-label">字号 比例</label><input id="ratio" type="range" min="5" max="40" value="15" class="tool-input" style="padding: 0;" /></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="tool-label">预览</label>
+        <div id="preview" style="background: var(--bg); padding: 1rem; border: 1px solid var(--border); border-radius: 12px;"></div>
+      </div>
+      <div>
+        <label class="tool-label">代码</label>
+        <textarea id="code" class="tool-textarea" style="min-height: 200px;" readonly></textarea>
+        <div class="tool-toolbar mt-2">
+          <button class="tool-btn tool-btn-primary" id="btn-copy">复制 SVG</button>
+          <button class="tool-btn" id="btn-data">复制 Data URI</button>
+          <button class="tool-btn" id="btn-download">下载</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  function gen(){
+    const w = +$('w').value, h = +$('h').value;
+    const t = $('text').value || `${w} × ${h}`;
+    const bg = $('bg').value, fg = $('fg').value;
+    const fs = Math.floor(Math.min(w,h) * (+$('ratio').value)/100);
+    $('text').placeholder = `${w} × ${h}`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="${bg}"/><text x="50%" y="50%" font-family="system-ui,sans-serif" font-size="${fs}" font-weight="600" fill="${fg}" text-anchor="middle" dominant-baseline="middle">${t}</text></svg>`;
+    $('code').value = svg;
+    $('preview').innerHTML = svg.replace(/width="\d+"/, 'width="100%"').replace(/height="\d+"/, 'height="auto"');
+    window._svg = svg;
+  }
+  ['w','h','text','bg','fg','ratio'].forEach(id => $(id).addEventListener('input', gen));
+  $('btn-copy').onclick = () => window.toolCopy(window._svg);
+  $('btn-data').onclick = () => window.toolCopy('data:image/svg+xml;base64,' + btoa(window._svg));
+  $('btn-download').onclick = () => {
+    const blob = new Blob([window._svg], {type:'image/svg+xml'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `placeholder-${$('w').value}x${$('h').value}.svg`; a.click();
+  };
+  gen();
+})();
+</script>

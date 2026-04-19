@@ -1,0 +1,65 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="ULID 生成器" description="字典序可排序的唯一标识符,带时间戳" category="生成器" icon="🎲">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div><label class="tool-label">数量</label><input id="count" type="number" min="1" max="500" value="10" class="tool-input" /></div>
+      <div><label class="tool-label">操作</label><div class="flex gap-2"><button class="tool-btn tool-btn-primary flex-1" id="btn-gen">生成</button><button class="tool-btn flex-1" id="btn-copy">复制全部</button></div></div>
+    </div>
+    <textarea id="out" class="tool-textarea" readonly style="min-height: 320px;"></textarea>
+
+    <div class="mt-6">
+      <label class="tool-label">解析 ULID</label>
+      <input id="parse" class="tool-input" placeholder="01ARZ3NDEKTSV4RRFFQ69G5FAV" />
+      <div class="grid md:grid-cols-2 gap-3 mt-3" id="info"></div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const ENC = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+  function encodeTime(now, len){
+    let s = '';
+    for (let i=len-1; i>=0; i--){ s = ENC[Math.floor(now / Math.pow(32,len-1-i)) % 32] + s; }
+    return s;
+  }
+  function encodeRand(len){
+    const r = crypto.getRandomValues(new Uint8Array(len));
+    let s = '';
+    for (let i=0; i<len; i++) s += ENC[r[i] % 32];
+    return s;
+  }
+  function ulid(){ return encodeTime(Date.now(),10) + encodeRand(16); }
+
+  function parse(u){
+    if (u.length !== 26) return null;
+    let t = 0;
+    for (let i=0; i<10; i++){ const idx = ENC.indexOf(u[i].toUpperCase()); if (idx<0) return null; t = t*32 + idx; }
+    return { ts: t, date: new Date(t).toISOString(), random: u.slice(10) };
+  }
+
+  $('btn-gen').onclick = () => {
+    const n = Math.min(500, parseInt($('count').value)||1);
+    const arr = []; for (let i=0;i<n;i++) arr.push(ulid());
+    $('out').value = arr.join('\n');
+  };
+  $('btn-copy').onclick = () => $('out').value && window.toolCopy($('out').value);
+  $('parse').addEventListener('input', e => {
+    const p = parse(e.target.value.trim());
+    const wrap = $('info'); wrap.innerHTML = '';
+    if (!p) return;
+    [['时间戳 (ms)', p.ts],['日期 (UTC)', p.date],['随机部分', p.random]].forEach(([k,v])=>{
+      const d = document.createElement('div');
+      d.className = 'tool-meta-item';
+      d.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+      wrap.appendChild(d);
+    });
+  });
+  $('btn-gen').click();
+})();
+</script>

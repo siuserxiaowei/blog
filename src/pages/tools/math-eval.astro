@@ -1,0 +1,92 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="数学计算器" description="支持 sin/cos/log/sqrt 等函数,变量、历史记录" category="开发辅助" icon="🧮">
+  <div class="tool-card">
+    <label class="tool-label">表达式</label>
+    <input id="expr" class="tool-input" placeholder="2 * sin(PI/4) + sqrt(16)" value="2 * sin(PI/4) + sqrt(16)" style="font-family: var(--font-mono); font-size: 1.1rem;" />
+
+    <div class="text-center my-6">
+      <div class="text-4xl font-bold" id="result" style="color: var(--color-accent); font-family: var(--font-mono);">—</div>
+    </div>
+
+    <div class="tool-toolbar mb-4">
+      {['+','-','*','/','(',')','^','%','sqrt(','sin(','cos(','tan(','log(','ln(','PI','E','floor(','ceil(','abs('].map(s => (
+        <button class="tool-btn op" data-s={s}>{s}</button>
+      ))}
+    </div>
+
+    <label class="tool-label">历史记录</label>
+    <div id="history" class="space-y-2"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const history = [];
+
+  function evalExpr(s){
+    // Whitelist-only: digits, operators, parens, identifiers
+    if (!/^[\d\s+\-*/().,%^a-zA-Z_]+$/.test(s)) throw new Error('包含非法字符');
+    s = s.replace(/\^/g, '**');
+    const ctx = { PI: Math.PI, E: Math.E };
+    const fns = ['sin','cos','tan','asin','acos','atan','sqrt','cbrt','log','log2','log10','exp','floor','ceil','round','abs','sign','min','max','pow'];
+    const expr = s.replace(/\b([a-zA-Z]\w*)\s*\(/g, (_, name) => {
+      if (fns.includes(name)) return `Math.${name === 'log' ? 'log' : name === 'ln' ? 'log' : name}(`;
+      throw new Error('未知函数: ' + name);
+    }).replace(/\b(PI|E)\b/g, 'Math.$1');
+    const v = Function('"use strict"; return (' + expr + ')')();
+    if (typeof v !== 'number' || isNaN(v)) throw new Error('结果非数字');
+    return v;
+  }
+
+  function compute(){
+    try {
+      const v = evalExpr($('expr').value);
+      $('result').textContent = +v.toFixed(10);
+      $('result').style.color = 'var(--color-accent)';
+    } catch(e){
+      $('result').textContent = '✗ ' + e.message;
+      $('result').style.color = '#f87171';
+    }
+  }
+
+  $('expr').addEventListener('input', compute);
+  $('expr').addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      try {
+        const v = evalExpr($('expr').value);
+        history.unshift({ e: $('expr').value, r: +v.toFixed(10) });
+        if (history.length > 10) history.pop();
+        renderHistory();
+      } catch(err){}
+    }
+  });
+
+  document.querySelectorAll('.op').forEach(b => b.onclick = () => {
+    const cur = $('expr');
+    const pos = cur.selectionStart;
+    cur.value = cur.value.slice(0, pos) + b.dataset.s + cur.value.slice(pos);
+    cur.focus();
+    cur.setSelectionRange(pos + b.dataset.s.length, pos + b.dataset.s.length);
+    compute();
+  });
+
+  function renderHistory(){
+    const w = $('history'); w.innerHTML = '';
+    history.forEach(h => {
+      const d = document.createElement('div');
+      d.className = 'flex items-center justify-between p-3 rounded-lg cursor-pointer';
+      d.style.cssText = 'background: var(--bg); border: 1px solid var(--border);';
+      d.innerHTML = `<code style="font-family: var(--font-mono); color: var(--text-secondary); font-size: 0.85rem;">${h.e}</code><code style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">= ${h.r}</code>`;
+      d.onclick = () => { $('expr').value = h.e; compute(); };
+      w.appendChild(d);
+    });
+  }
+
+  compute();
+})();
+</script>

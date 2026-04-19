@@ -1,0 +1,54 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Basic Auth 生成" description="生成 HTTP Basic 认证头,user:pass → Base64" category="加密哈希" icon="🔑">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div><label class="tool-label">用户名</label><input id="user" class="tool-input" placeholder="admin" /></div>
+      <div><label class="tool-label">密码</label><input id="pwd" type="text" class="tool-input" placeholder="secret" /></div>
+    </div>
+
+    <label class="tool-label">Authorization 头</label>
+    <input id="header" class="tool-input" readonly style="font-family: var(--font-mono);" />
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn tool-btn-primary" id="btn-copy-h">复制完整头</button>
+      <button class="tool-btn" id="btn-copy-v">仅复制值</button>
+    </div>
+
+    <label class="tool-label mt-6">curl 示例</label>
+    <pre id="curl" class="tool-output" style="font-size: 0.8rem;"></pre>
+
+    <hr style="border-color: var(--border); margin: 2rem 0;" />
+
+    <label class="tool-label">反向解析</label>
+    <input id="parse" class="tool-input" placeholder="Basic YWRtaW46c2VjcmV0" />
+    <pre id="parsed" class="tool-output mt-3" style="font-size: 0.85rem;">—</pre>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  function gen(){
+    const u = $('user').value, p = $('pwd').value;
+    const v = 'Basic ' + btoa(u + ':' + p);
+    $('header').value = 'Authorization: ' + v;
+    $('curl').textContent = `curl -H "${$('header').value}" https://api.example.com/protected`;
+    window._v = v;
+  }
+  ['user','pwd'].forEach(id => $(id).addEventListener('input', gen));
+  $('btn-copy-h').onclick = () => window.toolCopy($('header').value);
+  $('btn-copy-v').onclick = () => window.toolCopy(window._v || '');
+
+  $('parse').addEventListener('input', e => {
+    let s = e.target.value.trim().replace(/^(Authorization:\s*)?Basic\s+/i, '');
+    try {
+      const dec = atob(s);
+      const idx = dec.indexOf(':');
+      $('parsed').textContent = `用户名: ${dec.slice(0, idx)}\n密码:   ${dec.slice(idx+1)}`;
+    } catch(err){ $('parsed').textContent = '✗ 无效'; }
+  });
+  gen();
+})();
+</script>

@@ -1,0 +1,78 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JS / HTML 格式化" description="使用 Prettier 格式化 JavaScript / TypeScript / HTML" category="开发辅助" icon="✨">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="tool-label">语言</label>
+        <select id="lang" class="tool-select">
+          <option value="babel">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="html">HTML</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">缩进</label>
+        <select id="tab" class="tool-select">
+          <option value="2">2 空格</option>
+          <option value="4">4 空格</option>
+          <option value="tab">Tab</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-fmt">格式化</button>
+      <button class="tool-btn" id="btn-min">压缩为单行</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 360px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待 Prettier 加载</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline src="https://unpkg.com/prettier@3.3.3/standalone.js"></script>
+<script is:inline src="https://unpkg.com/prettier@3.3.3/plugins/babel.js"></script>
+<script is:inline src="https://unpkg.com/prettier@3.3.3/plugins/estree.js"></script>
+<script is:inline src="https://unpkg.com/prettier@3.3.3/plugins/typescript.js"></script>
+<script is:inline src="https://unpkg.com/prettier@3.3.3/plugins/html.js"></script>
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  $('btn-fmt').onclick = async () => {
+    if (typeof prettier === 'undefined') { setStatus('Prettier 还在加载...','err'); return; }
+    const lang = $('lang').value, tab = $('tab').value;
+    try {
+      const opts = {
+        parser: lang,
+        plugins: prettierPlugins,
+        useTabs: tab==='tab',
+        tabWidth: tab==='tab' ? 2 : parseInt(tab),
+        printWidth: 100
+      };
+      $('output').value = await prettier.format($('input').value, opts);
+      setStatus('✓ 格式化完成','ok');
+    } catch(e){ setStatus('✗ '+e.message.split('\n')[0],'err'); }
+  };
+  $('btn-min').onclick = () => {
+    $('output').value = $('input').value.replace(/\s+/g,' ').replace(/\s*([{};,:()])\s*/g,'$1').trim();
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+
+  $('input').value = 'function hello(name){const msg=`Hello, ${name}!`;console.log(msg);return {ok:true,msg}}\nconst arr=[1,2,3].map(x=>x*2).filter(x=>x>2);';
+  setTimeout(() => { setStatus('准备就绪','ok'); $('btn-fmt').click(); }, 1500);
+})();
+</script>

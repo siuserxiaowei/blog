@@ -1,0 +1,76 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="IPv4 子网计算器" description="CIDR 解析,网络号 / 广播地址 / 主机数 / 范围一应俱全" category="网络工具" icon="🌐">
+  <div class="tool-card">
+    <label class="tool-label">CIDR 表示</label>
+    <input id="cidr" class="tool-input" placeholder="192.168.1.0/24" value="192.168.1.0/24" style="font-family: var(--font-mono); font-size: 1.1rem;" />
+    <div class="tool-toolbar mt-3">
+      {['10.0.0.0/8','172.16.0.0/12','192.168.0.0/16','192.168.1.0/24','192.168.1.128/25','10.0.0.0/30'].map(c=>(
+        <button class="tool-btn preset" data-c={c}>{c}</button>
+      ))}
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+
+    <div class="grid md:grid-cols-2 gap-3 mt-6" id="info"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function ipToInt(ip){
+    const p = ip.split('.').map(Number);
+    if (p.length !== 4 || p.some(n => isNaN(n) || n<0 || n>255)) throw new Error('无效 IP');
+    return ((p[0]<<24) | (p[1]<<16) | (p[2]<<8) | p[3]) >>> 0;
+  }
+  function intToIp(n){ return [(n>>>24)&0xff,(n>>>16)&0xff,(n>>>8)&0xff, n&0xff].join('.'); }
+
+  function calc(){
+    const v = $('cidr').value.trim();
+    const m = v.match(/^(\d+\.\d+\.\d+\.\d+)\/(\d+)$/);
+    if (!m){ setStatus('✗ 格式 a.b.c.d/n','err'); return; }
+    try {
+      const ip = ipToInt(m[1]);
+      const cidr = parseInt(m[2]);
+      if (cidr<0||cidr>32) throw new Error('CIDR 0-32');
+      const mask = cidr === 0 ? 0 : (0xFFFFFFFF << (32-cidr)) >>> 0;
+      const network = (ip & mask) >>> 0;
+      const broadcast = (network | (~mask >>> 0)) >>> 0;
+      const total = cidr === 32 ? 1 : Math.pow(2, 32-cidr);
+      const usable = cidr >= 31 ? total : total - 2;
+
+      const data = [
+        ['CIDR', `/${cidr}`],
+        ['子网掩码', intToIp(mask)],
+        ['通配符掩码', intToIp(~mask >>> 0)],
+        ['网络地址', intToIp(network)],
+        ['广播地址', intToIp(broadcast)],
+        ['首个可用 IP', cidr >= 31 ? intToIp(network) : intToIp(network+1)],
+        ['末个可用 IP', cidr >= 31 ? intToIp(broadcast) : intToIp(broadcast-1)],
+        ['总地址数', total.toLocaleString()],
+        ['可用主机数', usable.toLocaleString()],
+        ['二进制掩码', mask.toString(2).padStart(32,'0').match(/.{8}/g).join('.')]
+      ];
+
+      const wrap = $('info'); wrap.innerHTML = '';
+      data.forEach(([k,vv])=>{
+        const d = document.createElement('div');
+        d.className = 'tool-meta-item cursor-pointer';
+        d.innerHTML = `<div class="k">${k}</div><div class="v">${vv}</div>`;
+        d.onclick = () => window.toolCopy(String(vv));
+        wrap.appendChild(d);
+      });
+      setStatus('✓ 解析完成','ok');
+    } catch(e){ setStatus('✗ '+e.message,'err'); }
+  }
+
+  $('cidr').addEventListener('input', calc);
+  document.querySelectorAll('.preset').forEach(b => b.onclick = () => { $('cidr').value = b.dataset.c; calc(); });
+  calc();
+})();
+</script>

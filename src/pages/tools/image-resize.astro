@@ -1,0 +1,108 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="图片压缩" description="本地浏览器压缩 / 缩放图片,不上传服务器" category="颜色图像" icon="🗜️">
+  <div class="tool-card">
+    <div id="drop" class="rounded-xl text-center cursor-pointer mb-4" style="border: 2px dashed var(--border); padding: 2rem 1rem; background: var(--bg);">
+      <input type="file" id="file-input" accept="image/*" class="hidden" />
+      <div style="font-size: 2.5rem; opacity: 0.4;">📤</div>
+      <p style="color: var(--text-secondary);">点击或拖拽图片</p>
+    </div>
+
+    <div id="settings" class="hidden">
+      <div class="grid md:grid-cols-3 gap-3 mb-3">
+        <div>
+          <label class="tool-label">最大宽度: <span id="w-v" style="color: var(--color-accent);">1920</span> px</label>
+          <input id="w" type="range" min="100" max="4000" value="1920" class="w-full" />
+        </div>
+        <div>
+          <label class="tool-label">质量: <span id="q-v" style="color: var(--color-accent);">85</span>%</label>
+          <input id="q" type="range" min="10" max="100" value="85" class="w-full" />
+        </div>
+        <div>
+          <label class="tool-label">输出格式</label>
+          <select id="fmt" class="tool-select">
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/webp" selected>WebP</option>
+            <option value="image/png">PNG</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <div>
+          <label class="tool-label">原图 <span id="orig-info" style="font-family: var(--font-mono); color: var(--text-secondary); font-size: 0.7rem;"></span></label>
+          <div id="orig" style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 1rem;"></div>
+        </div>
+        <div>
+          <label class="tool-label">压缩后 <span id="new-info" style="font-family: var(--font-mono); color: #4ade80; font-size: 0.7rem;"></span></label>
+          <div id="new" style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 1rem;"></div>
+        </div>
+      </div>
+
+      <div class="tool-toolbar mt-4">
+        <button class="tool-btn tool-btn-primary" id="btn-download">下载压缩后</button>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  let origImg = null;
+
+  ['dragenter','dragover'].forEach(e => $('drop').addEventListener(e, ev => { ev.preventDefault(); $('drop').style.borderColor = 'var(--color-accent)'; }));
+  ['dragleave','drop'].forEach(e => $('drop').addEventListener(e, ev => { ev.preventDefault(); $('drop').style.borderColor = 'var(--border)'; }));
+  $('drop').onclick = () => $('file-input').click();
+  $('drop').addEventListener('drop', ev => { const f=ev.dataTransfer.files[0]; if (f) handle(f); });
+  $('file-input').onchange = e => { const f=e.target.files[0]; if (f) handle(f); };
+
+  function handle(f){
+    const r = new FileReader();
+    r.onload = () => {
+      origImg = new Image();
+      origImg.onload = () => {
+        $('settings').classList.remove('hidden');
+        $('orig').innerHTML = `<img src="${r.result}" style="max-width:100%;max-height:280px;border-radius:6px;" />`;
+        $('orig-info').textContent = `${origImg.width}×${origImg.height} · ${(f.size/1024).toFixed(1)} KB`;
+        compress();
+      };
+      origImg.src = r.result;
+      origImg.fileSize = f.size;
+    };
+    r.readAsDataURL(f);
+  }
+
+  $('w').oninput = () => { $('w-v').textContent = $('w').value; compress(); };
+  $('q').oninput = () => { $('q-v').textContent = $('q').value; compress(); };
+  $('fmt').onchange = compress;
+
+  function compress(){
+    if (!origImg) return;
+    const maxW = +$('w').value;
+    const ratio = Math.min(1, maxW / origImg.width);
+    const w = Math.round(origImg.width * ratio), h = Math.round(origImg.height * ratio);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(origImg, 0, 0, w, h);
+    c.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      $('new').innerHTML = `<img src="${url}" style="max-width:100%;max-height:280px;border-radius:6px;" />`;
+      const ratio = Math.round((1 - blob.size/origImg.fileSize) * 100);
+      $('new-info').textContent = `${w}×${h} · ${(blob.size/1024).toFixed(1)} KB · 节省 ${ratio}%`;
+      window._compressedBlob = blob;
+      window._ext = $('fmt').value.split('/')[1];
+    }, $('fmt').value, +$('q').value/100);
+  }
+
+  $('btn-download').onclick = () => {
+    if (!window._compressedBlob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(window._compressedBlob);
+    a.download = `compressed.${window._ext}`;
+    a.click();
+  };
+})();
+</script>

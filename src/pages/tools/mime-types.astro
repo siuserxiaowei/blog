@@ -1,0 +1,53 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="MIME 类型查询" description="文件扩展名 ↔ MIME 类型互查" category="网络工具" icon="📎">
+  <div class="tool-card">
+    <label class="tool-label">搜索（扩展名或 MIME 关键词）</label>
+    <input id="q" class="tool-input" placeholder="png / image / json" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4" id="list"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const data = [
+    ['html, htm','text/html','网页'],['css','text/css','样式'],['js, mjs','text/javascript','脚本'],
+    ['json','application/json','JSON'],['xml','application/xml','XML'],['yaml, yml','application/yaml','YAML'],
+    ['csv','text/csv','CSV'],['txt','text/plain','纯文本'],['md, markdown','text/markdown','Markdown'],
+    ['pdf','application/pdf','PDF'],['zip','application/zip','ZIP 压缩包'],['tar','application/x-tar','Tar 归档'],
+    ['gz','application/gzip','Gzip'],['rar','application/vnd.rar','RAR 压缩'],['7z','application/x-7z-compressed','7Z 压缩'],
+    ['png','image/png','PNG 图片'],['jpg, jpeg','image/jpeg','JPEG 图片'],['gif','image/gif','GIF 动图'],
+    ['webp','image/webp','WebP 图片'],['svg','image/svg+xml','SVG 矢量图'],['ico','image/x-icon','图标'],
+    ['bmp','image/bmp','位图'],['avif','image/avif','AVIF 图片'],['tiff','image/tiff','TIFF 图片'],
+    ['mp3','audio/mpeg','MP3 音频'],['wav','audio/wav','WAV 音频'],['flac','audio/flac','FLAC 无损'],
+    ['ogg','audio/ogg','Ogg 音频'],['m4a','audio/mp4','M4A 音频'],['aac','audio/aac','AAC 音频'],
+    ['mp4','video/mp4','MP4 视频'],['webm','video/webm','WebM 视频'],['mov','video/quicktime','QuickTime'],
+    ['mkv','video/x-matroska','MKV'],['avi','video/x-msvideo','AVI'],['flv','video/x-flv','Flash 视频'],
+    ['woff','font/woff','字体'],['woff2','font/woff2','字体 v2'],['ttf','font/ttf','TTF 字体'],['otf','font/otf','OTF 字体'],
+    ['doc','application/msword','Word 旧版'],['docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document','Word'],
+    ['xls','application/vnd.ms-excel','Excel 旧版'],['xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','Excel'],
+    ['ppt','application/vnd.ms-powerpoint','PPT 旧版'],['pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation','PPT'],
+    ['form','application/x-www-form-urlencoded','表单数据'],['multipart','multipart/form-data','含文件表单'],
+    ['stream','application/octet-stream','二进制流'],['eot','application/vnd.ms-fontobject','EOT 字体']
+  ];
+
+  function render(q=''){
+    q = q.toLowerCase().trim();
+    const wrap = document.getElementById('list'); wrap.innerHTML = '';
+    data.filter(d => !q || d[0].includes(q) || d[1].includes(q) || d[2].toLowerCase().includes(q)).forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'p-3 rounded-lg cursor-pointer';
+      el.style.cssText = 'background: var(--bg); border: 1px solid var(--border);';
+      el.onmouseover = () => el.style.borderColor = 'var(--color-accent)';
+      el.onmouseout = () => el.style.borderColor = 'var(--border)';
+      el.innerHTML = `<div class="flex items-baseline gap-3"><code class="text-xs font-bold" style="color: var(--color-accent); font-family: var(--font-mono); min-width: 80px;">.${d[0]}</code><code class="flex-1 text-xs" style="color: var(--text); font-family: var(--font-mono);">${d[1]}</code></div><p class="text-[11px] mt-1" style="color: var(--text-secondary);">${d[2]}</p>`;
+      el.onclick = () => window.toolCopy(d[1]);
+      wrap.appendChild(el);
+    });
+  }
+  document.getElementById('q').addEventListener('input', e => render(e.target.value));
+  render();
+})();
+</script>

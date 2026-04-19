@@ -1,0 +1,84 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="curl → fetch" description="把 curl 命令转成 JS fetch / Node fetch / Axios 代码" category="网络工具" icon="↻">
+  <div class="tool-card">
+    <label class="tool-label">curl 命令</label>
+    <textarea id="curl" class="tool-textarea" style="min-height: 180px;" spellcheck="false" placeholder="curl -X POST 'https://api.example.com/users' -H 'Content-Type: application/json' -d '{\"name\":\"siuser\"}'"></textarea>
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn tool-btn-primary" id="btn-fetch">fetch</button>
+      <button class="tool-btn" id="btn-axios">axios</button>
+      <button class="tool-btn" id="btn-node">node fetch</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <label class="tool-label mt-4">输出</label>
+    <pre id="out" class="tool-output" style="min-height: 240px;"></pre>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function tokenize(s){
+    s = s.trim().replace(/\\\n/g,' ').replace(/\s+/g,' ');
+    const out = []; let cur=''; let q=null;
+    for (let i=0; i<s.length; i++){
+      const c = s[i];
+      if (q){ if (c===q){ q=null; } else cur += c; }
+      else if (c==='"' || c==="'"){ q = c; }
+      else if (c===' '){ if (cur) out.push(cur); cur=''; }
+      else cur += c;
+    }
+    if (cur) out.push(cur);
+    return out;
+  }
+
+  function parse(curl){
+    const t = tokenize(curl);
+    if (t[0] !== 'curl') throw new Error('需要以 curl 开头');
+    let url = '', method = 'GET', headers = {}, body = null;
+    for (let i=1; i<t.length; i++){
+      const x = t[i];
+      if (x === '-X' || x === '--request') method = t[++i];
+      else if (x === '-H' || x === '--header') { const [k,...v] = t[++i].split(':'); headers[k.trim()] = v.join(':').trim(); }
+      else if (x === '-d' || x === '--data' || x === '--data-raw' || x === '--data-binary') { body = t[++i]; if (method === 'GET') method = 'POST'; }
+      else if (x === '-u' || x === '--user') headers['Authorization'] = 'Basic ' + btoa(t[++i]);
+      else if (x === '--compressed' || x === '-i' || x === '-s' || x === '-k' || x === '-L' || x === '--location') continue;
+      else if (!x.startsWith('-')) url = x;
+    }
+    return { url, method, headers, body };
+  }
+
+  function gen(type){
+    let p;
+    try { p = parse($('curl').value); } catch(e){ window.toolToast(e.message, 'err'); return; }
+    const opts = { method: p.method };
+    if (Object.keys(p.headers).length) opts.headers = p.headers;
+    if (p.body) opts.body = p.body;
+    let code = '';
+    if (type === 'fetch') {
+      code = `fetch(${JSON.stringify(p.url)}, ${JSON.stringify(opts, null, 2)})\n  .then(r => r.json())\n  .then(data => console.log(data))\n  .catch(err => console.error(err));`;
+    } else if (type === 'axios') {
+      const cfg = { method: p.method.toLowerCase(), url: p.url, headers: p.headers };
+      if (p.body) cfg.data = p.body;
+      code = `import axios from 'axios';\n\naxios(${JSON.stringify(cfg, null, 2)})\n  .then(r => console.log(r.data))\n  .catch(err => console.error(err));`;
+    } else {
+      code = `// Node 18+\nconst res = await fetch(${JSON.stringify(p.url)}, ${JSON.stringify(opts, null, 2)});\nconst data = await res.json();\nconsole.log(data);`;
+    }
+    $('out').textContent = code;
+  }
+
+  $('btn-fetch').onclick = () => gen('fetch');
+  $('btn-axios').onclick = () => gen('axios');
+  $('btn-node').onclick = () => gen('node');
+  $('btn-copy').onclick = () => $('out').textContent && window.toolCopy($('out').textContent);
+
+  $('curl').value = `curl -X POST 'https://api.example.com/users' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Authorization: Bearer token123' \\
+  -d '{"name":"siuser","year":2026}'`;
+  gen('fetch');
+})();
+</script>

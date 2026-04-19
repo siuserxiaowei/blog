@@ -1,0 +1,73 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Open Graph 生成" description="生成 Open Graph + Twitter Card 元标签,实时预览" category="网络工具" icon="📱">
+  <div class="tool-card mb-6">
+    <div class="grid md:grid-cols-2 gap-3">
+      <div><label class="tool-label">标题</label><input id="title" class="tool-input" value="开发者工具箱" /></div>
+      <div><label class="tool-label">URL</label><input id="url" class="tool-input" value="https://siuserxiaowei.com/tools" /></div>
+      <div class="md:col-span-2"><label class="tool-label">描述</label><textarea id="desc" class="tool-textarea" style="min-height: 80px;">纯前端、零追踪的开发者在线工具集合</textarea></div>
+      <div><label class="tool-label">图片 URL</label><input id="image" class="tool-input" placeholder="https://..." /></div>
+      <div><label class="tool-label">站点名</label><input id="site" class="tool-input" value="siuser小伟" /></div>
+      <div><label class="tool-label">类型</label><select id="type" class="tool-select"><option>website</option><option>article</option><option>video.movie</option><option>music.song</option><option>profile</option></select></div>
+      <div><label class="tool-label">Twitter Card</label><select id="card" class="tool-select"><option>summary_large_image</option><option>summary</option><option>player</option></select></div>
+      <div><label class="tool-label">@Twitter 用户名</label><input id="twuser" class="tool-input" placeholder="@xxx" /></div>
+      <div><label class="tool-label">语言</label><input id="locale" class="tool-input" value="zh_CN" /></div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="tool-card">
+      <label class="tool-label">生成的 HTML</label>
+      <pre id="html" class="tool-output" style="min-height: 300px; font-size: 0.78rem;"></pre>
+      <div class="tool-toolbar mt-2"><button class="tool-btn tool-btn-primary" id="btn-copy">复制</button></div>
+    </div>
+    <div class="tool-card">
+      <label class="tool-label">社交平台预览</label>
+      <div id="preview" style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+        <div id="prev-img" style="width: 100%; height: 200px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 0.85rem;">无图片</div>
+        <div style="padding: 1rem;">
+          <p id="prev-url" style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-family: var(--font-mono); margin-bottom: 0.4rem;"></p>
+          <p id="prev-title" style="font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem;"></p>
+          <p id="prev-desc" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const fields = ['title','url','desc','image','site','type','card','twuser','locale'];
+
+  function gen(){
+    const v = Object.fromEntries(fields.map(f => [f, $(f).value]));
+    let h = '';
+    h += `<meta property="og:type" content="${v.type}" />\n`;
+    h += `<meta property="og:url" content="${v.url}" />\n`;
+    h += `<meta property="og:title" content="${v.title}" />\n`;
+    h += `<meta property="og:description" content="${v.desc}" />\n`;
+    if (v.site) h += `<meta property="og:site_name" content="${v.site}" />\n`;
+    if (v.image) h += `<meta property="og:image" content="${v.image}" />\n`;
+    if (v.locale) h += `<meta property="og:locale" content="${v.locale}" />\n\n`;
+    h += `<meta name="twitter:card" content="${v.card}" />\n`;
+    h += `<meta name="twitter:title" content="${v.title}" />\n`;
+    h += `<meta name="twitter:description" content="${v.desc}" />\n`;
+    if (v.image) h += `<meta name="twitter:image" content="${v.image}" />\n`;
+    if (v.twuser) h += `<meta name="twitter:site" content="${v.twuser.startsWith('@')?v.twuser:'@'+v.twuser}" />\n`;
+    $('html').textContent = h;
+
+    $('prev-title').textContent = v.title;
+    $('prev-desc').textContent = v.desc;
+    $('prev-url').textContent = v.url ? new URL(v.url).hostname : '';
+    if (v.image) $('prev-img').innerHTML = `<img src="${v.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='图片加载失败'"/>`;
+    else $('prev-img').innerHTML = '无图片';
+  }
+
+  fields.forEach(f => $(f).addEventListener('input', gen));
+  $('btn-copy').onclick = () => window.toolCopy($('html').textContent);
+  gen();
+})();
+</script>

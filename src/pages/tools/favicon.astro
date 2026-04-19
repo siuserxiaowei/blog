@@ -1,0 +1,79 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Favicon 生成" description="从一张图生成多尺寸 PNG / ICO favicon + HTML 标签" category="颜色图像" icon="⭐">
+  <div class="tool-card">
+    <div id="drop" class="rounded-xl text-center cursor-pointer mb-4" style="border: 2px dashed var(--border); padding: 2rem 1rem; background: var(--bg);">
+      <input type="file" id="file-input" accept="image/*" class="hidden" />
+      <div style="font-size: 2.5rem; opacity: 0.4;">⭐</div>
+      <p style="color: var(--text-secondary);">点击或拖拽源图（建议 512×512 以上）</p>
+    </div>
+
+    <div id="output" class="hidden">
+      <label class="tool-label">生成的图标</label>
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4" id="icons"></div>
+
+      <label class="tool-label">HTML 标签</label>
+      <pre id="html" class="tool-output" style="font-size: 0.78rem;"></pre>
+      <div class="tool-toolbar mt-2">
+        <button class="tool-btn tool-btn-primary" id="btn-copy">复制 HTML</button>
+        <button class="tool-btn" id="btn-zip">下载全部</button>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const sizes = [16, 32, 48, 64, 128, 180, 192, 512];
+
+  ['dragenter','dragover'].forEach(e => $('drop').addEventListener(e, ev => { ev.preventDefault(); $('drop').style.borderColor = 'var(--color-accent)'; }));
+  ['dragleave','drop'].forEach(e => $('drop').addEventListener(e, ev => { ev.preventDefault(); $('drop').style.borderColor = 'var(--border)'; }));
+  $('drop').onclick = () => $('file-input').click();
+  $('drop').addEventListener('drop', ev => { const f=ev.dataTransfer.files[0]; if (f) handle(f); });
+  $('file-input').onchange = e => { const f=e.target.files[0]; if (f) handle(f); };
+
+  function handle(f){
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => generate(img);
+      img.src = r.result;
+    };
+    r.readAsDataURL(f);
+  }
+
+  function generate(img){
+    $('output').classList.remove('hidden');
+    const wrap = $('icons'); wrap.innerHTML = '';
+    window._icons = {};
+    sizes.forEach(s => {
+      const c = document.createElement('canvas'); c.width = c.height = s;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, s, s);
+      const url = c.toDataURL('image/png');
+      window._icons[s] = url;
+      const el = document.createElement('div');
+      el.className = 'text-center cursor-pointer';
+      el.innerHTML = `<div style="background: var(--bg); border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px;"><img src="${url}" style="width:${Math.min(s,64)}px;height:${Math.min(s,64)}px;display:block;margin:0 auto;image-rendering:pixelated;" /></div><p style="font-size:0.7rem;color:var(--text-secondary);font-family:var(--font-mono);margin-top:0.4rem;">${s}×${s}</p>`;
+      el.onclick = () => { const a=document.createElement('a'); a.href=url; a.download=`favicon-${s}.png`; a.click(); };
+      wrap.appendChild(el);
+    });
+
+    $('html').textContent = `<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+<link rel="manifest" href="/site.webmanifest" />`;
+  }
+
+  $('btn-copy').onclick = () => window.toolCopy($('html').textContent);
+  $('btn-zip').onclick = () => {
+    Object.entries(window._icons).forEach(([s, url]) => {
+      const a = document.createElement('a'); a.href = url; a.download = `favicon-${s}.png`; a.click();
+    });
+  };
+})();
+</script>

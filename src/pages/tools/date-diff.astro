@@ -1,0 +1,124 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="日期计算器" description="日期相差天数、加减日期、年龄计算" category="时间日期" icon="📅">
+  <div class="tool-card mb-6">
+    <label class="tool-label">两日期相差</label>
+    <div class="grid md:grid-cols-2 gap-3">
+      <div><label class="tool-label">起始日期</label><input id="d1" type="date" class="tool-input" /></div>
+      <div><label class="tool-label">结束日期</label><input id="d2" type="date" class="tool-input" /></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4" id="diff-out"></div>
+  </div>
+
+  <div class="tool-card mb-6">
+    <label class="tool-label">日期加减</label>
+    <div class="grid md:grid-cols-3 gap-3">
+      <div><label class="tool-label">基准日期</label><input id="base" type="date" class="tool-input" /></div>
+      <div><label class="tool-label">数量</label><input id="amount" type="number" value="30" class="tool-input" /></div>
+      <div>
+        <label class="tool-label">单位</label>
+        <select id="unit" class="tool-select">
+          <option value="day">天</option>
+          <option value="week">周</option>
+          <option value="month">月</option>
+          <option value="year">年</option>
+          <option value="hour">小时</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-meta mt-4">
+      <div class="tool-meta-item"><div class="k">+ 加</div><div class="v" id="add-out">—</div></div>
+      <div class="tool-meta-item"><div class="k">- 减</div><div class="v" id="sub-out">—</div></div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">年龄计算</label>
+    <input id="birth" type="date" class="tool-input" style="max-width: 280px;" />
+    <pre id="age" class="tool-output mt-3" style="font-size: 0.9rem;">—</pre>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const today = new Date().toISOString().slice(0,10);
+  $('d1').value = '2026-01-01';
+  $('d2').value = today;
+  $('base').value = today;
+  $('birth').value = '2000-01-01';
+
+  function calcDiff(){
+    const a = new Date($('d1').value), b = new Date($('d2').value);
+    if (isNaN(a) || isNaN(b)) return;
+    const ms = b - a;
+    const days = Math.round(ms / 86400000);
+    const items = [
+      ['天数', days],
+      ['周数', (days/7).toFixed(1)],
+      ['月数', (days/30).toFixed(1)],
+      ['年数', (days/365.25).toFixed(2)],
+      ['小时', days*24],
+      ['分钟', days*24*60],
+      ['工作日', countWorkdays(a, b)],
+      ['周末日', days - countWorkdays(a, b)]
+    ];
+    const w = $('diff-out'); w.innerHTML = '';
+    items.forEach(([k,v]) => {
+      const d = document.createElement('div');
+      d.className = 'tool-meta-item';
+      d.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+      w.appendChild(d);
+    });
+  }
+
+  function countWorkdays(a, b){
+    if (a > b) [a,b] = [b,a];
+    let c = 0; const cur = new Date(a);
+    while (cur <= b){ const d = cur.getDay(); if (d !== 0 && d !== 6) c++; cur.setDate(cur.getDate()+1); }
+    return c;
+  }
+
+  function calcAdd(){
+    const base = new Date($('base').value);
+    if (isNaN(base)) return;
+    const n = parseInt($('amount').value) || 0;
+    const u = $('unit').value;
+    const add = new Date(base), sub = new Date(base);
+    const map = { day: 'Date', week: 'Date', month: 'Month', year: 'FullYear', hour: 'Hours' };
+    const mult = u === 'week' ? 7 : 1;
+    const m = map[u];
+    add[`set${m}`](add[`get${m}`]() + n * mult);
+    sub[`set${m}`](sub[`get${m}`]() - n * mult);
+    const fmt = d => u === 'hour' ? d.toLocaleString('zh-CN',{hour12:false}) : d.toISOString().slice(0,10);
+    $('add-out').textContent = fmt(add);
+    $('sub-out').textContent = fmt(sub);
+  }
+
+  function calcAge(){
+    const b = new Date($('birth').value);
+    if (isNaN(b)) return;
+    const now = new Date();
+    let y = now.getFullYear() - b.getFullYear();
+    let m = now.getMonth() - b.getMonth();
+    let d = now.getDate() - b.getDate();
+    if (d < 0){ m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+    if (m < 0){ y--; m += 12; }
+    const days = Math.round((now - b) / 86400000);
+    $('age').textContent = `年龄: ${y} 岁 ${m} 个月 ${d} 天\n出生至今: ${days} 天 / ${(days*24).toLocaleString()} 小时\n下次生日: ${nextBirth(b, now)}`;
+  }
+  function nextBirth(b, now){
+    const next = new Date(now.getFullYear(), b.getMonth(), b.getDate());
+    if (next < now) next.setFullYear(next.getFullYear()+1);
+    const days = Math.ceil((next - now)/86400000);
+    return `${next.toISOString().slice(0,10)} (${days} 天后)`;
+  }
+
+  ['d1','d2'].forEach(id => $(id).addEventListener('input', calcDiff));
+  ['base','amount','unit'].forEach(id => $(id).addEventListener('input', calcAdd));
+  $('birth').addEventListener('input', calcAge);
+  calcDiff(); calcAdd(); calcAge();
+})();
+</script>

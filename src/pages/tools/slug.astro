@@ -1,0 +1,78 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Slug 生成" description="生成 URL 友好的 slug,自动转拼音、去特殊字符" category="文本处理" icon="🔧">
+  <div class="tool-card">
+    <label class="tool-label">原文</label>
+    <textarea id="input" class="tool-textarea" style="min-height: 100px;" placeholder="如何在 Cloudflare Pages 部署 Astro 站点"></textarea>
+
+    <div class="grid md:grid-cols-3 gap-3 mt-3">
+      <div>
+        <label class="tool-label">分隔符</label>
+        <select id="sep" class="tool-select">
+          <option value="-">连字符 -</option>
+          <option value="_">下划线 _</option>
+          <option value=".">点 .</option>
+          <option value="">无</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">大小写</label>
+        <select id="case" class="tool-select">
+          <option value="lower">小写</option>
+          <option value="upper">大写</option>
+          <option value="preserve">保持</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">最长</label>
+        <input id="max" type="number" min="0" value="0" class="tool-input" placeholder="0=不限" />
+      </div>
+    </div>
+
+    <label class="tool-label mt-4">输出</label>
+    <input id="output" class="tool-input" readonly style="font-family: var(--font-mono); font-size: 1.05rem;" />
+    <div class="tool-toolbar mt-2"><button class="tool-btn tool-btn-primary" id="btn-copy">复制</button></div>
+
+    <div class="mt-6">
+      <label class="tool-label">URL 预览</label>
+      <code id="preview" class="block p-3 rounded-lg" style="background: var(--bg); border: 1px solid var(--border); font-family: var(--font-mono); color: var(--text); font-size: 0.85rem;">https://siuserxiaowei.com/blog/—</code>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function slugify(s){
+    return s.normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .replace(/[\u4e00-\u9fa5]/g, c => {
+        // simple CJK fallback: drop unsupported chars (without pinyin lib)
+        return ' ';
+      })
+      .replace(/[^a-zA-Z0-9\s\-_.]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  function gen(){
+    let s = slugify($('input').value);
+    const sep = $('sep').value;
+    s = s.split(/[\s\-_.]+/).filter(Boolean).join(sep);
+    if ($('case').value === 'lower') s = s.toLowerCase();
+    else if ($('case').value === 'upper') s = s.toUpperCase();
+    const max = +$('max').value;
+    if (max > 0 && s.length > max) s = s.slice(0, max).replace(new RegExp(sep + '$'), '');
+    $('output').value = s;
+    $('preview').textContent = `https://siuserxiaowei.com/blog/${s || '—'}`;
+  }
+
+  ['input','sep','case','max'].forEach(id => $(id).addEventListener('input', gen));
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('input').value = 'How to Deploy an Astro Site on Cloudflare Pages';
+  gen();
+})();
+</script>

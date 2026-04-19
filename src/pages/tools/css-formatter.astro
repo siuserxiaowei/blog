@@ -1,0 +1,56 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="CSS 格式化" description="美化、压缩 CSS,支持 SCSS / LESS" category="开发辅助" icon="🎀">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-pretty">美化</button>
+      <button class="tool-btn" id="btn-min">压缩</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-sample">示例</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 360px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function pretty(css){
+    css = css.replace(/\/\*[\s\S]*?\*\//g, m => '\x00' + Math.random() + '\x00' + m).replace(/\s+/g,' ');
+    let out='', indent=0;
+    let i=0;
+    while (i < css.length){
+      const c = css[i];
+      if (c === '{'){ out += ' {\n'; indent++; out += '  '.repeat(indent); i++; }
+      else if (c === '}'){ indent--; out = out.replace(/\s+$/,''); out += '\n' + '  '.repeat(indent) + '}\n' + '  '.repeat(indent); i++; }
+      else if (c === ';'){ out += ';\n' + '  '.repeat(indent); i++; }
+      else if (c === ':' && css.slice(i-1,i+1) !== '::'){ out += ': '; i++; }
+      else { out += c; i++; }
+    }
+    return out.replace(/^\s+/gm, m => m).replace(/\n\s*\n/g, '\n').trim();
+  }
+
+  $('btn-pretty').onclick = () => { try { $('output').value = pretty($('input').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-min').onclick = () => {
+    $('output').value = $('input').value.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s+/g,' ').replace(/\s*([{};:,>+~])\s*/g,'$1').replace(/;}/g,'}').trim();
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('btn-sample').onclick = () => {
+    $('input').value = '.btn{padding:10px 20px;background:#c9a96e;color:#fff;border-radius:8px;transition:all .2s ease}.btn:hover{background:#d4b87a;transform:translateY(-1px)}@media(max-width:768px){.btn{padding:8px 16px}}';
+    $('btn-pretty').click();
+  };
+  $('btn-sample').click();
+})();
+</script>

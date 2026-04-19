@@ -1,0 +1,78 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="TOTP 验证器" description="基于密钥实时生成 6 位验证码(Google Authenticator 兼容)" category="加密哈希" icon="🔢">
+  <div class="tool-card">
+    <label class="tool-label">Base32 密钥</label>
+    <input id="secret" class="tool-input" placeholder="JBSWY3DPEHPK3PXP" value="JBSWY3DPEHPK3PXP" style="font-family: var(--font-mono); text-transform: uppercase;" />
+
+    <div class="text-center my-8">
+      <div class="text-7xl font-bold tracking-widest" id="code" style="color: var(--color-accent); font-family: var(--font-mono);">------</div>
+      <div class="mt-4">
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 999px; height: 8px; max-width: 320px; margin: 0 auto; overflow: hidden;">
+          <div id="bar" style="height: 100%; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light)); width: 100%; transition: width 1s linear;"></div>
+        </div>
+        <p class="text-xs mt-2" style="color: var(--text-secondary); font-family: var(--font-mono);"><span id="left">30</span> 秒后刷新</p>
+      </div>
+    </div>
+
+    <div class="tool-toolbar justify-center">
+      <button class="tool-btn tool-btn-primary" id="btn-copy">复制验证码</button>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-3 mt-6">
+      <div class="tool-meta-item"><div class="k">下一个验证码</div><div class="v" id="next">—</div></div>
+      <div class="tool-meta-item"><div class="k">上一个验证码</div><div class="v" id="prev">—</div></div>
+    </div>
+
+    <div class="mt-6">
+      <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">📝 RFC 6238 标准 TOTP（Time-based One-Time Password)。30 秒周期、SHA-1、6 位代码,与 Google Authenticator / Authy / 1Password 兼容。</p>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const A32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+  function decode32(s){
+    s = s.toUpperCase().replace(/=+$/,'').replace(/\s/g,'');
+    let bits = '';
+    for (const c of s){ const i = A32.indexOf(c); if (i<0) throw new Error('无效 Base32'); bits += i.toString(2).padStart(5,'0'); }
+    const b = []; for (let i=0;i+8<=bits.length;i+=8) b.push(parseInt(bits.slice(i,i+8),2));
+    return new Uint8Array(b);
+  }
+
+  async function totp(key, t){
+    const counter = Math.floor(t / 30);
+    const counterBytes = new Uint8Array(8);
+    for (let i = 7; i >= 0; i--){ counterBytes[i] = counter & 0xff; }
+    let c = counter; for (let i=7;i>=0;i--){ counterBytes[i] = c & 0xff; c = Math.floor(c/256); }
+    const ck = await crypto.subtle.importKey('raw', key, { name:'HMAC', hash:'SHA-1' }, false, ['sign']);
+    const sig = new Uint8Array(await crypto.subtle.sign('HMAC', ck, counterBytes));
+    const offset = sig[19] & 0xf;
+    const code = ((sig[offset]&0x7f)<<24 | (sig[offset+1]&0xff)<<16 | (sig[offset+2]&0xff)<<8 | (sig[offset+3]&0xff)) % 1000000;
+    return String(code).padStart(6,'0');
+  }
+
+  async function update(){
+    try {
+      const key = decode32($('secret').value);
+      const now = Math.floor(Date.now()/1000);
+      const left = 30 - (now % 30);
+      $('code').textContent = await totp(key, now);
+      $('next').textContent = await totp(key, now + 30);
+      $('prev').textContent = await totp(key, now - 30);
+      $('left').textContent = left;
+      $('bar').style.width = (left/30*100) + '%';
+    } catch(e){ $('code').textContent = '------'; }
+  }
+
+  $('secret').addEventListener('input', update);
+  $('btn-copy').onclick = () => window.toolCopy($('code').textContent);
+  update();
+  setInterval(update, 1000);
+})();
+</script>

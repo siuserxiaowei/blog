@@ -1,0 +1,77 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="XML 格式化" description="美化、压缩、校验 XML" category="数据格式" icon="📄">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-pretty">美化</button>
+      <button class="tool-btn" id="btn-min">压缩</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-sample">示例</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 360px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function pretty(xml){
+    let formatted = '', indent = 0, prev = '';
+    xml = xml.replace(/>\s*</g,'><').trim();
+    xml.split(/(<[^>]+>)/g).filter(Boolean).forEach(node => {
+      if (!node.trim()) return;
+      if (node.startsWith('</')) indent--;
+      if (node.startsWith('<') && !node.startsWith('</') && !node.endsWith('/>') && !node.startsWith('<?') && !node.startsWith('<!')) {
+        formatted += '  '.repeat(indent) + node + '\n';
+        if (!node.match(/<(\w+)[^>]*>$/)) ; else indent++;
+      } else if (node.startsWith('</')) {
+        formatted += '  '.repeat(indent) + node + '\n';
+      } else if (node.startsWith('<')) {
+        formatted += '  '.repeat(indent) + node + '\n';
+      } else {
+        formatted += '  '.repeat(indent) + node + '\n';
+      }
+      prev = node;
+    });
+    return formatted.trim();
+  }
+
+  function validate(xml){
+    const p = new DOMParser().parseFromString(xml, 'application/xml');
+    const err = p.querySelector('parsererror');
+    if (err) throw new Error(err.textContent.split('\n')[0]);
+    return true;
+  }
+
+  $('btn-pretty').onclick = () => {
+    try { const v = $('input').value.trim(); if (!v) return; validate(v); $('output').value = pretty(v); setStatus('✓ XML 有效','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-min').onclick = () => {
+    try { const v = $('input').value; validate(v); $('output').value = v.replace(/>\s+</g,'><').replace(/\s+/g,' ').trim(); setStatus('✓ 已压缩','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('btn-sample').onclick = () => {
+    $('input').value = '<?xml version="1.0"?><catalog><book id="bk1"><title>siuser</title><year>2026</year></book><book id="bk2"><title>tools</title><year>2026</year></book></catalog>';
+    $('btn-pretty').click();
+  };
+  $('input').addEventListener('input', () => $('input').value && $('btn-pretty').click());
+  $('btn-sample').click();
+})();
+</script>

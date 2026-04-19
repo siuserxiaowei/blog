@@ -1,0 +1,48 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="HTML 去标签" description="去除 HTML 标签、属性、注释,提取纯文本" category="文本处理" icon="🧹">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-strip">去除全部标签</button>
+      <button class="tool-btn" id="btn-attr">仅去属性</button>
+      <button class="tool-btn" id="btn-comment">仅去注释</button>
+      <button class="tool-btn" id="btn-script">仅去 script/style</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入 HTML</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 320px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 320px;" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('btn-strip').onclick = () => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = $('input').value.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
+    $('output').value = tmp.textContent.replace(/\n{3,}/g,'\n\n').trim();
+  };
+  $('btn-attr').onclick = () => {
+    $('output').value = $('input').value.replace(/<(\w+)\s[^>]*>/g, '<$1>');
+  };
+  $('btn-comment').onclick = () => {
+    $('output').value = $('input').value.replace(/<!--[\s\S]*?-->/g, '');
+  };
+  $('btn-script').onclick = () => {
+    $('output').value = $('input').value.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('input').value = '<!-- 注释 --><div class="hello" id="x"><h1>标题</h1><p>这是 <strong>段落</strong>。</p><script>alert(1)</script></div>';
+  $('btn-strip').click();
+})();
+</script>

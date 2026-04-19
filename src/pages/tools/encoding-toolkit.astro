@@ -1,0 +1,102 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="编码工具包" description="Base32 / Base58 / Hex / 摩尔斯电码" category="编码转换" icon="🔣">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="tool-label">编码</label>
+        <select id="codec" class="tool-select">
+          <option value="hex">Hex (十六进制)</option>
+          <option value="base32">Base32</option>
+          <option value="base58">Base58</option>
+          <option value="morse">Morse 摩尔斯</option>
+          <option value="rot13">ROT13</option>
+          <option value="reverse">反转字符串</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">操作</label>
+        <div class="flex gap-2">
+          <button class="tool-btn tool-btn-primary flex-1" id="btn-enc">编码 →</button>
+          <button class="tool-btn flex-1" id="btn-dec">← 解码</button>
+        </div>
+      </div>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原文</label>
+        <textarea id="raw" class="tool-textarea" placeholder="hello world"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">编码后</label>
+        <textarea id="enc" class="tool-textarea"></textarea>
+      </div>
+    </div>
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const ALPHA32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const ALPHA58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+  function enc32(s){
+    const b = new TextEncoder().encode(s);
+    let bits='', out='';
+    for (const x of b) bits += x.toString(2).padStart(8,'0');
+    while (bits.length % 5) bits += '0';
+    for (let i=0;i<bits.length;i+=5) out += ALPHA32[parseInt(bits.slice(i,i+5),2)];
+    while (out.length % 8) out += '=';
+    return out;
+  }
+  function dec32(s){
+    s = s.replace(/=/g,'').toUpperCase();
+    let bits='';
+    for (const c of s){ const i = ALPHA32.indexOf(c); if (i<0) throw new Error('无效'); bits += i.toString(2).padStart(5,'0'); }
+    const b = []; for (let i=0;i+8<=bits.length;i+=8) b.push(parseInt(bits.slice(i,i+8),2));
+    return new TextDecoder().decode(new Uint8Array(b));
+  }
+  function enc58(s){
+    let bytes = Array.from(new TextEncoder().encode(s));
+    let zeros = 0; while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
+    let n = 0n; for (const b of bytes) n = n*256n + BigInt(b);
+    let out = ''; while (n > 0n){ out = ALPHA58[Number(n%58n)] + out; n /= 58n; }
+    return '1'.repeat(zeros) + out;
+  }
+  function dec58(s){
+    let zeros = 0; while (zeros < s.length && s[zeros] === '1') zeros++;
+    let n = 0n; for (const c of s){ const i = ALPHA58.indexOf(c); if (i<0) throw new Error('无效'); n = n*58n + BigInt(i); }
+    const bytes = []; while (n > 0n){ bytes.unshift(Number(n%256n)); n /= 256n; }
+    for (let i=0;i<zeros;i++) bytes.unshift(0);
+    return new TextDecoder().decode(new Uint8Array(bytes));
+  }
+
+  const MORSE = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','.':'.-.-.-',',':'--..--','?':'..--..',"'":'.----.','/':'-..-.','-':'-....-'};
+  const RMORSE = Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));
+
+  function rot13(s){ return s.replace(/[a-zA-Z]/g, c => String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase()<'n'?13:-13))); }
+
+  const codecs = {
+    hex: { enc: s => Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,'0')).join(''), dec: s => new TextDecoder().decode(new Uint8Array(s.replace(/\s/g,'').match(/.{2}/g).map(h=>parseInt(h,16)))) },
+    base32: { enc: enc32, dec: dec32 },
+    base58: { enc: enc58, dec: dec58 },
+    morse: {
+      enc: s => s.toUpperCase().split('').map(c => c===' '?'/':MORSE[c]||'').filter(Boolean).join(' '),
+      dec: s => s.split('/').map(w => w.trim().split(/\s+/).map(c => RMORSE[c]||'').join('')).join(' ')
+    },
+    rot13: { enc: rot13, dec: rot13 },
+    reverse: { enc: s => s.split('').reverse().join(''), dec: s => s.split('').reverse().join('') }
+  };
+
+  $('btn-enc').onclick = () => { try { $('enc').value = codecs[$('codec').value].enc($('raw').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-dec').onclick = () => { try { $('raw').value = codecs[$('codec').value].dec($('enc').value); } catch(e){ window.toolToast('解码失败','err'); } };
+  $('btn-copy').onclick = () => $('enc').value && window.toolCopy($('enc').value);
+})();
+</script>
