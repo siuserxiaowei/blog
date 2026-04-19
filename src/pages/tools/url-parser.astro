@@ -1,0 +1,81 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="URL 解析" description="解析 URL 各组成部分,展开查询参数为表格" category="网络工具" icon="🌐">
+  <div class="tool-card mb-6">
+    <label class="tool-label">URL</label>
+    <input id="url" class="tool-input" placeholder="https://siuserxiaowei.com/blog?page=2&tag=ai#section" value="https://siuserxiaowei.com/blog?page=2&tag=ai#section" />
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+
+  <div class="tool-card mb-6">
+    <label class="tool-label">URL 组成</label>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="parts"></div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">查询参数</label>
+    <div id="params" style="overflow-x: auto;"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function parse(){
+    const v = $('url').value.trim();
+    if (!v) return;
+    let u;
+    try { u = new URL(v); } catch(e){ setStatus('✗ '+e.message,'err'); return; }
+
+    const items = {
+      'PROTOCOL': u.protocol,
+      'HOST': u.host,
+      'HOSTNAME': u.hostname,
+      'PORT': u.port || '(默认)',
+      'PATHNAME': u.pathname,
+      'SEARCH': u.search || '(无)',
+      'HASH': u.hash || '(无)',
+      'ORIGIN': u.origin,
+      'USERNAME': u.username || '(无)'
+    };
+
+    const wrap = $('parts'); wrap.innerHTML = '';
+    Object.entries(items).forEach(([k,vv]) => {
+      const d = document.createElement('div');
+      d.className = 'tool-meta-item cursor-pointer';
+      d.innerHTML = `<div class="k">${k}</div><div class="v" style="font-size:0.85rem;">${vv}</div>`;
+      d.onclick = () => vv !== '(无)' && vv !== '(默认)' && window.toolCopy(vv);
+      wrap.appendChild(d);
+    });
+
+    const params = $('params'); params.innerHTML = '';
+    const entries = [...u.searchParams.entries()];
+    if (!entries.length) {
+      params.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 1rem;">无查询参数</p>';
+    } else {
+      const t = document.createElement('table');
+      t.style.cssText = 'width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem;';
+      t.innerHTML = `<thead><tr><th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:1px solid var(--border);color:var(--color-accent);">KEY</th><th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:1px solid var(--border);color:var(--color-accent);">VALUE (decoded)</th><th style="text-align:left;padding:0.6rem 0.8rem;border-bottom:1px solid var(--border);color:var(--color-accent);">RAW</th></tr></thead>`;
+      const tb = document.createElement('tbody');
+      entries.forEach(([k,vv]) => {
+        const raw = u.search.match(new RegExp('[?&]'+k+'=([^&#]*)'))?.[1] || '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text);">${k}</td><td style="padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text);">${vv}</td><td style="padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text-secondary);">${raw}</td>`;
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb);
+      params.appendChild(t);
+    }
+
+    setStatus(`✓ 解析完成 · ${entries.length} 个参数`,'ok');
+  }
+
+  $('url').addEventListener('input', parse);
+  parse();
+})();
+</script>

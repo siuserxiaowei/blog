@@ -1,0 +1,78 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JSON 格式化" description="美化、压缩、校验 JSON,错误位置精确定位" category="数据格式" icon="📦">
+  <div class="tool-card">
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">输入 JSON</label>
+        <div class="tool-toolbar">
+          <button class="tool-btn" id="btn-sample">示例</button>
+          <button class="tool-btn" id="btn-clear">清空</button>
+          <button class="tool-btn" id="btn-paste">粘贴</button>
+        </div>
+        <textarea id="input" class="tool-textarea" spellcheck="false" placeholder='{ "name": "siuser", "ok": true }'></textarea>
+        <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <div class="tool-toolbar">
+          <button class="tool-btn tool-btn-primary" id="btn-pretty">美化</button>
+          <button class="tool-btn" id="btn-min">压缩</button>
+          <button class="tool-btn" id="btn-escape">转义字符串</button>
+          <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+        </div>
+        <textarea id="output" class="tool-textarea" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const input = $('input'), output = $('output'), status = $('status');
+  const msg = status.querySelector('.msg');
+
+  function setStatus(text, kind){
+    msg.textContent = text;
+    status.classList.remove('is-ok','is-err');
+    if (kind) status.classList.add('is-' + kind);
+  }
+
+  function tryParse(){
+    const v = input.value.trim();
+    if (!v) { setStatus('等待输入'); return null; }
+    try {
+      const obj = JSON.parse(v);
+      setStatus('✓ JSON 有效', 'ok');
+      return obj;
+    } catch(e) {
+      const m = e.message.match(/position (\d+)/);
+      let extra = '';
+      if (m) {
+        const pos = parseInt(m[1]);
+        const before = v.slice(0, pos);
+        const line = before.split('\n').length;
+        const col = pos - before.lastIndexOf('\n');
+        extra = ` (第 ${line} 行,第 ${col} 列)`;
+      }
+      setStatus('✗ ' + e.message + extra, 'err');
+      return null;
+    }
+  }
+
+  $('btn-pretty').onclick = () => { const o = tryParse(); if (o !== null) output.value = JSON.stringify(o, null, 2); };
+  $('btn-min').onclick = () => { const o = tryParse(); if (o !== null) output.value = JSON.stringify(o); };
+  $('btn-escape').onclick = () => { const o = tryParse(); if (o !== null) output.value = JSON.stringify(JSON.stringify(o)); };
+  $('btn-copy').onclick = () => output.value && window.toolCopy(output.value);
+  $('btn-clear').onclick = () => { input.value = ''; output.value = ''; setStatus('等待输入'); };
+  $('btn-sample').onclick = () => {
+    input.value = '{"name":"siuser小伟","focus":"AI Voice","stack":["Astro","Cloudflare"],"shipping":true,"year":2026}';
+    $('btn-pretty').click();
+  };
+  $('btn-paste').onclick = async () => { try { input.value = await navigator.clipboard.readText(); $('btn-pretty').click(); } catch(e) {} };
+  input.addEventListener('input', () => { tryParse(); });
+})();
+</script>

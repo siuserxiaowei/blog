@@ -1,0 +1,47 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Unicode 转换" description="文本与 Unicode 转义字符互转" category="编码转换" icon="Ω">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-encode">→ Unicode</button>
+      <button class="tool-btn" id="btn-decode">← 还原</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原文</label>
+        <textarea id="raw" class="tool-textarea" placeholder="你好世界"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">Unicode</label>
+        <textarea id="enc" class="tool-textarea" placeholder="\u4f60\u597d..."></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('btn-encode').onclick = () => {
+    let out = '';
+    for (const ch of $('raw').value) {
+      const cp = ch.codePointAt(0);
+      if (cp < 128) out += ch;
+      else if (cp <= 0xFFFF) out += '\\u' + cp.toString(16).padStart(4,'0');
+      else out += '\\u{' + cp.toString(16) + '}';
+    }
+    $('enc').value = out;
+  };
+  $('btn-decode').onclick = () => {
+    try {
+      $('raw').value = $('enc').value
+        .replace(/\\u\{([0-9a-fA-F]+)\}/g,(_,h)=>String.fromCodePoint(parseInt(h,16)))
+        .replace(/\\u([0-9a-fA-F]{4})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));
+    } catch(e){ window.toolToast(e.message,'err'); }
+  };
+  $('btn-copy').onclick = () => $('enc').value && window.toolCopy($('enc').value);
+})();
+</script>

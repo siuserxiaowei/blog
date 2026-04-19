@@ -1,0 +1,47 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="HMAC 签名" description="基于密钥的哈希消息认证码,支持 SHA-1/256/384/512" category="加密哈希" icon="🔐">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label class="tool-label">算法</label>
+        <select id="algo" class="tool-select">
+          <option value="SHA-1">HMAC-SHA-1</option>
+          <option value="SHA-256" selected>HMAC-SHA-256</option>
+          <option value="SHA-384">HMAC-SHA-384</option>
+          <option value="SHA-512">HMAC-SHA-512</option>
+        </select>
+      </div>
+      <div class="md:col-span-2">
+        <label class="tool-label">密钥</label>
+        <input id="key" class="tool-input" placeholder="密钥..." />
+      </div>
+    </div>
+    <label class="tool-label">消息</label>
+    <textarea id="msg" class="tool-textarea" placeholder="要签名的消息"></textarea>
+    <div class="tool-toolbar mt-2">
+      <button class="tool-btn tool-btn-primary" id="btn-sign">计算 HMAC</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+    </div>
+    <label class="tool-label mt-4">输出（hex）</label>
+    <textarea id="out" class="tool-textarea" readonly style="min-height: 100px;"></textarea>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('btn-sign').onclick = async () => {
+    try {
+      const algo = $('algo').value;
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode($('key').value), { name:'HMAC', hash: algo }, false, ['sign']);
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode($('msg').value));
+      $('out').value = Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    } catch(e){ window.toolToast('签名失败: '+e.message,'err'); }
+  };
+  $('btn-copy').onclick = () => $('out').value && window.toolCopy($('out').value);
+})();
+</script>

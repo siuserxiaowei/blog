@@ -1,0 +1,89 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JWT 解析" description="解析 JSON Web Token,查看 Header / Payload / Signature 与过期时间" category="加密哈希" icon="🎫">
+  <div class="tool-card mb-6">
+    <label class="tool-label">JWT Token</label>
+    <textarea id="jwt" class="tool-textarea" placeholder="eyJhbGc..." style="min-height: 120px;"></textarea>
+    <div class="tool-toolbar mt-2">
+      <button class="tool-btn tool-btn-primary" id="btn-parse">解析</button>
+      <button class="tool-btn" id="btn-sample">示例</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-clear">清空</button>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="tool-card" style="background: rgba(248,113,113,0.05); border-color: rgba(248,113,113,0.3);">
+      <label class="tool-label" style="color: #f87171;">Header</label>
+      <pre class="tool-output" id="header" style="background: var(--surface);">—</pre>
+    </div>
+    <div class="tool-card" style="background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.3);">
+      <label class="tool-label" style="color: #a78bfa;">Payload</label>
+      <pre class="tool-output" id="payload" style="background: var(--surface);">—</pre>
+    </div>
+    <div class="tool-card" style="background: rgba(96,165,250,0.05); border-color: rgba(96,165,250,0.3);">
+      <label class="tool-label" style="color: #60a5fa;">Signature</label>
+      <pre class="tool-output" id="sig" style="background: var(--surface);">—</pre>
+    </div>
+  </div>
+
+  <div class="tool-meta" id="meta" style="display: none;"></div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function b64url(s){
+    s = s.replace(/-/g,'+').replace(/_/g,'/');
+    while (s.length % 4) s += '=';
+    try { return decodeURIComponent(escape(atob(s))); } catch(e){ return atob(s); }
+  }
+
+  $('btn-parse').onclick = () => {
+    const tok = $('jwt').value.trim();
+    const parts = tok.split('.');
+    if (parts.length !== 3) { setStatus('✗ 无效的 JWT(应有 3 段,. 分隔)','err'); return; }
+    try {
+      const h = JSON.parse(b64url(parts[0]));
+      const p = JSON.parse(b64url(parts[1]));
+      $('header').textContent = JSON.stringify(h, null, 2);
+      $('payload').textContent = JSON.stringify(p, null, 2);
+      $('sig').textContent = parts[2];
+
+      const meta = $('meta'); meta.innerHTML = ''; meta.style.display = 'grid';
+      const items = [];
+      if (h.alg) items.push(['ALG', h.alg]);
+      if (h.typ) items.push(['TYP', h.typ]);
+      if (p.iss) items.push(['ISS', p.iss]);
+      if (p.sub) items.push(['SUB', p.sub]);
+      if (p.aud) items.push(['AUD', Array.isArray(p.aud)?p.aud.join(', '):p.aud]);
+      if (p.iat) items.push(['IAT', new Date(p.iat*1000).toISOString().slice(0,19)+'Z']);
+      if (p.exp) {
+        const exp = new Date(p.exp*1000);
+        const expired = exp < new Date();
+        items.push([expired ? 'EXP ⚠ 已过期' : 'EXP', exp.toISOString().slice(0,19)+'Z']);
+      }
+      items.forEach(([k,v]) => {
+        const d = document.createElement('div');
+        d.className = 'tool-meta-item';
+        d.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+        meta.appendChild(d);
+      });
+      setStatus('✓ 解析成功','ok');
+    } catch(e){ setStatus('✗ 解析失败: '+e.message,'err'); }
+  };
+
+  $('btn-sample').onclick = () => {
+    $('jwt').value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzaXVzZXIiLCJuYW1lIjoiWGlhb1dlaSIsImlhdCI6MTczNTY4OTYwMCwiZXhwIjoyMDcyOTQ4MTI4fQ.YxGv3vWl_signature_demo';
+    $('btn-parse').click();
+  };
+  $('btn-clear').onclick = () => { $('jwt').value=''; $('header').textContent=$('payload').textContent=$('sig').textContent='—'; $('meta').style.display='none'; setStatus('等待输入'); };
+
+  $('jwt').addEventListener('input', () => { if ($('jwt').value.trim()) $('btn-parse').click(); });
+})();
+</script>

@@ -1,0 +1,105 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="时间戳转换" description="Unix 时间戳与日期互转,实时显示当前时间戳" category="时间日期" icon="⏱️">
+  <div class="tool-card mb-6">
+    <label class="tool-label">当前时间戳</label>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="tool-meta-item"><div class="k">秒级</div><div class="v" id="now-s">—</div></div>
+      <div class="tool-meta-item"><div class="k">毫秒级</div><div class="v" id="now-ms">—</div></div>
+      <div class="tool-meta-item"><div class="k">本地时间</div><div class="v" id="now-local" style="font-size:0.8rem;">—</div></div>
+      <div class="tool-meta-item"><div class="k">UTC ISO</div><div class="v" id="now-iso" style="font-size:0.8rem;">—</div></div>
+    </div>
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn" id="btn-copy-s">复制秒</button>
+      <button class="tool-btn" id="btn-copy-ms">复制毫秒</button>
+      <button class="tool-btn" id="btn-copy-iso">复制 ISO</button>
+    </div>
+  </div>
+
+  <div class="tool-card mb-6">
+    <label class="tool-label">时间戳 → 日期</label>
+    <div class="flex gap-2 mb-3">
+      <input id="ts-in" type="text" class="tool-input flex-1" placeholder="输入秒或毫秒时间戳" />
+      <button class="tool-btn tool-btn-primary" id="btn-ts">转换</button>
+    </div>
+    <pre class="tool-output" id="ts-out" style="min-height: 100px;">—</pre>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">日期 → 时间戳</label>
+    <div class="flex gap-2 mb-3">
+      <input id="dt-in" type="datetime-local" step="1" class="tool-input flex-1" />
+      <button class="tool-btn tool-btn-primary" id="btn-dt">转换</button>
+    </div>
+    <pre class="tool-output" id="dt-out" style="min-height: 100px;">—</pre>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  function tick(){
+    const d = new Date();
+    $('now-s').textContent = Math.floor(d.getTime()/1000);
+    $('now-ms').textContent = d.getTime();
+    $('now-local').textContent = d.toLocaleString('zh-CN', { hour12: false });
+    $('now-iso').textContent = d.toISOString();
+  }
+  tick(); setInterval(tick, 1000);
+
+  $('btn-copy-s').onclick = () => window.toolCopy($('now-s').textContent);
+  $('btn-copy-ms').onclick = () => window.toolCopy($('now-ms').textContent);
+  $('btn-copy-iso').onclick = () => window.toolCopy($('now-iso').textContent);
+
+  $('btn-ts').onclick = () => {
+    let v = $('ts-in').value.trim();
+    if (!v) return;
+    let n = Number(v);
+    if (n < 1e12) n *= 1000;
+    const d = new Date(n);
+    if (isNaN(d.getTime())) { $('ts-out').textContent = '✗ 无效时间戳'; return; }
+    $('ts-out').textContent = [
+      'ISO (UTC):     ' + d.toISOString(),
+      'Local (zh-CN): ' + d.toLocaleString('zh-CN',{hour12:false}),
+      'UTC String:    ' + d.toUTCString(),
+      'Unix 秒:       ' + Math.floor(d.getTime()/1000),
+      'Unix 毫秒:     ' + d.getTime(),
+      'RFC 2822:      ' + d.toString(),
+      '相对现在:      ' + relTime(d)
+    ].join('\n');
+  };
+
+  function relTime(d){
+    const diff = (d.getTime() - Date.now()) / 1000;
+    const abs = Math.abs(diff);
+    const future = diff > 0;
+    let v, u;
+    if (abs < 60) { v = abs; u = '秒'; }
+    else if (abs < 3600) { v = abs/60; u = '分钟'; }
+    else if (abs < 86400) { v = abs/3600; u = '小时'; }
+    else if (abs < 86400*30) { v = abs/86400; u = '天'; }
+    else if (abs < 86400*365) { v = abs/(86400*30); u = '月'; }
+    else { v = abs/(86400*365); u = '年'; }
+    return future ? `${v.toFixed(1)} ${u}后` : `${v.toFixed(1)} ${u}前`;
+  }
+
+  // init dt-in to now
+  const now = new Date(); now.setSeconds(0); now.setMilliseconds(0);
+  const tz = now.getTimezoneOffset();
+  $('dt-in').value = new Date(now.getTime() - tz*60000).toISOString().slice(0,19);
+
+  $('btn-dt').onclick = () => {
+    const v = $('dt-in').value;
+    if (!v) return;
+    const d = new Date(v);
+    $('dt-out').textContent = [
+      'Unix 秒:    ' + Math.floor(d.getTime()/1000),
+      'Unix 毫秒:  ' + d.getTime(),
+      'ISO (UTC):  ' + d.toISOString(),
+      'UTC String: ' + d.toUTCString()
+    ].join('\n');
+  };
+})();
+</script>

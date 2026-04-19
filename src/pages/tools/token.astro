@@ -1,0 +1,67 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Token 生成器" description="生成 API Token / 随机字符串,多种字符集" category="生成器" icon="🪙">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label class="tool-label">字符集</label>
+        <select id="alphabet" class="tool-select">
+          <option value="hex">十六进制 (0-9 a-f)</option>
+          <option value="alnum" selected>字母数字 (A-Z a-z 0-9)</option>
+          <option value="b64url">URL 安全 Base64</option>
+          <option value="alpha">仅字母</option>
+          <option value="num">仅数字</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">长度</label>
+        <input id="len" type="number" min="4" max="256" value="32" class="tool-input" />
+      </div>
+      <div>
+        <label class="tool-label">数量</label>
+        <input id="count" type="number" min="1" max="100" value="5" class="tool-input" />
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <input id="prefix" class="tool-input" placeholder="前缀（可选,如 sk_)" />
+      <input id="suffix" class="tool-input" placeholder="后缀（可选）" />
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-gen">生成</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制全部</button>
+    </div>
+    <textarea id="out" class="tool-textarea mt-3" readonly style="min-height: 280px;"></textarea>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const sets = {
+    hex: '0123456789abcdef',
+    alnum: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+    b64url: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
+    alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+    num: '0123456789'
+  };
+  function gen(){
+    const chars = sets[$('alphabet').value];
+    const L = Math.min(256, parseInt($('len').value)||32);
+    const N = Math.min(100, parseInt($('count').value)||1);
+    const prefix = $('prefix').value, suffix = $('suffix').value;
+    const arr = [];
+    for (let i=0;i<N;i++){
+      const r = crypto.getRandomValues(new Uint32Array(L));
+      let s = '';
+      for (let j=0;j<L;j++) s += chars[r[j] % chars.length];
+      arr.push(prefix + s + suffix);
+    }
+    $('out').value = arr.join('\n');
+  }
+  $('btn-gen').onclick = gen;
+  $('btn-copy').onclick = () => $('out').value && window.toolCopy($('out').value);
+  gen();
+})();
+</script>

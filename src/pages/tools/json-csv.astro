@@ -1,0 +1,93 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JSON ↔ CSV" description="JSON 数组与 CSV 互转,自动识别表头" category="数据格式" icon="📊">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-j2c">JSON → CSV</button>
+      <button class="tool-btn" id="btn-c2j">CSV → JSON</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-download">下载</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 360px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function escCSV(v){
+    if (v == null) return '';
+    const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+    return /[,"\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
+  function jsonToCsv(arr){
+    if (!Array.isArray(arr) || !arr.length) throw new Error('需要 JSON 数组');
+    const keys = [...new Set(arr.flatMap(o => Object.keys(o||{})))];
+    const header = keys.map(escCSV).join(',');
+    const rows = arr.map(o => keys.map(k => escCSV(o?.[k])).join(','));
+    return [header, ...rows].join('\n');
+  }
+  function parseCSVLine(line){
+    const out = []; let cur = '', q = false;
+    for (let i=0; i<line.length; i++){
+      const c = line[i];
+      if (q){
+        if (c==='"' && line[i+1]==='"') { cur += '"'; i++; }
+        else if (c==='"') q = false;
+        else cur += c;
+      } else {
+        if (c===',') { out.push(cur); cur = ''; }
+        else if (c==='"') q = true;
+        else cur += c;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+  function csvToJson(csv){
+    const lines = csv.replace(/\r/g,'').split('\n').filter(Boolean);
+    if (!lines.length) return [];
+    const headers = parseCSVLine(lines[0]);
+    return lines.slice(1).map(l => {
+      const cells = parseCSVLine(l);
+      const obj = {};
+      headers.forEach((h,i) => obj[h] = cells[i] ?? '');
+      return obj;
+    });
+  }
+
+  $('btn-j2c').onclick = () => {
+    try { $('output').value = jsonToCsv(JSON.parse($('input').value)); setStatus('✓ JSON → CSV','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-c2j').onclick = () => {
+    try { $('output').value = JSON.stringify(csvToJson($('input').value), null, 2); setStatus('✓ CSV → JSON','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('btn-download').onclick = () => {
+    if (!$('output').value) return;
+    const isCSV = $('output').value.includes(',') && !$('output').value.startsWith('[');
+    const blob = new Blob([$('output').value], { type: isCSV ? 'text/csv' : 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = isCSV ? 'data.csv' : 'data.json'; a.click();
+  };
+
+  $('input').value = '[\n  {"name": "Astro", "type": "framework", "year": 2021},\n  {"name": "Cloudflare", "type": "platform", "year": 2009}\n]';
+  $('btn-j2c').click();
+})();
+</script>

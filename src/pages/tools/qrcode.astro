@@ -1,0 +1,129 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="二维码生成" description="文本 / URL / WiFi 二维码,可下载 PNG / SVG" category="生成器" icon="⬛">
+  <div class="tool-card">
+    <div class="flex flex-wrap gap-2 mb-4" id="tabs">
+      <button data-tab="text" class="tab-btn tool-btn tool-btn-primary">文本/链接</button>
+      <button data-tab="wifi" class="tab-btn tool-btn">WiFi</button>
+      <button data-tab="vcard" class="tab-btn tool-btn">名片 vCard</button>
+    </div>
+
+    <div data-pane="text">
+      <label class="tool-label">内容</label>
+      <textarea id="t-text" class="tool-textarea" placeholder="https://siuserxiaowei.com" style="min-height: 100px;">https://siuserxiaowei.com</textarea>
+    </div>
+
+    <div data-pane="wifi" class="hidden">
+      <div class="grid md:grid-cols-2 gap-3">
+        <div><label class="tool-label">SSID</label><input id="t-ssid" class="tool-input" placeholder="WiFi 名称" /></div>
+        <div><label class="tool-label">密码</label><input id="t-pwd" class="tool-input" placeholder="WiFi 密码" /></div>
+        <div><label class="tool-label">加密</label><select id="t-enc" class="tool-select"><option>WPA</option><option>WEP</option><option value="nopass">无密码</option></select></div>
+        <div><label class="tool-label">隐藏网络</label><select id="t-hidden" class="tool-select"><option value="false">否</option><option value="true">是</option></select></div>
+      </div>
+    </div>
+
+    <div data-pane="vcard" class="hidden">
+      <div class="grid md:grid-cols-2 gap-3">
+        <div><label class="tool-label">姓名</label><input id="v-name" class="tool-input" /></div>
+        <div><label class="tool-label">公司</label><input id="v-org" class="tool-input" /></div>
+        <div><label class="tool-label">电话</label><input id="v-tel" class="tool-input" /></div>
+        <div><label class="tool-label">邮箱</label><input id="v-email" class="tool-input" /></div>
+        <div class="md:col-span-2"><label class="tool-label">网址</label><input id="v-url" class="tool-input" /></div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-3 mt-4">
+      <div>
+        <label class="tool-label">尺寸 <span id="size-v" style="color: var(--color-accent);">320</span> px</label>
+        <input id="size" type="range" min="120" max="600" value="320" class="w-full" />
+      </div>
+      <div>
+        <label class="tool-label">容错</label>
+        <select id="ec" class="tool-select"><option value="L">低 7%</option><option value="M" selected>中 15%</option><option value="Q">较高 25%</option><option value="H">高 30%</option></select>
+      </div>
+      <div>
+        <label class="tool-label">前景色</label>
+        <input id="fg" type="color" value="#0a0a0b" class="tool-input" style="height: 42px; padding: 4px;" />
+      </div>
+    </div>
+
+    <div class="tool-toolbar mt-4">
+      <button class="tool-btn tool-btn-primary" id="btn-gen">生成二维码</button>
+      <button class="tool-btn" id="btn-png">下载 PNG</button>
+      <button class="tool-btn" id="btn-svg">下载 SVG</button>
+    </div>
+
+    <div class="mt-6 flex justify-center" id="qr-wrap" style="background: var(--bg); padding: 2rem; border: 1px solid var(--border); border-radius: 16px;"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('size').oninput = () => { $('size-v').textContent = $('size').value; gen(); };
+
+  document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('tool-btn-primary'));
+    b.classList.add('tool-btn-primary');
+    document.querySelectorAll('[data-pane]').forEach(p => p.classList.add('hidden'));
+    document.querySelector('[data-pane="'+b.dataset.tab+'"]').classList.remove('hidden');
+    gen();
+  });
+
+  function payload(){
+    const tab = document.querySelector('.tab-btn.tool-btn-primary').dataset.tab;
+    if (tab==='wifi'){
+      const enc = $('t-enc').value;
+      if (enc==='nopass') return `WIFI:T:nopass;S:${$('t-ssid').value};;`;
+      return `WIFI:T:${enc};S:${$('t-ssid').value};P:${$('t-pwd').value};H:${$('t-hidden').value};;`;
+    }
+    if (tab==='vcard'){
+      return `BEGIN:VCARD\nVERSION:3.0\nFN:${$('v-name').value}\nORG:${$('v-org').value}\nTEL:${$('v-tel').value}\nEMAIL:${$('v-email').value}\nURL:${$('v-url').value}\nEND:VCARD`;
+    }
+    return $('t-text').value || ' ';
+  }
+
+  function gen(){
+    if (typeof qrcode === 'undefined') { setTimeout(gen, 200); return; }
+    const ec = $('ec').value, sz = parseInt($('size').value), fg = $('fg').value;
+    const qr = qrcode(0, ec);
+    qr.addData(payload());
+    qr.make();
+    const cells = qr.getModuleCount();
+    const cell = Math.floor(sz / (cells+2));
+    const total = cell * (cells+2);
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${total}" viewBox="0 0 ${total} ${total}"><rect width="100%" height="100%" fill="#ffffff"/>`;
+    for (let r=0;r<cells;r++) for (let c=0;c<cells;c++){
+      if (qr.isDark(r,c)) svg += `<rect x="${(c+1)*cell}" y="${(r+1)*cell}" width="${cell}" height="${cell}" fill="${fg}"/>`;
+    }
+    svg += '</svg>';
+    $('qr-wrap').innerHTML = svg;
+    window._lastSVG = svg; window._lastSize = total;
+  }
+
+  $('btn-gen').onclick = gen;
+  $('btn-svg').onclick = () => {
+    const blob = new Blob([window._lastSVG||''], {type:'image/svg+xml'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'qrcode.svg'; a.click();
+  };
+  $('btn-png').onclick = () => {
+    const svg = window._lastSVG; if (!svg) return;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = window._lastSize;
+      c.getContext('2d').drawImage(img,0,0);
+      c.toBlob(b => { const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='qrcode.png'; a.click(); });
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+  };
+
+  ['t-text','t-ssid','t-pwd','t-enc','t-hidden','v-name','v-org','v-tel','v-email','v-url','ec','fg'].forEach(id => {
+    const el = $(id); if (el) el.addEventListener('input', gen);
+  });
+  setTimeout(gen, 300);
+})();
+</script>

@@ -1,0 +1,48 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JSON ↔ YAML" description="JSON 与 YAML 双向转换" category="数据格式" icon="🔁">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-y2j">YAML → JSON</button>
+      <button class="tool-btn" id="btn-j2y">JSON → YAML</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 360px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 360px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  $('btn-y2j').onclick = () => {
+    if (typeof jsyaml === 'undefined') return setTimeout(() => $('btn-y2j').click(), 200);
+    try { $('output').value = JSON.stringify(jsyaml.load($('input').value), null, 2); setStatus('✓ YAML → JSON','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-j2y').onclick = () => {
+    if (typeof jsyaml === 'undefined') return setTimeout(() => $('btn-j2y').click(), 200);
+    try { $('output').value = jsyaml.dump(JSON.parse($('input').value), { indent: 2, lineWidth: 120 }); setStatus('✓ JSON → YAML','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+
+  $('input').value = '{\n  "name": "siuser",\n  "shipping": true,\n  "stack": ["Astro", "Cloudflare"],\n  "year": 2026\n}';
+  setTimeout(() => $('btn-j2y').click(), 400);
+})();
+</script>

@@ -1,0 +1,352 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+interface Tool {
+  id: string;
+  name: string;
+  nameEn: string;
+  desc: string;
+  cat: string;
+  icon: string;
+  status: 'live' | 'soon';
+  href?: string;
+}
+
+const tools: Tool[] = [
+  // ========== 数据格式 ==========
+  { id: 'json-formatter', name: 'JSON 格式化', nameEn: 'JSON Formatter', desc: '美化、压缩、校验 JSON,支持错误定位', cat: '数据格式', icon: '📦', status: 'live' },
+  { id: 'json-yaml', name: 'JSON ↔ YAML', nameEn: 'JSON ↔ YAML', desc: 'JSON 与 YAML 双向转换', cat: '数据格式', icon: '🔁', status: 'live' },
+  { id: 'json-csv', name: 'JSON ↔ CSV', nameEn: 'JSON ↔ CSV', desc: 'JSON 数组与 CSV 互转,自动识别表头', cat: '数据格式', icon: '📊', status: 'live' },
+  { id: 'json-diff', name: 'JSON 差异对比', nameEn: 'JSON Diff', desc: '对比两个 JSON 找出新增/删除/修改字段', cat: '数据格式', icon: '🔀', status: 'live' },
+  { id: 'xml-formatter', name: 'XML 格式化', nameEn: 'XML Formatter', desc: '美化与压缩 XML', cat: '数据格式', icon: '📄', status: 'soon' },
+  { id: 'sql-formatter', name: 'SQL 格式化', nameEn: 'SQL Formatter', desc: '美化 SQL 语句,支持多种方言', cat: '数据格式', icon: '🗃️', status: 'live' },
+
+  // ========== 编码转换 ==========
+  { id: 'base64', name: 'Base64 编解码', nameEn: 'Base64 Encoder', desc: '字符串/文件 Base64 编码与解码', cat: '编码转换', icon: '🔤', status: 'live' },
+  { id: 'url-encode', name: 'URL 编解码', nameEn: 'URL Encoder', desc: 'URL 编码、百分比编码与还原', cat: '编码转换', icon: '🔗', status: 'live' },
+  { id: 'html-entities', name: 'HTML 实体转义', nameEn: 'HTML Entities', desc: 'HTML 特殊字符与实体编码互转', cat: '编码转换', icon: '🏷️', status: 'live' },
+  { id: 'unicode', name: 'Unicode 转换', nameEn: 'Unicode Converter', desc: '文本与 Unicode 转义字符互转', cat: '编码转换', icon: 'Ω', status: 'live' },
+  { id: 'binary-text', name: '文本 ↔ 二进制', nameEn: 'Text ↔ Binary', desc: '文本与 ASCII 二进制互转', cat: '编码转换', icon: '01', status: 'live' },
+  { id: 'image-base64', name: '图片 ↔ Base64', nameEn: 'Image ↔ Base64', desc: '图片转 Data URI,可直接嵌入 HTML/CSS', cat: '编码转换', icon: '🖼️', status: 'live' },
+
+  // ========== 加密哈希 ==========
+  { id: 'hash', name: '哈希计算', nameEn: 'Hash', desc: 'MD5 / SHA-1 / SHA-256 / SHA-512 文本哈希', cat: '加密哈希', icon: '#', status: 'live' },
+  { id: 'hmac', name: 'HMAC 签名', nameEn: 'HMAC', desc: '基于密钥的哈希消息认证码', cat: '加密哈希', icon: '🔐', status: 'live' },
+  { id: 'jwt', name: 'JWT 解析', nameEn: 'JWT Parser', desc: '解析 JSON Web Token 头部与载荷', cat: '加密哈希', icon: '🎫', status: 'live' },
+  { id: 'bcrypt', name: 'Bcrypt 哈希', nameEn: 'Bcrypt', desc: 'Bcrypt 加密与密码比对', cat: '加密哈希', icon: '🔒', status: 'soon' },
+  { id: 'aes', name: 'AES 加解密', nameEn: 'AES', desc: 'AES-GCM 对称加密,带密码', cat: '加密哈希', icon: '🛡️', status: 'live' },
+
+  // ========== 生成器 ==========
+  { id: 'uuid', name: 'UUID 生成器', nameEn: 'UUID Generator', desc: '批量生成 v4 / v7 UUID', cat: '生成器', icon: '🆔', status: 'live' },
+  { id: 'password', name: '密码生成器', nameEn: 'Password Generator', desc: '生成强密码,可控字符集与长度', cat: '生成器', icon: '🔑', status: 'live' },
+  { id: 'token', name: 'Token 生成器', nameEn: 'Token Generator', desc: '生成 API token / 随机字符串', cat: '生成器', icon: '🪙', status: 'live' },
+  { id: 'lorem', name: 'Lorem Ipsum', nameEn: 'Lorem Ipsum', desc: '生成中英文占位文本', cat: '生成器', icon: '📝', status: 'live' },
+  { id: 'qrcode', name: '二维码生成', nameEn: 'QR Code', desc: '文本 / 链接 / WiFi 二维码生成', cat: '生成器', icon: '⬛', status: 'live' },
+
+  // ========== 时间日期 ==========
+  { id: 'timestamp', name: '时间戳转换', nameEn: 'Timestamp', desc: 'Unix 时间戳与日期互转,多时区', cat: '时间日期', icon: '⏱️', status: 'live' },
+  { id: 'cron', name: 'Cron 表达式', nameEn: 'Cron Parser', desc: '解析 Cron 表达式并预测下次执行', cat: '时间日期', icon: '⏰', status: 'live' },
+  { id: 'date-diff', name: '日期计算器', nameEn: 'Date Diff', desc: '两日期相差天数 / 加减日期', cat: '时间日期', icon: '📅', status: 'soon' },
+
+  // ========== 文本处理 ==========
+  { id: 'markdown-html', name: 'Markdown ↔ HTML', nameEn: 'Markdown ↔ HTML', desc: 'Markdown 与 HTML 双向转换,支持 GFM', cat: '文本处理', icon: 'M↓', status: 'live' },
+  { id: 'text-diff', name: '文本对比', nameEn: 'Text Diff', desc: '两段文本逐行高亮差异', cat: '文本处理', icon: '⇄', status: 'live' },
+  { id: 'case-converter', name: '大小写转换', nameEn: 'Case Converter', desc: 'camel/snake/kebab/PascalCase 互转', cat: '文本处理', icon: 'Aa', status: 'live' },
+  { id: 'text-stats', name: '文本统计', nameEn: 'Text Stats', desc: '字数/字符/行数/段落统计', cat: '文本处理', icon: '📈', status: 'live' },
+  { id: 'regex', name: '正则测试', nameEn: 'Regex Tester', desc: '正则匹配可视化,带捕获组', cat: '文本处理', icon: '/.*/', status: 'live' },
+  { id: 'slug', name: 'Slug 生成', nameEn: 'Slugify', desc: '生成 URL 友好的 slug,支持中文拼音', cat: '文本处理', icon: '🔧', status: 'soon' },
+
+  // ========== 网络工具 ==========
+  { id: 'url-parser', name: 'URL 解析', nameEn: 'URL Parser', desc: '解析 URL 各组成部分与查询参数', cat: '网络工具', icon: '🌐', status: 'live' },
+  { id: 'http-status', name: 'HTTP 状态码', nameEn: 'HTTP Status', desc: 'HTTP 状态码速查', cat: '网络工具', icon: '🚦', status: 'live' },
+  { id: 'mime-types', name: 'MIME 类型查询', nameEn: 'MIME Types', desc: '文件扩展名与 MIME 类型互查', cat: '网络工具', icon: '📎', status: 'soon' },
+  { id: 'user-agent', name: 'UA 解析', nameEn: 'User Agent', desc: '解析 User Agent 中的浏览器/系统', cat: '网络工具', icon: '💻', status: 'soon' },
+  { id: 'ip-info', name: 'IP 信息', nameEn: 'IP Info', desc: '查看本机出口 IP 与 IPv4/IPv6 转换', cat: '网络工具', icon: '🌍', status: 'soon' },
+  { id: 'curl-to-fetch', name: 'curl → fetch', nameEn: 'curl to fetch', desc: '把 curl 命令转成 fetch 代码', cat: '网络工具', icon: '↻', status: 'soon' },
+
+  // ========== 颜色图像 ==========
+  { id: 'color', name: '颜色转换', nameEn: 'Color Converter', desc: 'HEX / RGB / HSL / HSV 互转,带取色', cat: '颜色图像', icon: '🎨', status: 'live' },
+  { id: 'gradient', name: '渐变生成', nameEn: 'Gradient Maker', desc: '可视化生成 CSS 渐变背景', cat: '颜色图像', icon: '🌈', status: 'soon' },
+  { id: 'svg-placeholder', name: 'SVG 占位图', nameEn: 'SVG Placeholder', desc: '生成尺寸自定义的 SVG 占位图', cat: '颜色图像', icon: '🟦', status: 'soon' },
+  { id: 'image-resize', name: '图片压缩', nameEn: 'Image Resize', desc: '本地压缩与调整图片尺寸', cat: '颜色图像', icon: '🗜️', status: 'soon' },
+  { id: 'favicon', name: 'Favicon 生成', nameEn: 'Favicon', desc: '从 PNG 生成多尺寸 favicon', cat: '颜色图像', icon: '⭐', status: 'soon' },
+
+  // ========== 开发辅助 ==========
+  { id: 'mermaid', name: 'Mermaid 预览', nameEn: 'Mermaid', desc: '实时预览 Mermaid 流程图', cat: '开发辅助', icon: '📐', status: 'soon' },
+  { id: 'chmod', name: 'Chmod 计算', nameEn: 'Chmod Calc', desc: 'Linux 文件权限可视化计算', cat: '开发辅助', icon: '🔓', status: 'live' },
+  { id: 'rem-px', name: 'REM ↔ PX', nameEn: 'REM ↔ PX', desc: '前端字号单位换算', cat: '开发辅助', icon: '📏', status: 'live' },
+  { id: 'keycode', name: 'Keycode 速查', nameEn: 'Keycode', desc: '查询键盘按键代码', cat: '开发辅助', icon: '⌨️', status: 'live' },
+  { id: 'wx2x', name: '公众号 → X', nameEn: 'WeChat to X', desc: '微信公众号文章转 X (Twitter) Articles', cat: '开发辅助', icon: '𝕏', status: 'live', href: '/tools/wx2x' },
+];
+
+const categories = [...new Set(tools.map(t => t.cat))];
+const liveCount = tools.filter(t => t.status === 'live').length;
+const totalCount = tools.length;
+---
+
+<BaseLayout
+  title="工具箱 · siuser小伟"
+  description="开发者日常工具集合 - JSON / Base64 / 哈希 / 时间戳 / 二维码 / 颜色等纯前端在线工具"
+>
+  <Header />
+
+  <main class="min-h-screen pt-24 pb-20" style="background: var(--bg);">
+    <div class="mx-auto px-6" style="max-width: var(--container-max);">
+
+      <!-- ========== HERO ========== -->
+      <section class="mb-12 pb-10 border-b" style="border-color: var(--border);">
+        <div class="flex items-center gap-3 mb-3" style="font-family: var(--font-mono);">
+          <span class="text-[11px] tracking-[0.2em] uppercase" style="color: var(--color-accent);">// Toolbox</span>
+          <span class="flex-1 h-px" style="background: var(--border);"></span>
+          <span class="text-[11px] tracking-[0.15em] uppercase" style="color: var(--text-secondary);">{liveCount} / {totalCount} 已上线</span>
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-bold mb-4" style="font-family: var(--font-heading); color: var(--text); line-height: 1.1;">
+          开发者
+          <span class="text-shimmer">工具箱</span>
+        </h1>
+
+        <p class="text-base md:text-lg max-w-2xl mb-6" style="color: var(--text-secondary);">
+          一个纯前端、零追踪、不上传数据的工具集合。常用的 JSON、Base64、哈希、二维码、时间戳…日常那些「打开浏览器搜一下」的事,这里一站搞定。
+        </p>
+
+        <!-- Search bar -->
+        <div class="relative max-w-xl">
+          <input
+            id="tool-search"
+            type="search"
+            placeholder="搜索工具…  支持中文、英文、关键词"
+            class="w-full px-5 py-3.5 rounded-xl text-sm transition-all"
+            style="background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono); outline: none;"
+          />
+          <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--text-secondary);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+        </div>
+
+        <!-- Category filter chips -->
+        <div class="flex flex-wrap gap-2 mt-6">
+          <button data-cat-filter="all" class="cat-chip is-active px-3.5 py-1.5 rounded-full text-xs transition-all" style="font-family: var(--font-mono);">全部</button>
+          {categories.map(cat => (
+            <button data-cat-filter={cat} class="cat-chip px-3.5 py-1.5 rounded-full text-xs transition-all" style="font-family: var(--font-mono);">{cat}</button>
+          ))}
+        </div>
+      </section>
+
+      <!-- ========== TOOLS GRID ========== -->
+      <section>
+        {categories.map(cat => (
+          <div class="cat-block mb-12" data-cat={cat}>
+            <div class="flex items-center gap-3 mb-5">
+              <span class="w-1 h-5 rounded-full" style="background: var(--color-accent);"></span>
+              <h2 class="text-xl md:text-2xl font-semibold" style="font-family: var(--font-heading); color: var(--text);">{cat}</h2>
+              <span class="text-xs" style="font-family: var(--font-mono); color: var(--text-secondary);">{tools.filter(t => t.cat === cat).length} 个</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tools.filter(t => t.cat === cat).map(t => {
+                const href = t.href || (t.status === 'live' ? `/tools/${t.id}` : '#');
+                return (
+                  <a
+                    href={href}
+                    data-tool-card
+                    data-tool-name={`${t.name} ${t.nameEn} ${t.desc}`.toLowerCase()}
+                    data-tool-cat={t.cat}
+                    class:list={[
+                      "tool-grid-card group relative block p-5 rounded-2xl border transition-all duration-300",
+                      t.status === 'soon' && 'is-soon'
+                    ]}
+                    style="background: var(--surface); border-color: var(--border);"
+                  >
+                    <!-- Status badge -->
+                    {t.status === 'live' ? (
+                      <span class="absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full" style="font-family: var(--font-mono); background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3);">
+                        <span class="w-1.5 h-1.5 rounded-full" style="background: #4ade80; box-shadow: 0 0 6px #4ade80;"></span>
+                        LIVE
+                      </span>
+                    ) : (
+                      <span class="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full" style="font-family: var(--font-mono); background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border);">
+                        SOON
+                      </span>
+                    )}
+
+                    <div class="text-3xl mb-3 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6 inline-block" style="font-family: var(--font-mono); color: var(--color-accent);">
+                      {t.icon}
+                    </div>
+
+                    <h3 class="text-base font-semibold mb-1.5 transition-colors group-hover:text-[var(--color-accent)]" style="color: var(--text);">
+                      {t.name}
+                    </h3>
+                    <p class="text-[11px] mb-2 tracking-wider uppercase" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.6;">
+                      {t.nameEn}
+                    </p>
+                    <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
+                      {t.desc}
+                    </p>
+
+                    <!-- Hover arrow -->
+                    {t.status === 'live' && (
+                      <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--color-accent);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                      </div>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        <div id="empty-state" class="hidden text-center py-20">
+          <div class="text-5xl mb-3 opacity-30">∅</div>
+          <p class="text-base" style="color: var(--text-secondary);">没找到匹配的工具,换个关键词试试</p>
+        </div>
+      </section>
+
+      <!-- ========== FOOTER NOTE ========== -->
+      <section class="mt-20 pt-10 border-t text-center" style="border-color: var(--border);">
+        <p class="text-xs leading-relaxed max-w-xl mx-auto" style="color: var(--text-secondary); font-family: var(--font-mono);">
+          所有工具均在浏览器本地运行 · 数据不上传任何服务器<br/>
+          <span style="opacity: 0.6;">SOON 标记的工具陆续补齐 · 想要的工具直接 GitHub Issue</span>
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Category chip */
+  .cat-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .cat-chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .cat-chip.is-active {
+    background: var(--color-accent);
+    color: var(--color-bg-dark);
+    border-color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Tool grid card */
+  .tool-grid-card {
+    overflow: hidden;
+    position: relative;
+  }
+  .tool-grid-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent);
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+  .tool-grid-card:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 50%, var(--border)) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px -10px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+  .tool-grid-card:hover::before {
+    left: 100%;
+  }
+  .tool-grid-card.is-soon {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .tool-grid-card.is-soon:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border) !important;
+  }
+
+  .text-shimmer {
+    background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 50%, var(--color-accent) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+</style>
+
+<script is:inline>
+  (function() {
+    const search = document.getElementById('tool-search');
+    const cards = document.querySelectorAll('[data-tool-card]');
+    const blocks = document.querySelectorAll('.cat-block');
+    const empty = document.getElementById('empty-state');
+    const chips = document.querySelectorAll('.cat-chip');
+
+    let activeCat = 'all';
+    let q = '';
+
+    function apply() {
+      let visibleTotal = 0;
+      blocks.forEach(b => {
+        const cat = b.dataset.cat;
+        let visibleInBlock = 0;
+        b.querySelectorAll('[data-tool-card]').forEach(c => {
+          const matchCat = activeCat === 'all' || c.dataset.toolCat === activeCat;
+          const matchQ = !q || c.dataset.toolName.includes(q);
+          const ok = matchCat && matchQ;
+          c.style.display = ok ? '' : 'none';
+          if (ok) visibleInBlock++;
+        });
+        b.style.display = visibleInBlock > 0 ? '' : 'none';
+        visibleTotal += visibleInBlock;
+      });
+      empty.classList.toggle('hidden', visibleTotal > 0);
+    }
+
+    if (search) {
+      search.addEventListener('input', e => {
+        q = e.target.value.trim().toLowerCase();
+        apply();
+      });
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        activeCat = chip.dataset.catFilter;
+        chips.forEach(c => c.classList.toggle('is-active', c === chip));
+        apply();
+      });
+    });
+
+    // SOON cards: prevent navigation + toast
+    document.querySelectorAll('.is-soon').forEach(c => {
+      c.addEventListener('click', e => {
+        e.preventDefault();
+        if (window.toolToast) window.toolToast('即将上线,敬请期待');
+      });
+    });
+  })();
+</script>
+
+<!-- shared toast -->
+<div id="tool-toast" style="position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);padding:0.7rem 1.4rem;background:var(--surface);border:1px solid var(--color-accent);border-radius:10px;font-size:0.85rem;color:var(--text);opacity:0;pointer-events:none;transition:all 0.3s ease;z-index:99999;font-family:var(--font-mono);"></div>
+<script is:inline>
+  window.toolToast = function(msg) {
+    const t = document.getElementById('tool-toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(window._toolToastTimer);
+    window._toolToastTimer = setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 1800);
+  };
+</script>

@@ -1,0 +1,73 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="SQL 格式化" description="美化 SQL 语句,支持多种数据库方言" category="数据格式" icon="🗃️">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="tool-label">方言</label>
+        <select id="dialect" class="tool-select">
+          <option value="sql">Standard SQL</option>
+          <option value="mysql">MySQL</option>
+          <option value="postgresql">PostgreSQL</option>
+          <option value="sqlite">SQLite</option>
+          <option value="mariadb">MariaDB</option>
+          <option value="bigquery">BigQuery</option>
+          <option value="redshift">Redshift</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">大小写</label>
+        <select id="kw" class="tool-select">
+          <option value="upper">关键字大写</option>
+          <option value="lower">关键字小写</option>
+          <option value="preserve">保持原样</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-fmt">格式化</button>
+      <button class="tool-btn" id="btn-min">压缩为单行</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-sample">示例</button>
+    </div>
+    <div class="tool-grid-2 mt-3">
+      <div>
+        <label class="tool-label">输入</label>
+        <textarea id="input" class="tool-textarea" style="min-height: 320px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">输出</label>
+        <textarea id="output" class="tool-textarea" style="min-height: 320px;" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/sql-formatter@15.4.5/dist/sql-formatter.min.js"></script>
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  $('btn-fmt').onclick = () => {
+    if (typeof sqlFormatter === 'undefined') return setTimeout(() => $('btn-fmt').click(), 200);
+    try {
+      $('output').value = sqlFormatter.format($('input').value, {
+        language: $('dialect').value,
+        keywordCase: $('kw').value,
+        tabWidth: 2
+      });
+    } catch(e){ window.toolToast(e.message, 'err'); }
+  };
+  $('btn-min').onclick = () => {
+    $('output').value = $('input').value.replace(/\s+/g,' ').trim();
+  };
+  $('btn-copy').onclick = () => $('output').value && window.toolCopy($('output').value);
+  $('btn-sample').onclick = () => {
+    $('input').value = "select u.id,u.name,count(o.id) as orders from users u left join orders o on o.user_id=u.id where u.created_at >= '2026-01-01' and u.status='active' group by u.id,u.name having count(o.id) > 0 order by orders desc limit 20;";
+    $('btn-fmt').click();
+  };
+  setTimeout(() => $('btn-sample').click(), 400);
+})();
+</script>

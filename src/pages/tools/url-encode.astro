@@ -1,0 +1,38 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="URL 编解码" description="URL 编码、百分比编码与还原,支持组件级别" category="编码转换" icon="🔗">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-encode">编码 →</button>
+      <button class="tool-btn" id="btn-decode">← 解码</button>
+      <button class="tool-btn" id="btn-encode-component">encodeURIComponent</button>
+      <button class="tool-btn" id="btn-decode-component">decodeURIComponent</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制结果</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-clear">清空</button>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原始</label>
+        <textarea id="raw" class="tool-textarea" placeholder="https://example.com/?q=你好 世界"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">编码后</label>
+        <textarea id="enc" class="tool-textarea" placeholder="https%3A%2F%2Fexample.com%2F%3Fq%3D..."></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('btn-encode').onclick = () => { try { $('enc').value = encodeURI($('raw').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-decode').onclick = () => { try { $('raw').value = decodeURI($('enc').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-encode-component').onclick = () => { try { $('enc').value = encodeURIComponent($('raw').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-decode-component').onclick = () => { try { $('raw').value = decodeURIComponent($('enc').value); } catch(e){ window.toolToast(e.message,'err'); } };
+  $('btn-copy').onclick = () => $('enc').value && window.toolCopy($('enc').value);
+  $('btn-clear').onclick = () => { $('raw').value=''; $('enc').value=''; };
+})();
+</script>

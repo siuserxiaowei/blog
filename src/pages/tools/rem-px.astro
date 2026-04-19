@@ -1,0 +1,56 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="REM ↔ PX" description="前端字号单位 REM / EM / PX 互转" category="开发辅助" icon="📏">
+  <div class="tool-card mb-6">
+    <label class="tool-label">根字号(px)</label>
+    <input id="root" type="number" min="1" value="16" class="tool-input" style="max-width: 180px;" />
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="tool-card">
+      <label class="tool-label">PX → REM</label>
+      <input id="px" type="number" value="32" class="tool-input mb-3" />
+      <div class="tool-meta-item cursor-pointer" id="px-out" onclick="window.toolCopy(this.querySelector('.v').textContent)">
+        <div class="k">REM 值</div>
+        <div class="v" style="font-size: 1.4rem; color: var(--color-accent);">2rem</div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <label class="tool-label">REM → PX</label>
+      <input id="rem" type="number" step="0.01" value="2" class="tool-input mb-3" />
+      <div class="tool-meta-item cursor-pointer" id="rem-out" onclick="window.toolCopy(this.querySelector('.v').textContent)">
+        <div class="k">PX 值</div>
+        <div class="v" style="font-size: 1.4rem; color: var(--color-accent);">32px</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card mt-6">
+    <label class="tool-label">常用换算表</label>
+    <table style="width:100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem;" id="table"></table>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  function root(){ return parseFloat($('root').value) || 16; }
+  function update(){
+    const r = root();
+    $('px-out').querySelector('.v').textContent = (parseFloat($('px').value)/r).toFixed(4).replace(/\.?0+$/,'') + 'rem';
+    $('rem-out').querySelector('.v').textContent = (parseFloat($('rem').value)*r).toFixed(2).replace(/\.?0+$/,'') + 'px';
+
+    const t = $('table'); t.innerHTML = '<tr style="color:var(--color-accent);"><th style="text-align:left;padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);">PX</th><th style="text-align:left;padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);">REM</th><th style="text-align:left;padding:0.5rem 0.8rem;border-bottom:1px solid var(--border);">EM (1.5x)</th></tr>';
+    [10,12,14,16,18,20,24,28,32,40,48,56,64,80].forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="padding:0.4rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text);">${p}px</td><td style="padding:0.4rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text);">${(p/r).toFixed(3).replace(/\.?0+$/,'')}rem</td><td style="padding:0.4rem 0.8rem;border-bottom:1px solid var(--border);color:var(--text-secondary);">${(p/(r*1.5)).toFixed(3).replace(/\.?0+$/,'')}em</td>`;
+      t.appendChild(tr);
+    });
+  }
+  ['root','px','rem'].forEach(id => $(id).addEventListener('input', update));
+  update();
+})();
+</script>

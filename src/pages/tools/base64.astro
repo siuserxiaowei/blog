@@ -1,0 +1,81 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Base64 编解码" description="字符串与文件的 Base64 编码、解码,UTF-8 安全" category="编码转换" icon="🔤">
+  <div class="tool-card mb-6">
+    <label class="tool-label">字符串模式</label>
+    <div class="tool-grid-2">
+      <div>
+        <div class="tool-toolbar">
+          <button class="tool-btn tool-btn-primary" id="btn-encode">编码 →</button>
+          <button class="tool-btn" id="btn-clear-l">清空</button>
+        </div>
+        <textarea id="plain" class="tool-textarea" placeholder="原始文本(支持中文/Emoji)"></textarea>
+      </div>
+      <div>
+        <div class="tool-toolbar">
+          <button class="tool-btn" id="btn-decode">← 解码</button>
+          <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+        </div>
+        <textarea id="b64" class="tool-textarea" placeholder="Base64 字符串"></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">文件模式</label>
+    <div class="flex flex-wrap gap-3 items-center mb-3">
+      <label class="tool-btn tool-btn-primary" for="file-input">选择文件</label>
+      <input type="file" id="file-input" class="hidden" />
+      <span id="file-name" class="text-xs" style="color: var(--text-secondary); font-family: var(--font-mono);">未选择文件</span>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy-file">复制 Base64</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-download">下载 .txt</button>
+    </div>
+    <textarea id="file-out" class="tool-textarea" placeholder="文件 Base64 输出会显示在这里"></textarea>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function utf8ToB64(s){ return btoa(unescape(encodeURIComponent(s))); }
+  function b64ToUtf8(s){ return decodeURIComponent(escape(atob(s))); }
+
+  $('btn-encode').onclick = () => {
+    try { $('b64').value = utf8ToB64($('plain').value); setStatus('✓ 编码完成','ok'); }
+    catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+  $('btn-decode').onclick = () => {
+    try { $('plain').value = b64ToUtf8($('b64').value.replace(/\s+/g,'')); setStatus('✓ 解码完成','ok'); }
+    catch(e){ setStatus('✗ 无效的 Base64','err'); }
+  };
+  $('btn-copy').onclick = () => $('b64').value && window.toolCopy($('b64').value);
+  $('btn-clear-l').onclick = () => { $('plain').value=''; $('b64').value=''; setStatus('等待输入'); };
+
+  $('file-input').onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    $('file-name').textContent = f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
+    const r = new FileReader();
+    r.onload = () => {
+      const result = r.result;
+      const b64 = result.includes(',') ? result.split(',')[1] : result;
+      $('file-out').value = b64;
+    };
+    r.readAsDataURL(f);
+  };
+  $('btn-copy-file').onclick = () => $('file-out').value && window.toolCopy($('file-out').value);
+  $('btn-download').onclick = () => {
+    const txt = $('file-out').value;
+    if (!txt) return;
+    const blob = new Blob([txt],{type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'base64.txt'; a.click();
+  };
+})();
+</script>

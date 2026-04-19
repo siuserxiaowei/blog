@@ -1,0 +1,55 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="文本 ↔ 二进制" description="文本与 ASCII 二进制 / 十六进制互转" category="编码转换" icon="01">
+  <div class="tool-card">
+    <div class="flex items-center gap-3 mb-3">
+      <label class="tool-label" style="margin: 0;">输出格式</label>
+      <select id="mode" class="tool-select" style="max-width: 140px;">
+        <option value="bin">二进制</option>
+        <option value="hex">十六进制</option>
+        <option value="dec">十进制</option>
+      </select>
+      <span class="text-xs" style="color: var(--text-secondary);">UTF-8 字节</span>
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-encode">编码 →</button>
+      <button class="tool-btn" id="btn-decode">← 解码</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">文本</label>
+        <textarea id="raw" class="tool-textarea" placeholder="Hello"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">编码结果</label>
+        <textarea id="enc" class="tool-textarea" placeholder="01001000 01100101..."></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('btn-encode').onclick = () => {
+    const mode = $('mode').value;
+    const bytes = new TextEncoder().encode($('raw').value);
+    const arr = Array.from(bytes);
+    if (mode==='bin') $('enc').value = arr.map(b=>b.toString(2).padStart(8,'0')).join(' ');
+    else if (mode==='hex') $('enc').value = arr.map(b=>b.toString(16).padStart(2,'0')).join(' ');
+    else $('enc').value = arr.join(' ');
+  };
+  $('btn-decode').onclick = () => {
+    const mode = $('mode').value;
+    const radix = mode==='bin'?2 : mode==='hex'?16 : 10;
+    try {
+      const bytes = $('enc').value.trim().split(/\s+/).map(s=>parseInt(s,radix)).filter(n=>!isNaN(n));
+      $('raw').value = new TextDecoder().decode(new Uint8Array(bytes));
+    } catch(e){ window.toolToast('解码失败','err'); }
+  };
+  $('btn-copy').onclick = () => $('enc').value && window.toolCopy($('enc').value);
+})();
+</script>

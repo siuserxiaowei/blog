@@ -1,0 +1,85 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="文本对比" description="逐行对比两段文本的差异,新增/删除高亮" category="文本处理" icon="⇄">
+  <div class="tool-card mb-6">
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原文</label>
+        <textarea id="a" class="tool-textarea" style="min-height: 240px;" placeholder="第一段文本"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">对比</label>
+        <textarea id="b" class="tool-textarea" style="min-height: 240px;" placeholder="第二段文本"></textarea>
+      </div>
+    </div>
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn tool-btn-primary" id="btn-diff">对比</button>
+      <label class="flex items-center gap-2 text-sm" style="color: var(--text);"><input type="checkbox" id="ignore-case" /> 忽略大小写</label>
+      <label class="flex items-center gap-2 text-sm" style="color: var(--text);"><input type="checkbox" id="ignore-ws" /> 忽略空白</label>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">差异结果</label>
+    <div class="grid grid-cols-3 gap-2 mb-3 text-xs" style="font-family: var(--font-mono); color: var(--text-secondary);">
+      <span>共计 <span id="stat-total" style="color: var(--text);">0</span> 行</span>
+      <span>新增 <span id="stat-add" style="color: #4ade80;">0</span></span>
+      <span>删除 <span id="stat-del" style="color: #f87171;">0</span></span>
+    </div>
+    <pre id="result" class="tool-output" style="min-height: 280px; line-height: 1.6;"></pre>
+  </div>
+</ToolLayout>
+
+<style>
+  #result .add { background: rgba(74,222,128,0.15); color: #4ade80; display: block; }
+  #result .del { background: rgba(248,113,113,0.15); color: #f87171; display: block; text-decoration: line-through; opacity: 0.85; }
+  #result .same { color: var(--text-secondary); display: block; opacity: 0.6; }
+</style>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function lcs(a, b){
+    const m=a.length, n=b.length;
+    const dp = Array.from({length:m+1}, ()=>new Uint16Array(n+1));
+    for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1]+1 : Math.max(dp[i-1][j], dp[i][j-1]);
+    const out = []; let i=m, j=n;
+    while (i>0 && j>0){
+      if (a[i-1]===b[j-1]) { out.push({t:'same', v:a[--i]}); j--; }
+      else if (dp[i-1][j] >= dp[i][j-1]) out.push({t:'del', v:a[--i]});
+      else out.push({t:'add', v:b[--j]});
+    }
+    while (i>0) out.push({t:'del', v:a[--i]});
+    while (j>0) out.push({t:'add', v:b[--j]});
+    return out.reverse();
+  }
+
+  $('btn-diff').onclick = () => {
+    const norm = s => {
+      if ($('ignore-case').checked) s = s.toLowerCase();
+      if ($('ignore-ws').checked) s = s.replace(/\s+/g,' ').trim();
+      return s;
+    };
+    const a = $('a').value.split('\n');
+    const b = $('b').value.split('\n');
+    const an = a.map(norm), bn = b.map(norm);
+    const diff = lcs(an, bn);
+    let html = '', add=0, del=0;
+    let ai=0, bi=0;
+    diff.forEach(d => {
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;') || ' ';
+      if (d.t==='same') { html += `<span class="same">  ${esc(a[ai]||'')}</span>`; ai++; bi++; }
+      else if (d.t==='add') { html += `<span class="add">+ ${esc(b[bi]||'')}</span>`; bi++; add++; }
+      else { html += `<span class="del">- ${esc(a[ai]||'')}</span>`; ai++; del++; }
+    });
+    $('result').innerHTML = html || '<span style="color:var(--text-secondary);">无差异</span>';
+    $('stat-total').textContent = diff.length;
+    $('stat-add').textContent = add;
+    $('stat-del').textContent = del;
+  };
+})();
+</script>

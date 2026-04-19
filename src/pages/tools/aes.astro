@@ -1,0 +1,86 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="AES 加解密" description="AES-GCM 256 位对称加密,基于密码派生密钥(PBKDF2)" category="加密哈希" icon="🛡️">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="tool-label">密码</label>
+        <input id="pwd" type="password" class="tool-input" placeholder="加密密码" />
+      </div>
+      <div>
+        <label class="tool-label">操作</label>
+        <div class="flex gap-2">
+          <button class="tool-btn tool-btn-primary flex-1" id="btn-enc">加密 →</button>
+          <button class="tool-btn flex-1" id="btn-dec">← 解密</button>
+        </div>
+      </div>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">明文</label>
+        <textarea id="plain" class="tool-textarea" placeholder="要加密的内容"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">密文（Base64,自带盐和 IV）</label>
+        <textarea id="cipher" class="tool-textarea" placeholder="加密结果或要解密的密文"></textarea>
+      </div>
+    </div>
+    <div class="tool-toolbar mt-2">
+      <button class="tool-btn tool-btn-ghost" id="btn-copy-c">复制密文</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy-p">复制明文</button>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">输入密码与文本后操作</span></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  async function deriveKey(pwd, salt){
+    const baseKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(pwd), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name:'PBKDF2', salt, iterations:100000, hash:'SHA-256' },
+      baseKey, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']
+    );
+  }
+
+  function b2b64(b){ return btoa(String.fromCharCode(...new Uint8Array(b))); }
+  function b64ToBuf(s){ const b = atob(s); const u = new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+
+  $('btn-enc').onclick = async () => {
+    const p = $('pwd').value, t = $('plain').value;
+    if (!p || !t){ setStatus('请输入密码和明文','err'); return; }
+    try {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(p, salt);
+      const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(t));
+      const all = new Uint8Array(salt.length + iv.length + ct.byteLength);
+      all.set(salt); all.set(iv, 16); all.set(new Uint8Array(ct), 28);
+      $('cipher').value = b2b64(all);
+      setStatus('✓ 加密完成','ok');
+    } catch(e){ setStatus('✗ '+e.message,'err'); }
+  };
+
+  $('btn-dec').onclick = async () => {
+    const p = $('pwd').value, c = $('cipher').value.trim();
+    if (!p || !c){ setStatus('请输入密码和密文','err'); return; }
+    try {
+      const all = b64ToBuf(c);
+      const salt = all.slice(0,16), iv = all.slice(16,28), ct = all.slice(28);
+      const key = await deriveKey(p, salt);
+      const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, ct);
+      $('plain').value = new TextDecoder().decode(pt);
+      setStatus('✓ 解密成功','ok');
+    } catch(e){ setStatus('✗ 密码错误或密文无效','err'); }
+  };
+
+  $('btn-copy-c').onclick = () => $('cipher').value && window.toolCopy($('cipher').value);
+  $('btn-copy-p').onclick = () => $('plain').value && window.toolCopy($('plain').value);
+})();
+</script>

@@ -1,0 +1,72 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Lorem Ipsum" description="生成中文 / 英文占位文本,可指定段落、句子、字数" category="生成器" icon="📝">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label class="tool-label">语言</label>
+        <select id="lang" class="tool-select">
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+          <option value="mixed">中英混排</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">单位</label>
+        <select id="unit" class="tool-select">
+          <option value="paragraph">段落</option>
+          <option value="sentence">句子</option>
+          <option value="word">单词/字</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">数量</label>
+        <input id="count" type="number" min="1" max="100" value="3" class="tool-input" />
+      </div>
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-gen">生成</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <textarea id="out" class="tool-textarea mt-3" readonly style="min-height: 320px;"></textarea>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const en = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+  const zh = '我们在数字世界里寻找真实意义在产品中追求用户的认同坚信好的设计是少即是多每一次迭代都让体验更顺滑代码是诗也是工程沉淀久了便有了味道思考与执行同样重要持续学习保持好奇专注当下也眺望远方'.split('');
+  const rng = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  function pickWord(){
+    const lang = $('lang').value;
+    if (lang==='en') return en[rng(0,en.length-1)];
+    if (lang==='zh') return zh.slice(rng(0,zh.length-3), rng(0,zh.length-1)+1).join('');
+    return Math.random() < 0.5 ? en[rng(0,en.length-1)] : zh[rng(0,zh.length-1)];
+  }
+  function sentence(){
+    const lang = $('lang').value;
+    const n = rng(8,18);
+    let arr = []; for (let i=0;i<n;i++) arr.push(pickWord());
+    let s = arr.join(lang==='zh'?'':' ');
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+    return s + (lang==='zh'?'。':'. ');
+  }
+  function paragraph(){ const n = rng(4,8); let s=''; for(let i=0;i<n;i++) s+=sentence(); return s.trim(); }
+
+  function gen(){
+    const u = $('unit').value, n = Math.min(100, parseInt($('count').value)||1);
+    const lang = $('lang').value;
+    let out = [];
+    if (u==='paragraph') for (let i=0;i<n;i++) out.push(paragraph());
+    else if (u==='sentence') for (let i=0;i<n;i++) out.push(sentence().trim());
+    else { let arr=[]; for (let i=0;i<n;i++) arr.push(pickWord()); out=[arr.join(lang==='zh'?'':' ')]; }
+    $('out').value = out.join('\n\n');
+  }
+  $('btn-gen').onclick = gen;
+  $('btn-copy').onclick = () => $('out').value && window.toolCopy($('out').value);
+  gen();
+})();
+</script>

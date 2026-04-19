@@ -1,0 +1,92 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="图片 ↔ Base64" description="图片转 Data URI,可直接嵌入 HTML/CSS,支持反向解码预览" category="编码转换" icon="🖼️">
+  <div class="tool-card mb-6">
+    <label class="tool-label">图片 → Base64</label>
+    <div
+      id="drop"
+      class="rounded-xl text-center cursor-pointer transition-all"
+      style="border: 2px dashed var(--border); padding: 2rem 1rem; background: var(--bg);"
+    >
+      <input type="file" id="file-input" accept="image/*" class="hidden" />
+      <div style="font-size: 2.5rem; opacity: 0.4;">📤</div>
+      <p style="color: var(--text-secondary); margin-top: 0.5rem;">点击或拖拽图片到这里</p>
+      <p style="color: var(--text-secondary); font-size: 0.75rem; opacity: 0.6; margin-top: 0.25rem; font-family: var(--font-mono);">支持 JPG / PNG / WebP / SVG / GIF</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4 mt-4">
+      <div>
+        <label class="tool-label">预览</label>
+        <div id="preview" style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; min-height: 160px; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+          <span style="color: var(--text-secondary); font-size: 0.85rem;">选择图片后显示</span>
+        </div>
+      </div>
+      <div>
+        <label class="tool-label">Data URI 输出</label>
+        <textarea id="data-uri" class="tool-textarea" readonly style="min-height: 160px;"></textarea>
+        <div class="tool-toolbar mt-2">
+          <button class="tool-btn tool-btn-primary" id="btn-copy">复制 Data URI</button>
+          <button class="tool-btn" id="btn-copy-css">复制 CSS background</button>
+          <button class="tool-btn" id="btn-copy-img">复制 img 标签</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">Base64 → 图片</label>
+    <textarea id="dec-input" class="tool-textarea" placeholder="粘贴 data:image/... 或纯 Base64 字符串"></textarea>
+    <div class="tool-toolbar mt-2">
+      <button class="tool-btn tool-btn-primary" id="btn-decode">解码并预览</button>
+      <button class="tool-btn" id="btn-download">下载图片</button>
+    </div>
+    <div id="dec-preview" style="margin-top: 1rem;"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const drop = $('drop'), file = $('file-input');
+  drop.onclick = () => file.click();
+  ['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.style.borderColor = 'var(--color-accent)'; }));
+  ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.style.borderColor = 'var(--border)'; }));
+  drop.addEventListener('drop', ev => { const f = ev.dataTransfer.files[0]; if (f) handleFile(f); });
+  file.onchange = e => { const f = e.target.files[0]; if (f) handleFile(f); };
+
+  function handleFile(f){
+    const r = new FileReader();
+    r.onload = () => {
+      const uri = r.result;
+      $('data-uri').value = uri;
+      $('preview').innerHTML = `<img src="${uri}" style="max-width:100%;max-height:240px;border-radius:6px;"/>`;
+    };
+    r.readAsDataURL(f);
+  }
+
+  $('btn-copy').onclick = () => $('data-uri').value && window.toolCopy($('data-uri').value);
+  $('btn-copy-css').onclick = () => {
+    const v = $('data-uri').value;
+    if (v) window.toolCopy(`background-image: url('${v}');`);
+  };
+  $('btn-copy-img').onclick = () => {
+    const v = $('data-uri').value;
+    if (v) window.toolCopy(`<img src="${v}" />`);
+  };
+
+  $('btn-decode').onclick = () => {
+    let v = $('dec-input').value.trim();
+    if (!v.startsWith('data:')) v = 'data:image/png;base64,' + v.replace(/\s+/g,'');
+    $('dec-preview').innerHTML = `<img src="${v}" style="max-width:100%;border:1px solid var(--border);border-radius:8px;" onerror="this.outerHTML='<p style=color:#f87171>无效的图片 Base64</p>'"/>`;
+  };
+  $('btn-download').onclick = () => {
+    let v = $('dec-input').value.trim();
+    if (!v) return;
+    if (!v.startsWith('data:')) v = 'data:image/png;base64,' + v.replace(/\s+/g,'');
+    const a = document.createElement('a');
+    a.href = v; a.download = 'image.' + (v.match(/data:image\/(\w+)/)?.[1] || 'png');
+    a.click();
+  };
+})();
+</script>

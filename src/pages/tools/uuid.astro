@@ -1,0 +1,86 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="UUID 生成器" description="批量生成 UUID v4 / v7 / NIL / 短 ID" category="生成器" icon="🆔">
+  <div class="tool-card">
+    <div class="grid md:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label class="tool-label">类型</label>
+        <select id="type" class="tool-select">
+          <option value="v4">UUID v4 (随机)</option>
+          <option value="v7">UUID v7 (时序)</option>
+          <option value="nil">NIL UUID</option>
+          <option value="short">短 ID (Nano-style)</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label">数量</label>
+        <input id="count" type="number" min="1" max="1000" value="10" class="tool-input" />
+      </div>
+      <div>
+        <label class="tool-label">格式</label>
+        <select id="fmt" class="tool-select">
+          <option value="default">标准</option>
+          <option value="upper">大写</option>
+          <option value="nodash">无连字符</option>
+          <option value="brace">大括号</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-gen">生成</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制全部</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-clear">清空</button>
+    </div>
+    <textarea id="out" class="tool-textarea mt-3" readonly style="min-height: 320px;"></textarea>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function v4(){ return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3)|0x8).toString(16);}); }
+  function v7(){
+    const ts = Date.now();
+    const tsHex = ts.toString(16).padStart(12,'0');
+    const rand = crypto.getRandomValues(new Uint8Array(10));
+    let h = tsHex.slice(0,8) + '-' + tsHex.slice(8,12) + '-7';
+    h += rand[0].toString(16).padStart(2,'0')[0] + ((rand[0] & 0xf).toString(16)) + rand[1].toString(16).padStart(2,'0');
+    h += '-' + ((rand[2]&0x3f|0x80).toString(16).padStart(2,'0')) + rand[3].toString(16).padStart(2,'0') + '-';
+    for (let i=4;i<10;i++) h += rand[i].toString(16).padStart(2,'0');
+    return h;
+  }
+  function shortId(){
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+    const r = crypto.getRandomValues(new Uint8Array(21));
+    return Array.from(r).map(b=>chars[b%64]).join('');
+  }
+
+  function format(u){
+    const fmt = $('fmt').value;
+    if (fmt==='upper') return u.toUpperCase();
+    if (fmt==='nodash') return u.replace(/-/g,'');
+    if (fmt==='brace') return '{'+u+'}';
+    return u;
+  }
+
+  $('btn-gen').onclick = () => {
+    const t = $('type').value, n = Math.min(1000, parseInt($('count').value)||1);
+    const arr = [];
+    for (let i=0;i<n;i++){
+      let u;
+      if (t==='v4') u = v4();
+      else if (t==='v7') u = v7();
+      else if (t==='nil') u = '00000000-0000-0000-0000-000000000000';
+      else u = shortId();
+      arr.push(t==='short' ? u : format(u));
+    }
+    $('out').value = arr.join('\n');
+  };
+  $('btn-copy').onclick = () => $('out').value && window.toolCopy($('out').value);
+  $('btn-clear').onclick = () => $('out').value = '';
+  $('btn-gen').click();
+})();
+</script>

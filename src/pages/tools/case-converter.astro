@@ -1,0 +1,64 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="大小写转换" description="一键转换 camelCase / snake_case / kebab-case / PascalCase 等" category="文本处理" icon="Aa">
+  <div class="tool-card">
+    <label class="tool-label">输入文本</label>
+    <textarea id="input" class="tool-textarea" placeholder="hello world example string">hello world example</textarea>
+
+    <label class="tool-label mt-4">点击复制</label>
+    <div class="grid md:grid-cols-2 gap-3" id="results"></div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function tokenize(s){
+    return s.replace(/([a-z])([A-Z])/g,'$1 $2')
+            .replace(/[_\-\.\s]+/g,' ')
+            .trim().split(/\s+/).filter(Boolean).map(w=>w.toLowerCase());
+  }
+
+  function convert(s){
+    const w = tokenize(s);
+    if (!w.length) return {};
+    return {
+      'UPPERCASE': s.toUpperCase(),
+      'lowercase': s.toLowerCase(),
+      'Title Case': w.map(x=>x[0].toUpperCase()+x.slice(1)).join(' '),
+      'Sentence case': w.length ? w[0][0].toUpperCase() + w.slice(1).map(x=>x).join(' ').slice(0) : '',
+      'camelCase': w[0] + w.slice(1).map(x=>x[0].toUpperCase()+x.slice(1)).join(''),
+      'PascalCase': w.map(x=>x[0].toUpperCase()+x.slice(1)).join(''),
+      'snake_case': w.join('_'),
+      'CONSTANT_CASE': w.join('_').toUpperCase(),
+      'kebab-case': w.join('-'),
+      'Header-Case': w.map(x=>x[0].toUpperCase()+x.slice(1)).join('-'),
+      'dot.case': w.join('.'),
+      'path/case': w.join('/'),
+      '反转': s.split('').reverse().join(''),
+      '交替大小写': s.split('').map((c,i)=>i%2?c.toLowerCase():c.toUpperCase()).join('')
+    };
+  }
+
+  function render(){
+    const out = convert($('input').value);
+    const wrap = $('results'); wrap.innerHTML = '';
+    Object.entries(out).forEach(([k,v])=>{
+      const d = document.createElement('div');
+      d.className = 'p-3 rounded-lg cursor-pointer transition-all';
+      d.style.cssText = 'background: var(--bg); border: 1px solid var(--border);';
+      d.innerHTML = `<div class="text-[10px] uppercase tracking-wider mb-1" style="color: var(--color-accent); font-family: var(--font-mono);">${k}</div><code class="text-sm break-all" style="color: var(--text); font-family: var(--font-mono);">${v||'(空)'}</code>`;
+      d.onmouseover = () => d.style.borderColor = 'var(--color-accent)';
+      d.onmouseout = () => d.style.borderColor = 'var(--border)';
+      d.onclick = () => v && window.toolCopy(v);
+      wrap.appendChild(d);
+    });
+  }
+
+  $('input').addEventListener('input', render);
+  render();
+})();
+</script>

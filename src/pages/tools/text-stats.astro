@@ -1,0 +1,71 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="文本统计" description="字符 / 单词 / 行 / 段落 / 中英文 / 阅读时长统计" category="文本处理" icon="📈">
+  <div class="tool-card mb-6">
+    <label class="tool-label">输入文本</label>
+    <textarea id="input" class="tool-textarea" style="min-height: 240px;" placeholder="粘贴或输入要统计的文本..."></textarea>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="stats"></div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const items = [
+    ['字符数（含空格）','chars'],
+    ['字符数（不含空格）','noSpace'],
+    ['单词数','words'],
+    ['行数','lines'],
+    ['段落数','paragraphs'],
+    ['中文字符','cjk'],
+    ['英文单词','en'],
+    ['数字','digits'],
+    ['空白','ws'],
+    ['标点','punct'],
+    ['最长行','longest'],
+    ['阅读时长','read']
+  ];
+  const wrap = $('stats');
+  items.forEach(([label, key]) => {
+    const d = document.createElement('div');
+    d.className = 'tool-meta-item';
+    d.innerHTML = `<div class="k">${label}</div><div class="v" data-k="${key}">0</div>`;
+    wrap.appendChild(d);
+  });
+
+  function calc(s){
+    return {
+      chars: s.length,
+      noSpace: s.replace(/\s/g,'').length,
+      words: (s.match(/\b[\w'-]+\b/g) || []).length,
+      lines: s ? s.split('\n').length : 0,
+      paragraphs: s.trim() ? s.trim().split(/\n\s*\n/).length : 0,
+      cjk: (s.match(/[\u4e00-\u9fa5\u3040-\u30ff]/g) || []).length,
+      en: (s.match(/[a-zA-Z]+/g) || []).length,
+      digits: (s.match(/\d/g) || []).length,
+      ws: (s.match(/\s/g) || []).length,
+      punct: (s.match(/[!-/:-@\[-`{-~。,、;:!?""''「」]/g) || []).length,
+      longest: s ? Math.max(...s.split('\n').map(l=>l.length)) : 0,
+      read: ''
+    };
+  }
+
+  function render(){
+    const s = $('input').value;
+    const r = calc(s);
+    // reading time: 中文 300 字/分钟, 英文 200 词/分钟
+    const min = r.cjk/300 + r.words/200;
+    r.read = min < 1 ? `< 1 分钟` : `约 ${Math.round(min)} 分钟`;
+    Object.entries(r).forEach(([k,v]) => {
+      const el = document.querySelector(`[data-k="${k}"]`);
+      if (el) el.textContent = v;
+    });
+  }
+
+  $('input').addEventListener('input', render);
+  render();
+})();
+</script>

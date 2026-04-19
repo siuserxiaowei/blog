@@ -1,0 +1,40 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="HTML 实体转义" description="HTML 特殊字符与实体编码互转" category="编码转换" icon="🏷️">
+  <div class="tool-card">
+    <div class="tool-toolbar">
+      <button class="tool-btn tool-btn-primary" id="btn-escape">转义 →</button>
+      <button class="tool-btn" id="btn-unescape">← 还原</button>
+      <button class="tool-btn tool-btn-ghost" id="btn-copy">复制</button>
+    </div>
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原文</label>
+        <textarea id="raw" class="tool-textarea" placeholder='<div class="hello">你好 & 世界</div>'></textarea>
+      </div>
+      <div>
+        <label class="tool-label">实体</label>
+        <textarea id="enc" class="tool-textarea" placeholder='&lt;div class=&quot;hello&quot;&gt;...'></textarea>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' };
+  const re = /[&<>"']/g;
+  const escape = s => s.replace(re, c => map[c]);
+  const unescape = s => {
+    const t = document.createElement('textarea');
+    t.innerHTML = s;
+    return t.value;
+  };
+  $('btn-escape').onclick = () => $('enc').value = escape($('raw').value);
+  $('btn-unescape').onclick = () => $('raw').value = unescape($('enc').value);
+  $('btn-copy').onclick = () => $('enc').value && window.toolCopy($('enc').value);
+})();
+</script>

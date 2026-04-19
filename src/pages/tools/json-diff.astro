@@ -1,0 +1,80 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="JSON 差异对比" description="找出两个 JSON 对象的新增、删除、修改" category="数据格式" icon="🔀">
+  <div class="tool-card mb-6">
+    <div class="tool-grid-2">
+      <div>
+        <label class="tool-label">原版 (a)</label>
+        <textarea id="a" class="tool-textarea" style="min-height: 240px;" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label class="tool-label">新版 (b)</label>
+        <textarea id="b" class="tool-textarea" style="min-height: 240px;" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="tool-toolbar mt-3">
+      <button class="tool-btn tool-btn-primary" id="btn-diff">对比</button>
+      <button class="tool-btn" id="btn-sample">示例</button>
+    </div>
+    <div class="tool-status" id="status"><span class="dot"></span><span class="msg">等待输入</span></div>
+  </div>
+
+  <div class="tool-card">
+    <label class="tool-label">差异结果</label>
+    <pre id="result" class="tool-output" style="min-height: 240px; line-height: 1.6;"></pre>
+  </div>
+</ToolLayout>
+
+<style>
+  #result .add { color: #4ade80; }
+  #result .del { color: #f87171; }
+  #result .chg { color: #fbbf24; }
+</style>
+
+<script is:inline>
+(function(){
+  const $ = id => document.getElementById(id);
+  const status = $('status'), msg = status.querySelector('.msg');
+  const setStatus = (t,k) => { msg.textContent = t; status.classList.remove('is-ok','is-err'); if(k) status.classList.add('is-'+k); };
+
+  function diff(a, b, path='', out=[]){
+    const keys = new Set([...Object.keys(a||{}), ...Object.keys(b||{})]);
+    keys.forEach(k => {
+      const p = path ? path + '.' + k : k;
+      const av = a?.[k], bv = b?.[k];
+      if (!(k in a)) out.push({ t:'add', p, v:bv });
+      else if (!(k in b)) out.push({ t:'del', p, v:av });
+      else if (typeof av === 'object' && typeof bv === 'object' && av !== null && bv !== null && !Array.isArray(av)) {
+        diff(av, bv, p, out);
+      } else if (JSON.stringify(av) !== JSON.stringify(bv)) {
+        out.push({ t:'chg', p, av, bv });
+      }
+    });
+    return out;
+  }
+
+  $('btn-diff').onclick = () => {
+    let A, B;
+    try { A = JSON.parse($('a').value); } catch(e){ setStatus('✗ a: '+e.message,'err'); return; }
+    try { B = JSON.parse($('b').value); } catch(e){ setStatus('✗ b: '+e.message,'err'); return; }
+    const d = diff(A, B);
+    if (!d.length) { $('result').innerHTML = '<span style="color:#4ade80">✓ 完全相同</span>'; setStatus('✓ 无差异','ok'); return; }
+    const html = d.map(x => {
+      if (x.t==='add') return `<span class="add">+ ${x.p} = ${JSON.stringify(x.v)}</span>`;
+      if (x.t==='del') return `<span class="del">- ${x.p} = ${JSON.stringify(x.v)}</span>`;
+      return `<span class="chg">~ ${x.p}: ${JSON.stringify(x.av)} → ${JSON.stringify(x.bv)}</span>`;
+    }).join('\n');
+    $('result').innerHTML = html;
+    setStatus(`✓ ${d.length} 处差异 (新增 ${d.filter(x=>x.t==='add').length} / 删除 ${d.filter(x=>x.t==='del').length} / 修改 ${d.filter(x=>x.t==='chg').length})`,'ok');
+  };
+
+  $('btn-sample').onclick = () => {
+    $('a').value = '{\n  "name": "siuser",\n  "year": 2025,\n  "stack": ["Astro"],\n  "removed": true\n}';
+    $('b').value = '{\n  "name": "siuser",\n  "year": 2026,\n  "stack": ["Astro", "Cloudflare"],\n  "added": "new"\n}';
+    $('btn-diff').click();
+  };
+  $('btn-sample').click();
+})();
+</script>

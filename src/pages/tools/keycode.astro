@@ -1,0 +1,52 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+---
+
+<ToolLayout title="Keycode 速查" description="按下任意键查看键盘事件信息" category="开发辅助" icon="⌨️">
+  <div class="tool-card text-center" style="padding: 3rem 1rem;">
+    <p class="text-sm mb-4" style="color: var(--text-secondary);">点击下方区域并按下任意键</p>
+    <div id="key-display" tabindex="0" class="rounded-2xl mx-auto cursor-text" style="max-width: 480px; padding: 4rem 2rem; background: var(--bg); border: 2px dashed var(--border); outline: none; transition: all 0.2s;">
+      <div class="text-7xl font-bold mb-3" id="key-glyph" style="color: var(--color-accent); font-family: var(--font-mono);">?</div>
+      <div class="text-xs uppercase tracking-widest" style="color: var(--text-secondary); font-family: var(--font-mono);">点击后按键</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-6" id="info"></div>
+</ToolLayout>
+
+<script is:inline>
+(function(){
+  const display = document.getElementById('key-display');
+  const info = document.getElementById('info');
+  const glyph = document.getElementById('key-glyph');
+  display.focus();
+  display.onclick = () => display.focus();
+  display.onfocus = () => display.style.borderColor = 'var(--color-accent)';
+  display.onblur = () => display.style.borderColor = 'var(--border)';
+
+  display.addEventListener('keydown', e => {
+    e.preventDefault();
+    glyph.textContent = e.key === ' ' ? '␣' : e.key.length === 1 ? e.key : e.key;
+    const fields = {
+      'event.key': e.key,
+      'event.code': e.code,
+      'event.keyCode': e.keyCode,
+      'event.which': e.which,
+      'event.location': ['Standard','Left','Right','Numpad'][e.location] || e.location,
+      'modifiers': [
+        e.ctrlKey?'Ctrl':null, e.shiftKey?'Shift':null, e.altKey?'Alt':null, e.metaKey?'Meta/⌘':null
+      ].filter(Boolean).join(' + ') || '—',
+      'event.repeat': e.repeat,
+      'unicode': e.key.length === 1 ? 'U+' + e.key.charCodeAt(0).toString(16).padStart(4,'0').toUpperCase() : '—'
+    };
+    info.innerHTML = '';
+    Object.entries(fields).forEach(([k,v]) => {
+      const d = document.createElement('div');
+      d.className = 'tool-meta-item cursor-pointer';
+      d.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+      d.onclick = () => window.toolCopy(String(v));
+      info.appendChild(d);
+    });
+  });
+})();
+</script>
