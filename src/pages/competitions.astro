@@ -64,6 +64,16 @@ const competitions = [
     winning:['社会价值/公益性','AI Native 体验','生活场景重构','技术先进性'],
     timeline:[{event:'2026 报名启动(预计)',date:'2026-07-01',critical:false},{event:'报名截止(参考 2025)',date:'2026-08-15',critical:true},{event:'外滩大会决赛(预计)',date:'2026-09-15',critical:true}],
     url:'https://www.inclusionconf.com/' },
+  { id:'beyondhack', name:'BEYOND HACK DAY', fullName:'BEYOND Expo 2026 · BEYOND HACK DAY 全球 AI 开发者与一人公司黑客松', org:'BEYOND Expo · 嘉立创星火（奖金赞助）', rel:'A+', loc:'澳门 · 威尼斯人金光会展', date:'2026 年 4 - 5 月', deadlineISO:'2026-05-08', tier:'S', cat:'创投曝光', match:8.9, suit:'很高',
+    desc:'亚洲最大科技博览会 BEYOND Expo 的核心赛事，面向全球开发者、创作者、一人公司、高校团队开放招募，最终筛选约 400 位选手赴澳门线下极限开发。嘉立创星火赞助百万级奖金池，决赛与 BEYOND Expo 展会（1200+ 展商 / 3 万+ 专业观众）联动。IP 100% 归参赛者。',
+    strategy:'挑具身智能或 AI 硬件赛道，讲成「用 AI Agent 重做物理世界一个场景」。决赛 5-30 当日配颁奖 + 百家投资机构对接，比拿奖更值的是现场谈投/谈产业。',
+    audience:'独立开发者、一人公司、AI 硬件方案商，能现场极限开发出 demo',
+    rewards:['嘉立创星火赞助的百万级奖金池','冠/亚/季军 + 最佳技术 + 最佳创意专项','深圳龙岗 AI 产业政策（算力/人才/空间/资金）','100+ 投资机构现场对接','行业导师全周期陪跑','IP 100% 归参赛者'],
+    pros:['BEYOND Expo 亚洲最大科技展背书','澳门现场极限开发氛围','奖池重且对硬件方案商友好','嘉立创赞助=制造资源真实','一人公司/小团队专门通道'],
+    cons:['报名窗口短（4-17 至 5-8）','入围筛选严（约 400 席）','需亲赴澳门现场'],
+    winning:['AI Agent 重构物理场景','48 小时可交付 demo','量产与商业化路径','一人公司/小团队叙事'],
+    timeline:[{event:'全球报名开启',date:'2026-04-17',critical:false},{event:'报名截止',date:'2026-05-08',critical:true},{event:'线上评审入围',date:'2026-05-15',critical:false},{event:'澳门极限开发',date:'2026-05-29',critical:true},{event:'路演 + 颁奖',date:'2026-05-30',critical:true}],
+    url:'https://www.beyondexpo.com/' },
   { id:'huawei', name:'HarmonyOS 创新赛', fullName:'2026 HarmonyOS 创新赛 · 极客赛道', org:'华为（HDC2026 配套赛事）', rel:'A+', loc:'全球分赛区 · 决赛东莞松山湖', date:'2026 年 3 - 6 月', deadlineISO:'2026-05-15', tier:'S', cat:'工程量产', match:8.5, suit:'很高',
     desc:'2026 届改名为 HarmonyOS 创新赛·极客赛道，3-18 启动，围绕 AI 智能化体验、安全隐私、全场景协同、3D 空间化四大主题征集 Demo。总奖池超 68 万现金（单项最高 15 万），决赛进 HDC2026 松山湖主会场。注意：2026 奖池较 2025 大幅调整，聚焦创意 Demo。',
     strategy:'挑一个主题把 Demo 做深，主打 AI Native 体验或全场景创新；路径是「拿奖→认证→生态白名单→订单」。',
@@ -241,13 +251,14 @@ const categories = [...new Set(enriched.map(c => c.cat))];
       <div class="animate-fade-in glass-card gradient-border p-7 md:p-10 grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8" style="border-radius: var(--radius-xl);">
         <div>
           <p class="section-kicker mb-4">// Priority Matrix</p>
-          <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.02em;">
-            鸿蒙创新赛 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> Red Dot
+          <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
+            BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> Red Dot
           </h2>
           <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            方案商最稀缺的不是奖金证书，而是「订单 + 上量通道 + 政策资金」。2026 已启动且最值得打的是 <strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15 截止）</strong>，奖池 68 万、决赛进 HDC2026 松山湖。创客中国第 11 届 7-10 截止，工信部网络安全产业发展中心主办，政策兑现率高。Red Dot Design Concept 2026 Late 4-29 截止，是国际背书最快的路径。大湾区 / 深创赛第二届都尚未公告启动。
+            窗口最短的是 <strong style="color: var(--color-accent);">BEYOND HACK DAY（5-8 截止）</strong>，澳门现场极限开发 + 嘉立创星火百万奖池 + 100+ 投资机构对接，对硬件方案商是最短的资本 / 产业接入。<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15 截止）</strong>奖池 68 万、决赛进 HDC2026 松山湖。创客中国第 11 届 7-10 截止，政策兑现率高。Red Dot Design Concept 2026 Late 4-29 截止，是国际背书最快的路径。
           </p>
           <div class="flex flex-wrap gap-2">
+            <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
             <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
             <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
             <span class="pill-note"><span class="dot-accent2"></span>国际 · Red Dot · 4-29</span>
