@@ -3,223 +3,195 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BlogCard from '../components/BlogCard.astro';
-import Timeline from '../components/Timeline.astro';
 import Newsletter from '../components/Newsletter.astro';
 import { getCollection } from 'astro:content';
 
 const allPosts = (await getCollection('blog'))
-  .filter(post => !post.data.draft)
+  .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
 const posts = allPosts.slice(0, 3);
 const totalPosts = allPosts.length;
+const todayLabel = new Date().toLocaleDateString('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric'
+}).toUpperCase();
 
-// Format current date dispatch-style
-const now = new Date();
-const weekNum = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
-const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+const sections = [
+  {
+    title: '工具箱',
+    eyebrow: 'Browser-first utilities',
+    href: '/tools',
+    desc: '把高频开发小需求都收进一个更快的工具目录里，直接打开就能用。',
+    stat: '60+ tools'
+  },
+  {
+    title: '项目展示',
+    eyebrow: 'Products in progress',
+    href: '/projects',
+    desc: '集中展示我在做的 AI、自动化和个人产品，保持公开迭代。',
+    stat: '4 active bets'
+  },
+  {
+    title: '比赛雷达',
+    eyebrow: 'Opportunity scanner',
+    href: '/competitions',
+    desc: '收集创业、黑客松和创新比赛的信息，降低搜集成本。',
+    stat: 'Always updating'
+  },
+];
 ---
 
 <BaseLayout>
   <Header />
 
   <main class="flex-1">
+    <section id="home" class="home-hero mx-auto px-6 pt-32 pb-18 md:pt-40 md:pb-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+      <div class="home-grid">
+        <div class="scroll-reveal">
+          <div class="hero-meta-row">
+            <span class="hero-chip">Independent Dispatch</span>
+            <span class="hero-date">{todayLabel}</span>
+          </div>
 
-    <!-- ==================== HERO ==================== -->
-    <section id="home" class="relative min-h-screen flex items-center overflow-hidden">
+          <h1 class="hero-title">
+            做产品，写判断，<br />
+            <span class="text-shimmer">把过程公开出来。</span>
+          </h1>
 
-      <!-- Hero Background: Aurora Gold -->
-      <div class="absolute inset-0 z-0 overflow-hidden">
-        <canvas id="hero-canvas" class="absolute inset-0 w-full h-full"></canvas>
-        <!-- Bottom fade -->
-        <div class="absolute bottom-0 left-0 right-0 h-48" style="background: linear-gradient(to top, var(--bg), transparent);"></div>
+          <p class="hero-copy">
+            这里是我的个人网站，也是一个持续发布中的工作台。
+            我关注 AI、自动化、产品工程和学习系统，把思考写成文章，把问题做成工具。
+          </p>
+
+          <div class="hero-actions">
+            <a href="#blog" class="hero-btn hero-btn-primary btn-glow">看最新文章</a>
+            <a href="/tools" class="hero-btn hero-btn-ghost">进入工具箱</a>
+          </div>
+
+          <div class="hero-stats">
+            <div>
+              <span class="k">Articles</span>
+              <strong>{totalPosts}</strong>
+            </div>
+            <div>
+              <span class="k">Focus</span>
+              <strong>AI + Product</strong>
+            </div>
+            <div>
+              <span class="k">Mode</span>
+              <strong>Ship Weekly</strong>
+            </div>
+          </div>
+        </div>
+
+        <aside class="scroll-reveal hero-panel surface-card gradient-border">
+          <div class="hero-panel-head">
+            <p>Currently shipping</p>
+            <span>live</span>
+          </div>
+
+          <div class="hero-panel-block">
+            <h2>当前重点</h2>
+            <ul>
+              <li>把个人网站做成更像产品，而不是单纯博客。</li>
+              <li>持续扩展浏览器内可用的开发工具箱。</li>
+              <li>围绕 AI 语音与自动化做更明确的产品判断。</li>
+            </ul>
+          </div>
+
+          <div class="hero-panel-block">
+            <h3>Recent dispatches</h3>
+            <div class="hero-dispatches">
+              {posts.map((post) => (
+                <a href={`/blog/${post.id}`} class="hero-dispatch">
+                  <span>{post.data.title}</span>
+                  <em>{post.data.date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</em>
+                </a>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
-
-      <!-- Content -->
-      <div class="relative z-10 mx-auto px-6 w-full" style="max-width: var(--container-max);">
-      <div class="max-w-2xl py-20">
-        <!-- Dispatch metadata bar -->
-        <div class="scroll-reveal flex items-center gap-3 mb-8" style="font-family: var(--font-mono);">
-          <span class="text-[11px] tracking-[0.15em] uppercase" style="color: var(--color-accent);">siuser小伟</span>
-          <span class="flex-1 h-px" style="background: var(--border);"></span>
-          <span class="text-[11px] tracking-[0.15em] uppercase" style="color: var(--text-secondary);">Week {weekNum}</span>
-          <span class="flex-1 h-px" style="background: var(--border);"></span>
-          <span class="text-[11px] tracking-[0.15em] uppercase" style="color: var(--text-secondary);">{dateStr}</span>
-        </div>
-
-        <!-- Name -->
-        <h1 class="scroll-reveal text-4xl md:text-6xl lg:text-7xl font-bold mb-6" style="font-family: var(--font-heading); color: var(--text); line-height: 1.1;">
-          你好，我是<br/>
-          <span class="inline-block mt-2 text-shimmer">siuser小伟</span>
-        </h1>
-
-        <!-- Typing effect -->
-        <div class="scroll-reveal h-8 mb-8 flex items-center">
-          <span class="text-lg md:text-xl" style="color: var(--text-secondary); font-family: var(--font-heading);">
-            <span id="typewriter"></span>
-            <span class="typing-cursor" style="color: var(--color-accent);">|</span>
-          </span>
-        </div>
-
-        <!-- Tagline -->
-        <p class="scroll-reveal neon-underline mb-8 text-xs md:text-sm tracking-[0.2em] uppercase" style="font-family: var(--font-mono); color: var(--color-accent);">
-          Keep Shipping, Keep Thinking.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="scroll-reveal flex flex-wrap items-center gap-4">
-          <a href="#blog" class="btn-glow inline-flex items-center gap-2 px-6 py-3 text-sm tracking-wider uppercase rounded-lg transition-all duration-300" style="background: var(--color-accent); color: var(--color-bg-dark); font-weight: 500;">
-            <span data-i18n="hero.cta.blog">浏览文章</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-          <a href="#about" class="elastic-click inline-flex items-center gap-2 px-6 py-3 text-sm tracking-wider uppercase rounded-lg border transition-all duration-300 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]" style="border-color: var(--border); color: var(--text-secondary);">
-            <span data-i18n="hero.cta.about">了解更多</span>
-          </a>
-          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-3 text-sm transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-            GitHub
-          </a>
-        </div>
-
-        <!-- Stats bar -->
-        <div class="scroll-reveal mt-12 pt-6 border-t flex flex-wrap items-center gap-4 md:gap-8" style="border-color: var(--border); font-family: var(--font-mono);">
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] tracking-wider uppercase" style="color: var(--text-secondary);">Posts</span>
-            <span class="text-sm font-medium" style="color: var(--text);">{totalPosts}</span>
-          </div>
-          <span class="hidden md:block text-xs" style="color: var(--border);">|</span>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] tracking-wider uppercase" style="color: var(--text-secondary);">Projects</span>
-            <span class="text-sm font-medium" style="color: var(--text);">4</span>
-          </div>
-          <span class="hidden md:block text-xs" style="color: var(--border);">|</span>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] tracking-wider uppercase" style="color: var(--text-secondary);">Stack</span>
-            <span class="text-sm font-medium" style="color: var(--text);">Astro + AI</span>
-          </div>
-          <span class="hidden md:block text-xs" style="color: var(--border);">|</span>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] tracking-wider uppercase" style="color: var(--text-secondary);">Focus</span>
-            <span class="text-sm font-medium" style="color: var(--color-accent);">AI Voice Agent</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce-slow z-10">
-        <span class="text-xs tracking-widest uppercase" style="color: var(--text-secondary); opacity: 0.5; font-family: var(--font-mono);">Scroll</span>
-        <svg class="w-4 h-4" style="color: var(--text-secondary); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7" />
-        </svg>
-      </div>
-      </div><!-- close content wrapper -->
     </section>
 
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== ABOUT ==================== -->
-    <section id="about" class="mx-auto px-6 py-24 md:py-32" style="max-width: var(--container-max);">
-      <!-- Section Header -->
-      <div class="scroll-reveal mb-16">
-        <div class="flex items-center gap-3 mb-3">
-          <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">About</p>
-          <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 关于我</span>
-        </div>
-        <h2 class="text-3xl md:text-4xl" style="font-family: var(--font-heading); color: var(--text);" data-i18n="section.about">关于我</h2>
-        <div class="divider-glow mt-4"></div>
+    <section id="about" class="mx-auto px-6 py-20 md:py-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+      <div class="section-head scroll-reveal">
+        <p class="section-kicker">About</p>
+        <h2>我希望这个网站看起来像我做事的方式。</h2>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-12 md:gap-16">
-        <!-- Left: Introduction -->
-        <div class="scroll-reveal space-y-5">
-          <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-            <span data-i18n="about.intro1">你好，我是 siuser小伟。一个对技术和商业都保持热情的探索者。</span>
+      <div class="about-grid">
+        <div class="scroll-reveal about-copy">
+          <p>
+            我不太想把这里做成标准模板式个人主页。相比“展示简历”，我更在意把正在发生的东西放上来：
+            现在在研究什么、正在做什么产品、哪些判断成立、哪些尝试应该放弃。
           </p>
-          <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-            <span data-i18n="about.intro2">我相信最好的产品来自于对问题的深刻理解，而不仅仅是技术的堆砌。在这个 AI 快速发展的时代，我专注于寻找技术与真实需求之间的交汇点。</span>
-          </p>
-          <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-            <span data-i18n="about.intro3">这个空间记录了我的思考、学习与创造。希望你在这里能找到一些有价值的内容。</span>
+          <p>
+            所以这个站会同时是三种东西：一个写作空间、一个工具目录、一个正在成形的产品工作台。
+            它应该清晰、克制、有一点编辑感，也要足够像一个真正会持续更新的系统。
           </p>
         </div>
 
-        <!-- Right: Info Cards -->
-        <div class="scroll-reveal grid grid-cols-2 gap-4">
-          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
-            <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">01</div>
-            <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card1.title">技术探索</h3>
-            <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card1.desc">AI / 全栈开发 / 产品工程</p>
+        <div class="about-principles">
+          <div class="scroll-reveal glass-card spotlight principle-card">
+            <span>01</span>
+            <h3>先有判断，再有实现</h3>
+            <p>先想清楚为什么做，再决定怎么做。</p>
           </div>
-          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
-            <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">02</div>
-            <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card2.title">商业思考</h3>
-            <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card2.desc">创业 / 产品策略 / 商业模式</p>
+          <div class="scroll-reveal glass-card spotlight principle-card">
+            <span>02</span>
+            <h3>公开迭代</h3>
+            <p>把过程写出来，网站本身也成为作品的一部分。</p>
           </div>
-          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
-            <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">03</div>
-            <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card3.title">持续学习</h3>
-            <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card3.desc">阅读 / 写作 / 跨领域探索</p>
+          <div class="scroll-reveal glass-card spotlight principle-card">
+            <span>03</span>
+            <h3>用工具减掉重复劳动</h3>
+            <p>把高频小需求积累成真正能复用的系统。</p>
           </div>
-          <div class="glass-card shine-hover tilt-card spotlight p-5 rounded-xl">
-            <div class="text-2xl mb-2" style="color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;">04</div>
-            <h3 class="text-sm font-medium mb-1" style="color: var(--text);" data-i18n="about.card4.title">创造价值</h3>
-            <p class="text-xs leading-relaxed" style="color: var(--text-secondary);" data-i18n="about.card4.desc">用产品解决真实问题</p>
+          <div class="scroll-reveal glass-card spotlight principle-card">
+            <span>04</span>
+            <h3>长期主义但不拖延</h3>
+            <p>方向看长期，执行看每一周有没有新东西上线。</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== TIMELINE ==================== -->
-    <section id="timeline" class="mx-auto px-6 py-24 md:py-32" style="max-width: var(--container-max);">
-      <!-- Section Header -->
-      <div class="scroll-reveal mb-16">
-        <div class="flex items-center gap-3 mb-3">
-          <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">Journey</p>
-          <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 成长历程</span>
-        </div>
-        <h2 class="text-3xl md:text-4xl" style="font-family: var(--font-heading); color: var(--text);" data-i18n="section.timeline">成长历程</h2>
-        <div class="divider-glow mt-4"></div>
+    <section class="mx-auto px-6 py-10 md:py-12" style="max-width: var(--container-max);">
+      <div class="section-head scroll-reveal">
+        <p class="section-kicker">Entry Points</p>
+        <h2>把内容、工具和项目分得更清楚。</h2>
       </div>
 
-      <Timeline />
+      <div class="entry-grid">
+        {sections.map((section, index) => (
+          <a href={section.href} class="scroll-reveal surface-card card-hover gradient-border entry-card">
+            <span class="entry-index">{String(index + 1).padStart(2, '0')}</span>
+            <p class="entry-kicker">{section.eyebrow}</p>
+            <h3>{section.title}</h3>
+            <p class="entry-copy">{section.desc}</p>
+            <div class="entry-footer">
+              <span>{section.stat}</span>
+              <span>进入 ↗</span>
+            </div>
+          </a>
+        ))}
+      </div>
     </section>
 
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== BLOG ==================== -->
-    <section id="blog" class="mx-auto px-6 py-24 md:py-32" style="max-width: var(--container-max);">
-      <!-- Section Header -->
-      <div class="scroll-reveal flex items-end justify-between mb-16">
-        <div>
-          <div class="flex items-center gap-3 mb-3">
-            <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">Latest</p>
-            <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 最新文章</span>
-          </div>
-          <h2 class="text-3xl md:text-4xl" style="font-family: var(--font-heading); color: var(--text);" data-i18n="section.blog">最新文章</h2>
-          <div class="divider-glow mt-4"></div>
+    <section id="blog" class="mx-auto px-6 py-20 md:py-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+      <div class="section-row scroll-reveal">
+        <div class="section-head">
+          <p class="section-kicker">Writing</p>
+          <h2>最近写下来的东西。</h2>
         </div>
-        <a href="/blog" class="hidden md:inline-flex items-center gap-1.5 text-sm tracking-wider uppercase transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
-          <span data-i18n="blog.viewall">查看全部</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </a>
+        <a href="/blog" class="section-link">全部文章 ↗</a>
       </div>
 
-      <div class="grid gap-6">
-        {posts.map(post => (
+      <div class="blog-list">
+        {posts.map((post) => (
           <div class="scroll-reveal">
             <BlogCard
               title={post.data.title}
@@ -232,258 +204,425 @@ const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric'
           </div>
         ))}
       </div>
+    </section>
 
-      {posts.length === 0 && (
-        <div class="text-center py-20">
-          <p class="text-lg" style="color: var(--text-secondary);">文章即将上线，敬请期待。</p>
+    <section id="contact" class="mx-auto px-6 py-18 md:py-22" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+      <div class="contact-grid">
+        <div class="scroll-reveal">
+          <Newsletter />
         </div>
-      )}
 
-      <div class="scroll-reveal mt-8 md:hidden text-center">
-        <a href="/blog" class="inline-flex items-center gap-1.5 text-sm tracking-wider uppercase transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
-          <span data-i18n="blog.viewall.mobile">查看全部文章</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </a>
-      </div>
-    </section>
+        <div class="scroll-reveal surface-card gradient-border contact-card">
+          <p class="section-kicker">Contact</p>
+          <h2>保持联系，或者直接来聊合作。</h2>
+          <p class="contact-copy">
+            如果你喜欢我在做的方向，或者你也在做 AI、自动化、内容产品这类东西，欢迎直接联系我。
+          </p>
 
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== QUOTE ==================== -->
-    <section class="mx-auto px-6 py-20 md:py-24 text-center" style="max-width: var(--container-max);">
-      <blockquote class="scroll-reveal max-w-xl mx-auto glass-card border-glow animate-float p-8 md:p-10 rounded-2xl">
-        <p class="text-xl md:text-2xl italic leading-relaxed text-gradient" style="font-family: var(--font-heading);">
-          "The best way to predict the future is to create it."
-        </p>
-        <footer class="mt-4 text-sm" style="color: var(--color-accent); font-family: var(--font-mono);">
-          — Peter Drucker
-        </footer>
-      </blockquote>
-    </section>
-
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== NEWSLETTER ==================== -->
-    <section id="newsletter" class="mx-auto px-6 py-24 md:py-32" style="max-width: var(--container-max);">
-      <div class="scroll-reveal">
-        <Newsletter />
-      </div>
-    </section>
-
-    <!-- Section divider -->
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-      <div class="border-t" style="border-color: var(--border);"></div>
-    </div>
-
-    <!-- ==================== CONTACT ==================== -->
-    <section id="contact" class="mx-auto px-6 py-24 md:py-32" style="max-width: var(--container-max);">
-      <div class="scroll-reveal max-w-xl mx-auto text-center">
-        <div class="flex items-center justify-center gap-3 mb-3">
-          <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">Contact</p>
-          <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 保持联系</span>
-        </div>
-        <h2 class="text-3xl md:text-4xl mb-6" style="font-family: var(--font-heading); color: var(--text);" data-i18n="section.contact">保持联系</h2>
-        <div class="divider-accent mx-auto mb-8"></div>
-        <p class="text-base leading-relaxed mb-10" style="color: var(--text-secondary);">
-          <span data-i18n="contact.desc">如果你对我的内容感兴趣，或想探讨合作的可能性，欢迎通过以下方式联系我。</span>
-        </p>
-
-        <div class="flex items-center justify-center gap-6">
-          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="group gradient-border border-sweep glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
-            <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            <span class="text-xs" style="color: var(--text-secondary);">GitHub</span>
-          </a>
-          <a href="mailto:hi@siuserxiaowei.com" class="group gradient-border border-sweep glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
-            <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <span class="text-xs" style="color: var(--text-secondary);">Email</span>
-          </a>
-          <a href="/rss.xml" class="group gradient-border border-sweep glass-card elastic-click shake-hover flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 hover:border-[var(--color-accent)]">
-            <svg class="w-6 h-6 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
-            </svg>
-            <span class="text-xs" style="color: var(--text-secondary);">RSS</span>
-          </a>
+          <div class="contact-links">
+            <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">
+              <span>GitHub</span>
+              <em>@siuserxiaowei</em>
+            </a>
+            <a href="mailto:hi@siuserxiaowei.com">
+              <span>Email</span>
+              <em>hi@siuserxiaowei.com</em>
+            </a>
+            <a href="/rss.xml">
+              <span>RSS</span>
+              <em>订阅更新</em>
+            </a>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <Footer />
+</BaseLayout>
 
-  <!-- Typewriter Effect -->
-  <script is:inline>
-    const phrases = [
-      '探索技术的深度，记录思考的痕迹。',
-      '在创造中寻找意义。',
-      'Building things that matter.',
-      '用产品解决真实问题。',
-    ];
-    let phraseIdx = 0, charIdx = 0, isDeleting = false;
-    const el = document.getElementById('typewriter');
+<style>
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    gap: 2rem;
+    align-items: end;
+  }
 
-    function type() {
-      if (!el) return;
-      const current = phrases[phraseIdx];
+  .hero-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
 
-      if (isDeleting) {
-        el.textContent = current.substring(0, charIdx - 1);
-        charIdx--;
-      } else {
-        el.textContent = current.substring(0, charIdx + 1);
-        charIdx++;
-      }
+  .hero-chip,
+  .hero-date,
+  .section-kicker,
+  .entry-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
 
-      let delay = isDeleting ? 40 : 80;
+  .hero-chip,
+  .section-kicker {
+    color: var(--color-accent);
+  }
 
-      if (!isDeleting && charIdx === current.length) {
-        delay = 2500;
-        isDeleting = true;
-      } else if (isDeleting && charIdx === 0) {
-        isDeleting = false;
-        phraseIdx = (phraseIdx + 1) % phrases.length;
-        delay = 500;
-      }
+  .hero-date {
+    color: var(--text-secondary);
+  }
 
-      setTimeout(type, delay);
+  .hero-title {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 0.9;
+    margin-bottom: 1.3rem;
+  }
+
+  .hero-copy {
+    max-width: 42rem;
+    color: var(--text-secondary);
+    font-size: clamp(1rem, 1.55vw, 1.22rem);
+    line-height: 1.85;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1.6rem;
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.2rem;
+    border-radius: 999px;
+    padding: 0 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .hero-btn-primary {
+    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 70%, white 30%));
+    color: #111;
+  }
+
+  .hero-btn-ghost {
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    color: var(--text);
+  }
+
+  .hero-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1.8rem;
+  }
+
+  .hero-stats > div,
+  .principle-card,
+  .entry-card,
+  .contact-card {
+    border-radius: 24px;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+  }
+
+  .hero-stats > div {
+    padding: 1rem;
+  }
+
+  .hero-stats .k {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .hero-stats strong {
+    font-size: 1.02rem;
+  }
+
+  .hero-panel {
+    padding: 1.35rem;
+    border-radius: 28px;
+  }
+
+  .hero-panel-head,
+  .entry-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-panel-head span {
+    border-radius: 999px;
+    padding: 0.28rem 0.55rem;
+    color: var(--text);
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+
+  .hero-panel-block + .hero-panel-block {
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  }
+
+  .hero-panel-block h2,
+  .hero-panel-block h3 {
+    margin-bottom: 0.7rem;
+    font-size: 1.8rem;
+  }
+
+  .hero-panel-block ul {
+    margin: 0;
+    padding-left: 1.05rem;
+    color: var(--text-secondary);
+  }
+
+  .hero-panel-block li + li {
+    margin-top: 0.55rem;
+  }
+
+  .hero-dispatches {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .hero-dispatch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .hero-dispatch span {
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .hero-dispatch em {
+    color: var(--text-secondary);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-head h2,
+  .contact-card h2 {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 0.98;
+    margin-top: 0.35rem;
+  }
+
+  .section-row {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-link {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .about-grid,
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 1.35rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-copy {
+    display: grid;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 1.02rem;
+    line-height: 1.9;
+  }
+
+  .about-principles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.95rem;
+  }
+
+  .principle-card,
+  .entry-card,
+  .contact-card {
+    padding: 1.15rem;
+  }
+
+  .principle-card span,
+  .entry-index {
+    display: inline-block;
+    margin-bottom: 0.8rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .principle-card h3,
+  .entry-card h3 {
+    margin-bottom: 0.55rem;
+    font-size: 1.6rem;
+  }
+
+  .principle-card p,
+  .entry-copy,
+  .contact-copy {
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .entry-card {
+    display: block;
+  }
+
+  .entry-footer {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  }
+
+  .blog-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-links {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.3rem;
+  }
+
+  .contact-links a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .contact-links span {
+    color: var(--text);
+  }
+
+  .contact-links em {
+    color: var(--text-secondary);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+
+  @media (max-width: 1024px) {
+    .home-grid,
+    .about-grid,
+    .contact-grid,
+    .entry-grid {
+      grid-template-columns: 1fr;
     }
 
-    type();
-  </script>
+    .about-principles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 
-  <!-- Hero Canvas: Animated Mesh Gradient -->
-  <script is:inline>
-    (function() {
-      const canvas = document.getElementById('hero-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let w, h, time = 0;
+  @media (max-width: 720px) {
+    .hero-title {
+      font-size: 3.2rem;
+    }
 
-      function resize() {
-        w = canvas.width = canvas.offsetWidth;
-        h = canvas.height = canvas.offsetHeight;
-      }
-      resize();
-      window.addEventListener('resize', resize);
+    .hero-stats,
+    .about-principles {
+      grid-template-columns: 1fr;
+    }
 
-      const isDark = () => document.documentElement.getAttribute('data-theme') !== 'light';
+    .section-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
 
-      function draw() {
-        time += 0.003;
-        ctx.clearRect(0, 0, w, h);
+    .hero-dispatch {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
 
-        // Base fill
-        if (isDark()) {
-          ctx.fillStyle = '#08080a';
-        } else {
-          ctx.fillStyle = '#faf8f5';
-        }
-        ctx.fillRect(0, 0, w, h);
-
-        // Draw multiple flowing gradient layers
-        const blobs = [
-          { x: 0.7, y: 0.3, r: 0.45, speed: 1, color: isDark() ? [201,169,110] : [180,150,80] , alpha: isDark() ? 0.25 : 0.15 },
-          { x: 0.2, y: 0.7, r: 0.4,  speed: 0.7, color: isDark() ? [160,130,80] : [160,130,60],  alpha: isDark() ? 0.18 : 0.1 },
-          { x: 0.5, y: 0.2, r: 0.35, speed: 1.3, color: isDark() ? [180,140,70] : [170,140,70],  alpha: isDark() ? 0.12 : 0.08 },
-          { x: 0.8, y: 0.8, r: 0.3,  speed: 0.9, color: isDark() ? [140,100,50] : [150,120,60],  alpha: isDark() ? 0.15 : 0.08 },
-        ];
-
-        blobs.forEach(b => {
-          const cx = w * (b.x + Math.sin(time * b.speed) * 0.08);
-          const cy = h * (b.y + Math.cos(time * b.speed * 0.8) * 0.06);
-          const r = Math.min(w, h) * b.r;
-
-          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-          grad.addColorStop(0, `rgba(${b.color[0]},${b.color[1]},${b.color[2]},${b.alpha})`);
-          grad.addColorStop(0.5, `rgba(${b.color[0]},${b.color[1]},${b.color[2]},${b.alpha * 0.4})`);
-          grad.addColorStop(1, `rgba(${b.color[0]},${b.color[1]},${b.color[2]},0)`);
-
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, w, h);
-        });
-
-        // Subtle noise grain overlay
-        if (isDark()) {
-          for (let i = 0; i < 800; i++) {
-            const x = Math.random() * w;
-            const y = Math.random() * h;
-            const a = Math.random() * 0.04;
-            ctx.fillStyle = `rgba(201,169,110,${a})`;
-            ctx.fillRect(x, y, 1, 1);
-          }
-        }
-
-        // Grid lines
-        ctx.strokeStyle = isDark() ? 'rgba(201,169,110,0.04)' : 'rgba(146,112,42,0.04)';
-        ctx.lineWidth = 0.5;
-        const gridSize = 80;
-        for (let x = 0; x < w; x += gridSize) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, h);
-          ctx.stroke();
-        }
-        for (let y = 0; y < h; y += gridSize) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
-
-        requestAnimationFrame(draw);
-      }
-
-      draw();
-    })();
-  </script>
-
-  <!-- Scroll Reveal Animation -->
-  <script is:inline>
+<script is:inline>
+  (() => {
     const revealElements = document.querySelectorAll('.scroll-reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          revealObserver.unobserve(entry.target);
-        }
+    if (!revealElements.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
 
-    revealElements.forEach(el => revealObserver.observe(el));
+    revealElements.forEach((element) => observer.observe(element));
 
-    // Spotlight effect — radial glow follows mouse on .spotlight cards
-    document.querySelectorAll('.spotlight').forEach(el => {
-      el.addEventListener('mousemove', e => {
-        const rect = el.getBoundingClientRect();
-        el.style.setProperty('--spot-x', (e.clientX - rect.left - 150) + 'px');
-        el.style.setProperty('--spot-y', (e.clientY - rect.top - 150) + 'px');
+    document.querySelectorAll('.spotlight').forEach((element) => {
+      element.addEventListener('mousemove', (event) => {
+        const rect = element.getBoundingClientRect();
+        element.style.setProperty('--spot-x', `${event.clientX - rect.left - 140}px`);
+        element.style.setProperty('--spot-y', `${event.clientY - rect.top - 140}px`);
       });
     });
-
-    // Timeline active line & dots
-    const timelineDots = document.querySelectorAll('[data-dot]');
-    const timelineLine = document.querySelector('.timeline-active-line');
-    if (timelineLine && timelineDots.length > 0) {
-      const dotObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.borderColor = 'var(--color-accent)';
-            entry.target.style.background = 'var(--color-accent)';
-          }
-        });
-      }, { threshold: 0.5 });
-      timelineDots.forEach(dot => dotObserver.observe(dot));
-    }
-  </script>
-</BaseLayout>
+  })();
+</script>

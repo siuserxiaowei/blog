@@ -5,12 +5,38 @@
 <button
   id="lang-toggle"
   onclick="toggleLang()"
-  class="p-2 rounded-full transition-colors duration-200 hover:bg-[var(--surface-2)]"
+  class="lang-toggle-btn"
   aria-label="切换语言"
   title="中/EN"
 >
-  <span id="lang-label" class="text-xs font-medium tracking-wide" style="color: var(--text-secondary);">EN</span>
+  <span id="lang-label">EN</span>
 </button>
+
+<style>
+  .lang-toggle-btn {
+    height: 2.5rem;
+    min-width: 2.5rem;
+    padding: 0 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+
+  .lang-toggle-btn:hover {
+    color: var(--text);
+    border-color: color-mix(in srgb, var(--color-accent) 44%, var(--border));
+    transform: translateY(-1px);
+  }
+</style>
 
 <script is:inline>
   // i18n translations

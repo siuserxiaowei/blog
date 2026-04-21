@@ -17,50 +17,132 @@ function formatDate(dateStr: string) {
 ---
 
 <a href={`/blog/${slug}`} class="group block">
-  <article class="lift-card shine-hover border-sweep glass-card gold-shadow relative rounded-xl overflow-hidden">
-    <!-- Hero Image -->
+  <article class="blog-card surface-card card-hover gradient-border rounded-[24px]">
     {image && (
-      <div class="aspect-[2.4/1] overflow-hidden">
-        <img src={image} alt={title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+      <div class="blog-card-media">
+        <img src={image} alt={title} loading="lazy" />
       </div>
     )}
-    <!-- Main content -->
-    <div class="p-6 md:p-8">
-      <!-- Date & Tags -->
-      <div class="flex items-center gap-3 mb-4">
-        <time class="text-xs tracking-wider uppercase" style="color: var(--text-secondary); font-family: var(--font-mono);">
-          {formatDate(date)}
-        </time>
-        {tags.length > 0 && (
-          <span class="text-xs" style="color: var(--border);">|</span>
-        )}
-        {tags.map(tag => (
-          <span class="text-xs px-2 py-0.5 rounded-full" style="background: var(--surface-2); color: var(--color-accent);">
-            {tag}
-          </span>
-        ))}
+
+    <div class="blog-card-body">
+      <div class="blog-card-meta">
+        <time>{formatDate(date)}</time>
+        <div class="blog-card-tags">
+          {tags.slice(0, 3).map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
       </div>
 
-      <!-- Title -->
-      <h3 class="text-xl md:text-2xl mb-3 transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="font-family: var(--font-heading); color: var(--text);">
-        {title}
-      </h3>
+      <div class="blog-card-content">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
 
-      <!-- Description -->
-      <p class="text-sm leading-relaxed mb-4" style="color: var(--text-secondary);">
-        {description}
-      </p>
-
-      <!-- Read more -->
-      <span class="inline-flex items-center gap-1.5 text-xs tracking-wider uppercase transition-colors duration-200" style="color: var(--color-accent);">
-        阅读全文
-        <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
-      </span>
+      <div class="blog-card-footer">
+        <span>Read dispatch</span>
+        <span class="blog-card-arrow">↗</span>
+      </div>
     </div>
-
-    <!-- Hover overlay -->
-    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style="background: linear-gradient(135deg, transparent 60%, color-mix(in srgb, var(--color-accent) 8%, transparent));"></div>
   </article>
 </a>
+
+<style>
+  .blog-card {
+    overflow: hidden;
+  }
+
+  .blog-card-media {
+    aspect-ratio: 2.35 / 1;
+    overflow: hidden;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .blog-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(.2, .7, .2, 1), filter 0.4s ease;
+    filter: saturate(0.92) contrast(1.02);
+  }
+
+  .group:hover .blog-card-media img {
+    transform: scale(1.04);
+    filter: saturate(1.02) contrast(1.05);
+  }
+
+  .blog-card-body {
+    display: grid;
+    gap: 1.1rem;
+    padding: 1.45rem;
+  }
+
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .blog-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .blog-card-tags span {
+    border-radius: 999px;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+  }
+
+  .blog-card-content h3 {
+    margin-bottom: 0.6rem;
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    line-height: 1.05;
+  }
+
+  .blog-card-content p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .blog-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .blog-card-arrow {
+    color: var(--color-accent);
+    transition: transform 0.2s ease;
+  }
+
+  .group:hover .blog-card-arrow {
+    transform: translate(2px, -2px);
+  }
+
+  @media (max-width: 680px) {
+    .blog-card-body {
+      padding: 1.15rem;
+    }
+
+    .blog-card-content h3 {
+      font-size: 1.5rem;
+    }
+  }
+</style>

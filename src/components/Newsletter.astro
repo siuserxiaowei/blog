@@ -2,140 +2,230 @@
 interface Props {
   compact?: boolean;
 }
+
 const { compact = false } = Astro.props;
 ---
 
 {compact ? (
-  <!-- Compact version for blog page -->
-  <div class="glass-card rounded-xl p-6 md:p-8">
-    <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-      <div class="flex-1">
-        <h3 class="text-lg font-medium mb-1" style="font-family: var(--font-heading); color: var(--text);">
-          <span data-i18n="newsletter.title.compact">订阅更新</span>
-        </h3>
-        <p class="text-sm" style="color: var(--text-secondary);">
-          <span data-i18n="newsletter.desc.compact">新文章发布时，第一时间通知你。不发垃圾邮件。</span>
-        </p>
-      </div>
-      <form
-        id="newsletter-form-compact"
-        class="flex gap-2 w-full md:w-auto"
-      >
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="your@email.com"
-          class="flex-1 md:w-56 px-4 py-2.5 text-sm rounded-lg border outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
-          style="background: var(--surface); border-color: var(--border); color: var(--text); font-family: var(--font-mono);"
-        />
-        <button
-          type="submit"
-          class="px-5 py-2.5 text-sm font-medium tracking-wider uppercase rounded-lg transition-all duration-300 hover:opacity-90 shrink-0"
-          style="background: var(--color-accent); color: var(--color-bg-dark);"
-        >
-          <span data-i18n="newsletter.btn">订阅</span>
-        </button>
-      </form>
+  <div class="newsletter-shell compact">
+    <div>
+      <p class="newsletter-kicker">Subscribe</p>
+      <h3 data-i18n="newsletter.title.compact">订阅更新</h3>
+      <p class="newsletter-copy" data-i18n="newsletter.desc.compact">新文章发布时，第一时间通知你。不发垃圾邮件。</p>
     </div>
-    <p id="newsletter-msg-compact" class="hidden mt-3 text-sm" style="color: var(--color-accent);"></p>
-  </div>
-) : (
-  <!-- Full version for homepage -->
-  <div class="max-w-xl mx-auto text-center">
-    <div class="flex items-center justify-center gap-3 mb-3">
-      <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">Subscribe</p>
-      <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 邮件订阅</span>
-    </div>
-    <h2 class="text-3xl md:text-4xl mb-4" style="font-family: var(--font-heading); color: var(--text);" data-i18n="newsletter.title">
-      不错过每一篇
-    </h2>
-    <div class="divider-accent mx-auto mb-6"></div>
-    <p class="text-base leading-relaxed mb-8" style="color: var(--text-secondary);">
-      <span data-i18n="newsletter.desc">输入邮箱，新文章发布时第一时间收到通知。<br/>没有垃圾邮件，随时取消。</span>
-    </p>
 
-    <form
-      id="newsletter-form"
-      class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-    >
-      <input
-        type="email"
-        name="email"
-        required
-        placeholder="your@email.com"
-        class="flex-1 px-5 py-3 text-sm rounded-lg border outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
-        style="background: var(--surface); border-color: var(--border); color: var(--text); font-family: var(--font-mono);"
-      />
-      <button
-        type="submit"
-        class="btn-glow px-6 py-3 text-sm font-medium tracking-wider uppercase rounded-lg transition-all duration-300 hover:opacity-90"
-        style="background: var(--color-accent); color: var(--color-bg-dark);"
-      >
+    <form id="newsletter-form-compact" class="newsletter-form compact-form">
+      <input type="email" name="email" required placeholder="your@email.com" />
+      <button type="submit" class="newsletter-btn">
         <span data-i18n="newsletter.btn">订阅</span>
       </button>
     </form>
 
-    <p id="newsletter-msg" class="hidden mt-4 text-sm" style="color: var(--color-accent);"></p>
+    <p id="newsletter-msg-compact" class="newsletter-msg hidden"></p>
+  </div>
+) : (
+  <div class="newsletter-shell full">
+    <p class="newsletter-kicker">Newsletter</p>
+    <h2 data-i18n="newsletter.title">不错过每一篇</h2>
+    <p class="newsletter-copy" data-i18n="newsletter.desc">输入邮箱，新文章发布时第一时间收到通知。没有垃圾邮件，随时取消。</p>
 
-    <p class="mt-4 text-xs" style="color: var(--text-secondary); opacity: 0.5;">
-      <svg class="inline w-3 h-3 mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
+    <form id="newsletter-form" class="newsletter-form">
+      <input type="email" name="email" required placeholder="your@email.com" />
+      <button type="submit" class="newsletter-btn">
+        <span data-i18n="newsletter.btn">订阅</span>
+      </button>
+    </form>
+
+    <p id="newsletter-msg" class="newsletter-msg hidden"></p>
+    <p class="newsletter-privacy">
       <span data-i18n="newsletter.privacy">你的邮箱不会分享给任何第三方</span>
     </p>
   </div>
 )}
+
+<style>
+  .newsletter-shell {
+    border-radius: 28px;
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 82%, transparent), color-mix(in srgb, var(--surface-2) 92%, transparent));
+    box-shadow: var(--shadow-card);
+  }
+
+  .newsletter-shell.full {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .newsletter-shell.compact {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .newsletter-kicker {
+    margin-bottom: 0.5rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .newsletter-shell h2,
+  .newsletter-shell h3 {
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+
+  .newsletter-shell h2 {
+    font-size: clamp(2rem, 3.8vw, 3.4rem);
+  }
+
+  .newsletter-shell h3 {
+    font-size: 1.55rem;
+  }
+
+  .newsletter-copy {
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 32rem;
+    margin: 1.35rem auto 0;
+  }
+
+  .compact-form {
+    max-width: none;
+    margin: 0;
+  }
+
+  .newsletter-form input {
+    flex: 1;
+    min-width: 0;
+    height: 3.1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+    color: var(--text);
+    padding: 0 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .newsletter-form input:focus {
+    border-color: color-mix(in srgb, var(--color-accent) 60%, var(--border));
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+
+  .newsletter-btn {
+    border: none;
+    height: 3.1rem;
+    padding: 0 1.3rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 68%, white 32%));
+    color: #111;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 20px 34px -24px color-mix(in srgb, var(--color-accent) 62%, transparent);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .newsletter-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 24px 42px -24px color-mix(in srgb, var(--color-accent) 72%, transparent);
+  }
+
+  .newsletter-msg {
+    margin-top: 0.8rem;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+  }
+
+  .newsletter-privacy {
+    margin-top: 0.9rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 720px) {
+    .newsletter-shell.full,
+    .newsletter-shell.compact {
+      padding: 1.35rem;
+      border-radius: 24px;
+    }
+
+    .newsletter-form {
+      flex-direction: column;
+    }
+
+    .newsletter-btn,
+    .newsletter-form input {
+      width: 100%;
+    }
+  }
+</style>
 
 <script is:inline>
   document.addEventListener('astro:page-load', initNewsletter);
   document.addEventListener('DOMContentLoaded', initNewsletter);
 
   function initNewsletter() {
-    ['newsletter-form', 'newsletter-form-compact'].forEach(formId => {
+    ['newsletter-form', 'newsletter-form-compact'].forEach((formId) => {
       const form = document.getElementById(formId);
       if (!form || form.dataset.bound) return;
       form.dataset.bound = 'true';
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = form.querySelector('input[name="email"]').value;
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const input = form.querySelector('input[name="email"]');
         const btn = form.querySelector('button[type="submit"]');
         const msgId = formId === 'newsletter-form' ? 'newsletter-msg' : 'newsletter-msg-compact';
         const msgEl = document.getElementById(msgId);
+        const originalText = btn.textContent;
 
         btn.disabled = true;
         btn.textContent = '...';
 
         try {
-          // Buttondown API - replace USERNAME with your Buttondown username
-          const res = await fetch('https://buttondown.com/api/emails/embed-subscribe/siuserxiaowei', {
+          const response = await fetch('https://buttondown.com/api/emails/embed-subscribe/siuserxiaowei', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ email, tag: 'website' })
+            body: new URLSearchParams({ email: input.value, tag: 'website' })
           });
 
-          if (msgEl) {
-            msgEl.classList.remove('hidden');
-            if (res.ok || res.status === 303) {
-              msgEl.textContent = '🎉 订阅成功！请查看邮箱确认。';
-              msgEl.style.color = 'var(--color-accent)';
-              form.reset();
-            } else {
-              msgEl.textContent = '订阅失败，请稍后重试。';
-              msgEl.style.color = '#ef4444';
-            }
+          if (!msgEl) return;
+          msgEl.classList.remove('hidden');
+
+          if (response.ok || response.status === 303) {
+            msgEl.textContent = '订阅成功，请去邮箱确认。';
+            msgEl.style.color = 'var(--color-accent)';
+            form.reset();
+          } else {
+            msgEl.textContent = '订阅失败，请稍后再试。';
+            msgEl.style.color = '#ef4444';
           }
         } catch {
           if (msgEl) {
             msgEl.classList.remove('hidden');
-            msgEl.textContent = '网络错误，请稍后重试。';
+            msgEl.textContent = '网络异常，请稍后再试。';
             msgEl.style.color = '#ef4444';
           }
         } finally {
           btn.disabled = false;
-          const isZh = document.documentElement.lang === 'zh-CN';
-          btn.textContent = isZh ? '订阅' : 'Subscribe';
+          btn.textContent = originalText;
         }
       });
     });
