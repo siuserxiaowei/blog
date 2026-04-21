@@ -7,171 +7,420 @@ import Newsletter from '../../components/Newsletter.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog'))
-  .filter(post => !post.data.draft)
+  .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Get all unique tags
-const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
+const readingLanes = [
+  '产品判断与拆解',
+  'AI 工具与自动化实验',
+  '公开构建中的过程记录'
+];
 ---
 
 <BaseLayout title="文章 - siuser小伟" description="关于技术、思考与创造的文章集合">
   <Header />
 
   <main class="flex-1">
-    <section class="mx-auto px-6 pt-16 pb-8 md:pt-24 md:pb-12" style="max-width: var(--container-max);">
-      <p class="animate-fade-in stagger-1 text-xs tracking-[0.2em] uppercase mb-3" style="color: var(--color-accent);">
-        Articles
-      </p>
-      <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-4" style="font-family: var(--font-heading); color: var(--text);" data-i18n="blog.title">
-        所有文章
-      </h1>
-      <p class="animate-fade-in stagger-3 text-base" style="color: var(--text-secondary);">
-        共 {posts.length} 篇文章
-      </p>
-    </section>
+    <section class="mx-auto px-6 pt-32 pb-10 md:pt-38 md:pb-14" style="max-width: var(--container-max);">
+      <div class="blog-hero">
+        <div class="scroll-reveal">
+          <p class="section-kicker">Writing</p>
+          <h1 data-i18n="blog.title">所有文章</h1>
+          <p class="blog-hero-copy">
+            这里集中放我在产品、AI、自动化和学习系统上的判断与实验记录。相比“总结”，我更关心把真实推进过程写清楚。
+          </p>
 
-    <!-- Search -->
-    <section class="mx-auto px-6 pb-6" style="max-width: var(--container-max);">
-      <div class="relative animate-fade-in stagger-3">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          id="search-input"
-          type="text"
-          placeholder="搜索文章..."
-          data-i18n="blog.search"
-          class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border outline-none transition-colors duration-200 focus:border-[var(--color-accent)]"
-          style="background: var(--surface); border-color: var(--border); color: var(--text);"
-        />
-      </div>
-    </section>
-
-    <!-- Tags filter -->
-    {allTags.length > 0 && (
-      <section class="mx-auto px-6 pb-8" style="max-width: var(--container-max);">
-        <div class="flex flex-wrap gap-2">
-          <button class="tag-filter text-xs px-3 py-1.5 rounded-full border transition-colors duration-200" style="border-color: var(--color-accent); color: var(--color-accent);" data-tag="all" data-i18n="blog.tag.all">
-            全部
-          </button>
-          {allTags.map(tag => (
-            <button class="tag-filter text-xs px-3 py-1.5 rounded-full border transition-colors duration-200 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]" style="border-color: var(--border); color: var(--text-secondary);" data-tag={tag}>
-              {tag}
-            </button>
-          ))}
+          <div class="blog-hero-stats">
+            <div class="metric-tile blog-metric">
+              <span>Published</span>
+              <strong>{posts.length} posts</strong>
+            </div>
+            <div class="metric-tile blog-metric">
+              <span>Tags</span>
+              <strong>{allTags.length} topics</strong>
+            </div>
+            <div class="metric-tile blog-metric">
+              <span>Mode</span>
+              <strong>Signal-first writing</strong>
+            </div>
+          </div>
         </div>
-      </section>
-    )}
 
-    <!-- Posts -->
-    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
-      <div id="posts-container" class="grid gap-6">
-        {posts.map(post => (
-          <div class="post-item" data-title={post.data.title.toLowerCase()} data-description={post.data.description.toLowerCase()} data-tags={JSON.stringify(post.data.tags || [])}>
-            <BlogCard
-              title={post.data.title}
-              description={post.data.description}
-              date={post.data.date.toISOString()}
-              tags={post.data.tags}
-              slug={post.id}
-              image={post.data.image}
+        <aside class="scroll-reveal surface-card gradient-border blog-search-panel">
+          <div>
+            <p class="section-kicker">Search & Filter</p>
+            <p class="blog-search-copy">按关键词和标签快速收窄，先找到与你现在最相关的内容。</p>
+          </div>
+
+          <div class="search-wrap">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="搜索文章..."
+              data-i18n="blog.search"
             />
           </div>
-        ))}
-      </div>
 
-      <div id="no-results" class="text-center py-20 hidden">
-        <p class="text-lg" style="color: var(--text-secondary);" data-i18n="blog.noresults">没有找到匹配的文章</p>
+          {allTags.length > 0 && (
+            <div class="tag-grid">
+              <button class="tag-filter is-active" data-tag="all" data-i18n="blog.tag.all">全部</button>
+              {allTags.map((tag) => (
+                <button class="tag-filter" data-tag={tag}>{tag}</button>
+              ))}
+            </div>
+          )}
+        </aside>
       </div>
-
-      {posts.length === 0 && (
-        <div class="text-center py-20">
-          <p class="text-lg" style="color: var(--text-secondary);">暂无文章，即将更新。</p>
-        </div>
-      )}
     </section>
 
-    <!-- Newsletter -->
     <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
-      <Newsletter compact />
+      <div class="blog-shell">
+        <aside class="scroll-reveal surface-card reading-card">
+          <p class="section-kicker">Reading Lanes</p>
+          <h2>三条内容主线</h2>
+          <div class="reading-lanes">
+            {readingLanes.map((lane) => (
+              <div class="reading-lane">
+                <span></span>
+                <p>{lane}</p>
+              </div>
+            ))}
+          </div>
+
+          <div class="reading-note">
+            <span>Note</span>
+            <p>文章默认按时间倒序排列，适合先看最近的判断，再回头补上下文。</p>
+          </div>
+        </aside>
+
+        <div>
+          <div id="posts-container" class="blog-list">
+            {posts.map((post) => (
+              <div
+                class="post-item"
+                data-title={post.data.title.toLowerCase()}
+                data-description={post.data.description.toLowerCase()}
+                data-tags={JSON.stringify(post.data.tags || [])}
+              >
+                <BlogCard
+                  title={post.data.title}
+                  description={post.data.description}
+                  date={post.data.date.toISOString()}
+                  tags={post.data.tags}
+                  slug={post.id}
+                  image={post.data.image}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div id="no-results" class="blog-empty hidden">
+            <div>∅</div>
+            <p data-i18n="blog.noresults">没有找到匹配的文章</p>
+          </div>
+
+          {posts.length === 0 && (
+            <div class="blog-empty">
+              <div>∅</div>
+              <p>暂无文章，即将更新。</p>
+            </div>
+          )}
+
+          <div class="newsletter-wrap">
+            <Newsletter compact />
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
   <Footer />
 
   <script is:inline>
-    (function() {
+    (() => {
       const searchInput = document.getElementById('search-input');
       const noResults = document.getElementById('no-results');
       const postItems = document.querySelectorAll('.post-item');
       const tagFilters = document.querySelectorAll('.tag-filter');
 
-      // Read URL params
       const params = new URLSearchParams(window.location.search);
       let activeTag = params.get('tag') || 'all';
       const initialQuery = params.get('q') || '';
 
       if (searchInput && initialQuery) searchInput.value = initialQuery;
 
-      function updateURL() {
+      const updateURL = () => {
         const query = searchInput ? searchInput.value.trim() : '';
-        const url = new URL(window.location);
-        if (activeTag && activeTag !== 'all') { url.searchParams.set('tag', activeTag); } else { url.searchParams.delete('tag'); }
-        if (query) { url.searchParams.set('q', query); } else { url.searchParams.delete('q'); }
+        const url = new URL(window.location.href);
+
+        if (activeTag && activeTag !== 'all') {
+          url.searchParams.set('tag', activeTag);
+        } else {
+          url.searchParams.delete('tag');
+        }
+
+        if (query) {
+          url.searchParams.set('q', query);
+        } else {
+          url.searchParams.delete('q');
+        }
+
         history.replaceState(null, '', url);
-      }
+      };
 
-      function updateTagStyles() {
-        tagFilters.forEach(b => {
-          if (b.getAttribute('data-tag') === activeTag) {
-            b.style.borderColor = 'var(--color-accent)';
-            b.style.color = 'var(--color-accent)';
-          } else {
-            b.style.borderColor = 'var(--border)';
-            b.style.color = 'var(--text-secondary)';
-          }
+      const updateTagStyles = () => {
+        tagFilters.forEach((button) => {
+          const active = button.getAttribute('data-tag') === activeTag;
+          button.classList.toggle('is-active', active);
         });
-      }
+      };
 
-      function filterPosts() {
+      const filterPosts = () => {
         const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
         let visibleCount = 0;
 
-        postItems.forEach(item => {
+        postItems.forEach((item) => {
           const title = item.getAttribute('data-title') || '';
           const desc = item.getAttribute('data-description') || '';
           const tags = JSON.parse(item.getAttribute('data-tags') || '[]');
-
           const matchesSearch = !query || title.includes(query) || desc.includes(query);
           const matchesTag = activeTag === 'all' || tags.includes(activeTag);
+          const visible = matchesSearch && matchesTag;
 
-          if (matchesSearch && matchesTag) {
-            item.style.display = '';
-            visibleCount++;
-          } else {
-            item.style.display = 'none';
-          }
+          item.classList.toggle('hidden', !visible);
+          if (visible) visibleCount += 1;
         });
 
         if (noResults) noResults.classList.toggle('hidden', visibleCount > 0);
         updateURL();
-      }
+      };
 
-      if (searchInput) {
-        searchInput.addEventListener('input', filterPosts);
-      }
+      searchInput?.addEventListener('input', filterPosts);
 
-      tagFilters.forEach(btn => {
-        btn.addEventListener('click', () => {
-          activeTag = btn.getAttribute('data-tag') || 'all';
+      tagFilters.forEach((button) => {
+        button.addEventListener('click', () => {
+          activeTag = button.getAttribute('data-tag') || 'all';
           updateTagStyles();
           filterPosts();
         });
       });
 
-      // Apply initial state from URL
       updateTagStyles();
       filterPosts();
+
+      const revealElements = document.querySelectorAll('.scroll-reveal');
+      if (!revealElements.length) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
+
+      revealElements.forEach((element) => observer.observe(element));
     })();
   </script>
 </BaseLayout>
+
+<style>
+  .blog-hero,
+  .blog-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .blog-hero h1,
+  .reading-card h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.02;
+  }
+
+  .blog-hero-copy,
+  .blog-search-copy {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  .blog-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 1.3rem;
+  }
+
+  .blog-metric {
+    padding: 0.95rem 1rem;
+  }
+
+  .blog-metric span {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .blog-search-panel,
+  .reading-card {
+    border-radius: 28px;
+    padding: 1.2rem;
+  }
+
+  .blog-search-panel {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+  }
+
+  .search-wrap input {
+    width: 100%;
+    height: 3.15rem;
+    padding: 0 1rem 0 2.8rem;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 86%, transparent);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag-filter {
+    border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+    background: color-mix(in srgb, var(--surface) 84%, transparent);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 0.52rem 0.82rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .tag-filter:hover,
+  .tag-filter.is-active {
+    transform: translateY(-1px);
+    color: #111;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 74%, white 26%));
+  }
+
+  .reading-card {
+    height: fit-content;
+  }
+
+  .reading-lanes {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .reading-lane {
+    display: grid;
+    grid-template-columns: 0.7rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+  }
+
+  .reading-lane span {
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-top: 0.45rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+
+  .reading-lane p,
+  .reading-note p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .reading-note {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  }
+
+  .reading-note span {
+    display: inline-flex;
+    margin-bottom: 0.4rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .blog-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .blog-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .blog-empty div {
+    margin-bottom: 0.45rem;
+    font-size: 3rem;
+    opacity: 0.35;
+  }
+
+  .newsletter-wrap {
+    margin-top: 1.2rem;
+  }
+
+  @media (max-width: 1024px) {
+    .blog-hero,
+    .blog-shell {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .blog-hero-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-search-panel,
+    .reading-card {
+      border-radius: 24px;
+      padding: 1rem;
+    }
+  }
+</style>

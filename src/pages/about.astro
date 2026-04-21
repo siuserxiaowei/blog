@@ -2,86 +2,155 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+const principles = [
+  {
+    index: '01',
+    titleKey: 'aboutpage.p1.title',
+    descKey: 'aboutpage.p1.desc',
+    title: '持续学习',
+    desc: '保持对新知识的渴望，在变化中寻找不变的规律。'
+  },
+  {
+    index: '02',
+    titleKey: 'aboutpage.p2.title',
+    descKey: 'aboutpage.p2.desc',
+    title: '独立思考',
+    desc: '不盲从权威，用第一性原理拆解问题。'
+  },
+  {
+    index: '03',
+    titleKey: 'aboutpage.p3.title',
+    descKey: 'aboutpage.p3.desc',
+    title: '创造价值',
+    desc: '用技术和产品解决真实问题，创造长期价值。'
+  },
+  {
+    index: '04',
+    titleKey: 'aboutpage.p4.title',
+    descKey: 'aboutpage.p4.desc',
+    title: '分享与连接',
+    desc: '在分享中成长，在连接中发现更多可能。'
+  }
+];
+
+const focusAreas = [
+  'AI 与自动化产品',
+  '产品工程与工具化',
+  '学习系统与公开构建',
+  '长期主义下的个人工作台'
+];
 ---
 
 <BaseLayout title="关于 - siuser小伟" description="了解更多关于我的故事">
   <Header />
 
   <main class="flex-1">
-    <section class="mx-auto px-6 pt-16 pb-20 md:pt-24" style="max-width: 720px;">
-      <!-- Header -->
-      <p class="animate-fade-in stagger-1 text-xs tracking-[0.2em] uppercase mb-3" style="color: var(--color-accent);">
-        About
-      </p>
-      <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-6" style="font-family: var(--font-heading); color: var(--text);">
-        关于我
-      </h1>
-      <div class="animate-fade-in stagger-3 divider-accent mb-12"></div>
-
-      <!-- Content -->
-      <div class="animate-fade-in stagger-4 space-y-6">
-        <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-          <span data-i18n="aboutpage.intro1">你好，我是 siuser小伟。欢迎来到我的个人空间。</span>
-        </p>
-
-        <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-          <span data-i18n="aboutpage.intro2">这里是我记录思考、分享洞察的地方。我相信技术的力量，也相信持续学习和创造的价值。在这个快速变化的时代，保持好奇心和独立思考尤为重要。</span>
-        </p>
-
-        <p class="text-base md:text-lg leading-relaxed" style="color: var(--text-secondary);">
-          <span data-i18n="aboutpage.intro3">我关注的领域包括但不限于：人工智能、产品设计、创业与商业思维。希望通过这个博客，能与志同道合的人建立连接。</span>
-        </p>
-      </div>
-
-      <!-- Principles -->
-      <div class="animate-fade-in stagger-5 mt-16">
-        <h2 class="text-xl md:text-2xl mb-8" style="font-family: var(--font-heading); color: var(--text);">
-          <span data-i18n="aboutpage.principles">信条</span>
-        </h2>
-        <div class="grid gap-6 md:grid-cols-2">
-          <div class="glass-card shine-hover tilt-card p-6 rounded-xl">
-            <div class="text-2xl mb-3" style="color: var(--color-accent); font-family: var(--font-mono);">01</div>
-            <h3 class="text-sm font-medium mb-2" style="color: var(--text);" data-i18n="aboutpage.p1.title">持续学习</h3>
-            <p class="text-sm leading-relaxed" style="color: var(--text-secondary);" data-i18n="aboutpage.p1.desc">保持对新知识的渴望，在变化中寻找不变的规律。</p>
-          </div>
-          <div class="glass-card shine-hover tilt-card p-6 rounded-xl">
-            <div class="text-2xl mb-3" style="color: var(--color-accent); font-family: var(--font-mono);">02</div>
-            <h3 class="text-sm font-medium mb-2" style="color: var(--text);" data-i18n="aboutpage.p2.title">独立思考</h3>
-            <p class="text-sm leading-relaxed" style="color: var(--text-secondary);" data-i18n="aboutpage.p2.desc">不盲从权威，用第一性原理拆解问题。</p>
-          </div>
-          <div class="glass-card shine-hover tilt-card p-6 rounded-xl">
-            <div class="text-2xl mb-3" style="color: var(--color-accent); font-family: var(--font-mono);">03</div>
-            <h3 class="text-sm font-medium mb-2" style="color: var(--text);" data-i18n="aboutpage.p3.title">创造价值</h3>
-            <p class="text-sm leading-relaxed" style="color: var(--text-secondary);" data-i18n="aboutpage.p3.desc">用技术和产品解决真实问题，创造长期价值。</p>
-          </div>
-          <div class="glass-card shine-hover tilt-card p-6 rounded-xl">
-            <div class="text-2xl mb-3" style="color: var(--color-accent); font-family: var(--font-mono);">04</div>
-            <h3 class="text-sm font-medium mb-2" style="color: var(--text);" data-i18n="aboutpage.p4.title">分享与连接</h3>
-            <p class="text-sm leading-relaxed" style="color: var(--text-secondary);" data-i18n="aboutpage.p4.desc">在分享中成长，在连接中发现更多可能。</p>
-          </div>
+    <section class="mx-auto px-6 pt-32 pb-18 md:pt-38 md:pb-22" style="max-width: var(--container-max);">
+      <div class="about-hero">
+        <div class="scroll-reveal">
+          <p class="section-kicker">About</p>
+          <h1>关于我，也关于这个网站为什么会长成现在这样。</h1>
+          <p class="hero-copy">
+            这里不是把信息堆成一页的个人介绍，而是把我关心的问题、正在做的事情和持续形成的判断整理成一个长期运行的工作台。
+          </p>
         </div>
+
+        <aside class="scroll-reveal surface-card gradient-border about-panel">
+          <p class="section-kicker">Current Focus</p>
+          <div class="about-panel-list">
+            {focusAreas.map((item, index) => (
+              <div class="about-panel-row">
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <p>{item}</p>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="mx-auto px-6 pb-16 md:pb-20" style="max-width: var(--container-max);">
+      <div class="about-story">
+        <article class="scroll-reveal surface-card about-story-card">
+          <p class="section-kicker">Narrative</p>
+          <div class="story-copy">
+            <p>
+              <span data-i18n="aboutpage.intro1">你好，我是 siuser小伟。欢迎来到我的个人空间。</span>
+            </p>
+            <p>
+              <span data-i18n="aboutpage.intro2">这里是我记录思考、分享洞察的地方。我相信技术的力量，也相信持续学习和创造的价值。在这个快速变化的时代，保持好奇心和独立思考尤为重要。</span>
+            </p>
+            <p>
+              <span data-i18n="aboutpage.intro3">我关注的领域包括但不限于：人工智能、产品设计、创业与商业思维。希望通过这个博客，能与志同道合的人建立连接。</span>
+            </p>
+          </div>
+        </article>
+
+        <article class="scroll-reveal surface-card about-side-card">
+          <p class="section-kicker">What This Site Does</p>
+          <div class="about-side-list">
+            <div>
+              <span>01</span>
+              <p>把想法写成文章，而不是留在备忘录里。</p>
+            </div>
+            <div>
+              <span>02</span>
+              <p>把重复的小问题做成工具，而不是每次重新搜索。</p>
+            </div>
+            <div>
+              <span>03</span>
+              <p>把公开构建中的项目和机会整理成可持续更新的系统。</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="mx-auto px-6 pb-18 md:pb-22" style="max-width: var(--container-max);">
+      <div class="section-row scroll-reveal">
+        <div class="section-head">
+          <p class="section-kicker">Principles</p>
+          <h2><span data-i18n="aboutpage.principles">信条</span></h2>
+        </div>
+        <p class="section-side-copy">这些不是漂亮话，而是我希望网站结构、写作方式和项目推进方式都能体现出来的准则。</p>
       </div>
 
-      <!-- Contact -->
-      <div class="mt-16 pt-8 border-t" style="border-color: var(--border);">
-        <h2 class="text-xl md:text-2xl mb-4" style="font-family: var(--font-heading); color: var(--text);">
-          <span data-i18n="aboutpage.contact">联系我</span>
-        </h2>
-        <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-          <span data-i18n="aboutpage.contact.desc">如果你对我写的内容感兴趣，或者想聊聊合作的可能性，欢迎通过以下方式联系我。</span>
-        </p>
-        <div class="flex items-center gap-6">
-          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            GitHub
+      <div class="principles-grid">
+        {principles.map((item) => (
+          <article class="scroll-reveal surface-card card-hover principle-card">
+            <div class="principle-head">
+              <span>{item.index}</span>
+            </div>
+            <h3 data-i18n={item.titleKey}>{item.title}</h3>
+            <p data-i18n={item.descKey}>{item.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
+      <div class="scroll-reveal surface-card gradient-border contact-card">
+        <div>
+          <p class="section-kicker">Contact</p>
+          <h2><span data-i18n="aboutpage.contact">联系我</span></h2>
+          <p class="contact-copy">
+            <span data-i18n="aboutpage.contact.desc">如果你对我写的内容感兴趣，或者想聊聊合作的可能性，欢迎通过以下方式联系我。</span>
+          </p>
+        </div>
+
+        <div class="contact-links">
+          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">
+            <span>GitHub</span>
+            <em>@siuserxiaowei</em>
           </a>
-          <a href="mailto:hi@siuserxiaowei.com" class="inline-flex items-center gap-2 text-sm transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Email
+          <a href="mailto:hi@siuserxiaowei.com">
+            <span>Email</span>
+            <em>hi@siuserxiaowei.com</em>
+          </a>
+          <a href="/rss.xml">
+            <span>RSS</span>
+            <em>订阅更新</em>
           </a>
         </div>
       </div>
@@ -90,3 +159,187 @@ import Footer from '../components/Footer.astro';
 
   <Footer />
 </BaseLayout>
+
+<style>
+  .about-hero,
+  .about-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1.04fr) minmax(300px, 0.96fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .about-hero h1,
+  .section-head h2,
+  .contact-card h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.02;
+  }
+
+  .hero-copy,
+  .story-copy,
+  .section-side-copy,
+  .contact-copy {
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  .hero-copy {
+    max-width: 42rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
+
+  .about-panel,
+  .about-story-card,
+  .about-side-card,
+  .principle-card,
+  .contact-card {
+    border-radius: 28px;
+    padding: 1.25rem;
+  }
+
+  .about-panel-list,
+  .about-side-list,
+  .story-copy,
+  .contact-links {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .about-panel-row,
+  .about-side-list > div,
+  .contact-links a,
+  .principle-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .about-panel-row,
+  .about-side-list > div {
+    padding-top: 0.85rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  }
+
+  .about-panel-row:first-child,
+  .about-side-list > div:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .about-panel-row span,
+  .about-side-list span,
+  .principle-head span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .about-panel-row p,
+  .about-side-list p,
+  .principle-card p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .section-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.2rem;
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .principle-card h3 {
+    margin-top: 0.7rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.35rem;
+    line-height: 1.12;
+  }
+
+  .contact-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.7fr);
+    gap: 1rem;
+  }
+
+  .contact-links a {
+    align-items: center;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 84%, transparent);
+  }
+
+  .contact-links span {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .contact-links em {
+    color: var(--text-secondary);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1024px) {
+    .about-hero,
+    .about-story,
+    .section-row,
+    .contact-card {
+      grid-template-columns: 1fr;
+    }
+
+    .principles-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .principles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-panel,
+    .about-story-card,
+    .about-side-card,
+    .principle-card,
+    .contact-card {
+      border-radius: 24px;
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+
+    if (!revealElements.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
+
+    revealElements.forEach((element) => observer.observe(element));
+  })();
+</script>

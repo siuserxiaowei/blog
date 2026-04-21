@@ -54,6 +54,7 @@ const signalStrip = [
 
 const entryPoints = [
   {
+    mark: 'TB',
     title: '工具箱',
     eyebrow: 'Browser-first utilities',
     href: '/tools',
@@ -62,6 +63,7 @@ const entryPoints = [
     tags: ['快开即用', '浏览器内运行', '无上传']
   },
   {
+    mark: 'PR',
     title: '项目展示',
     eyebrow: 'Products in progress',
     href: '/projects',
@@ -70,6 +72,7 @@ const entryPoints = [
     tags: ['AI 产品', '自动化', '公开构建']
   },
   {
+    mark: 'RD',
     title: '比赛雷达',
     eyebrow: 'Opportunity scanner',
     href: '/competitions',
@@ -213,7 +216,10 @@ const publishingLanes = [
       <div class="entry-grid">
         {entryPoints.map((entry) => (
           <a href={entry.href} class="scroll-reveal surface-card card-hover gradient-border entry-card">
-            <p class="entry-eyebrow">{entry.eyebrow}</p>
+            <div class="entry-head">
+              <span class="entry-mark">{entry.mark}</span>
+              <p class="entry-eyebrow">{entry.eyebrow}</p>
+            </div>
             <h3>{entry.title}</h3>
             <p class="entry-copy">{entry.desc}</p>
 
@@ -338,7 +344,8 @@ const publishingLanes = [
   .hero-board-head,
   .hero-dispatches-head,
   .entry-footer,
-  .operating-card-foot {
+  .operating-card-foot,
+  .entry-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -638,6 +645,21 @@ const publishingLanes = [
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+  }
+
+  .entry-mark {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 84%, transparent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .entry-copy {

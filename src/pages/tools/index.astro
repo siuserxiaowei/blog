@@ -136,6 +136,22 @@ const collections = [
 }));
 
 const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
+const getToolMark = (tool: Tool) => {
+  const normalized = tool.nameEn
+    .replace(/[↔→]/g, ' ')
+    .replace(/[^a-zA-Z0-9+]+/g, ' ')
+    .trim();
+  const upper = normalized.toUpperCase();
+  const common = ['JSON', 'YAML', 'CSV', 'XML', 'SQL', 'JWT', 'AES', 'OTP', 'UUID', 'ULID', 'URL', 'HTML', 'CSS', 'MIME', 'HTTP', 'OG', 'HMAC', 'TOTP'];
+  const matched = common.find((item) => upper.includes(item));
+  if (matched) return matched.slice(0, 4);
+  if (upper.includes('BASE64')) return '64';
+  const parts = normalized.split(/\s+/).filter(Boolean);
+  return parts
+    .slice(0, 2)
+    .map((part) => part.replace(/[^a-zA-Z0-9]/g, '').slice(0, 1).toUpperCase())
+    .join('') || tool.id.slice(0, 2).toUpperCase();
+};
 ---
 
 <BaseLayout
@@ -241,7 +257,10 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
               <div class="collection-links">
                 {collection.items.map((tool) => (
                   <a href={getToolHref(tool)}>
-                    <span>{tool.name}</span>
+                    <div class="collection-link-main">
+                      <span class="collection-mark">{getToolMark(tool)}</span>
+                      <span>{tool.name}</span>
+                    </div>
                     <em>{tool.nameEn}</em>
                   </a>
                 ))}
@@ -263,7 +282,7 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
           {featuredTools.map((tool) => (
             <a href={getToolHref(tool)} class="featured-card surface-card card-hover gradient-border">
               <div class="featured-card-head">
-                <span class="featured-icon">{tool.icon}</span>
+                <span class="featured-icon">{getToolMark(tool)}</span>
                 <span class="featured-status">live</span>
               </div>
               <h3>{tool.name}</h3>
@@ -314,7 +333,7 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
                       class:list={['tool-card-item surface-card card-hover', tool.status === 'soon' && 'is-soon']}
                     >
                       <div class="tool-card-head">
-                        <span class="tool-card-icon">{tool.icon}</span>
+                        <span class="tool-card-icon">{getToolMark(tool)}</span>
                         <span class:list={['tool-state', tool.status === 'live' ? 'is-live' : 'is-soon']}>
                           {tool.status}
                         </span>
@@ -606,6 +625,20 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
     transition: transform 0.2s ease, border-color 0.2s ease;
   }
 
+  .collection-link-main {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+  }
+
+  .collection-link-main span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .collection-links a:hover {
     transform: translateY(-1px);
     border-color: color-mix(in srgb, var(--color-accent) 28%, var(--border));
@@ -637,6 +670,7 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
     padding: 1rem;
   }
 
+  .collection-mark,
   .featured-icon,
   .tool-card-icon {
     width: 2.75rem;
@@ -646,7 +680,12 @@ const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
     border-radius: 16px;
     background: color-mix(in srgb, var(--surface-2) 88%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    font-size: 1.25rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .featured-status,

@@ -8,8 +8,8 @@ const { compact = false } = Astro.props;
 
 {compact ? (
   <div class="newsletter-shell compact">
-    <div>
-      <p class="newsletter-kicker">Subscribe</p>
+    <div class="newsletter-compact-copy">
+      <p class="newsletter-kicker">Dispatch</p>
       <h3 data-i18n="newsletter.title.compact">订阅更新</h3>
       <p class="newsletter-copy" data-i18n="newsletter.desc.compact">新文章发布时，第一时间通知你。不发垃圾邮件。</p>
     </div>
@@ -25,21 +25,44 @@ const { compact = false } = Astro.props;
   </div>
 ) : (
   <div class="newsletter-shell full">
-    <p class="newsletter-kicker">Newsletter</p>
-    <h2 data-i18n="newsletter.title">不错过每一篇</h2>
-    <p class="newsletter-copy" data-i18n="newsletter.desc">输入邮箱，新文章发布时第一时间收到通知。没有垃圾邮件，随时取消。</p>
+    <div class="newsletter-grid">
+      <div class="newsletter-copy-block">
+        <p class="newsletter-kicker">Dispatch</p>
+        <h2 data-i18n="newsletter.title">不错过每一篇</h2>
+        <p class="newsletter-copy" data-i18n="newsletter.desc">输入邮箱，新文章发布时第一时间收到通知。没有垃圾邮件，随时取消。</p>
 
-    <form id="newsletter-form" class="newsletter-form">
-      <input type="email" name="email" required placeholder="your@email.com" />
-      <button type="submit" class="newsletter-btn">
-        <span data-i18n="newsletter.btn">订阅</span>
-      </button>
-    </form>
+        <div class="newsletter-points">
+          <div>
+            <span>01</span>
+            <p>只在有新文章、工具或值得公开的实验时发送。</p>
+          </div>
+          <div>
+            <span>02</span>
+            <p>偏向产品判断、AI 工具实验和工作台建设过程。</p>
+          </div>
+          <div>
+            <span>03</span>
+            <p>低频，但会尽量保证每次都值得打开。</p>
+          </div>
+        </div>
+      </div>
 
-    <p id="newsletter-msg" class="newsletter-msg hidden"></p>
-    <p class="newsletter-privacy">
-      <span data-i18n="newsletter.privacy">你的邮箱不会分享给任何第三方</span>
-    </p>
+      <div class="newsletter-form-block">
+        <p class="newsletter-panel-kicker">Join the list</p>
+
+        <form id="newsletter-form" class="newsletter-form">
+          <input type="email" name="email" required placeholder="your@email.com" />
+          <button type="submit" class="newsletter-btn">
+            <span data-i18n="newsletter.btn">订阅</span>
+          </button>
+        </form>
+
+        <p id="newsletter-msg" class="newsletter-msg hidden"></p>
+        <p class="newsletter-privacy">
+          <span data-i18n="newsletter.privacy">你的邮箱不会分享给任何第三方</span>
+        </p>
+      </div>
+    </div>
   </div>
 )}
 
@@ -47,44 +70,69 @@ const { compact = false } = Astro.props;
   .newsletter-shell {
     border-radius: 28px;
     border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 82%, transparent), color-mix(in srgb, var(--surface-2) 92%, transparent));
-    box-shadow: var(--shadow-card);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--surface-2) 94%, transparent));
+    box-shadow: 0 24px 48px -34px rgba(0, 0, 0, 0.35);
   }
 
   .newsletter-shell.full {
-    max-width: 42rem;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
+    padding: 1.45rem;
   }
 
   .newsletter-shell.compact {
     display: grid;
-    gap: 1rem;
-    padding: 1.5rem;
+    gap: 0.9rem;
+    padding: 1.25rem;
   }
 
-  .newsletter-kicker {
-    margin-bottom: 0.5rem;
+  .newsletter-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .newsletter-copy-block,
+  .newsletter-form-block {
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 64%, transparent);
+  }
+
+  .newsletter-copy-block {
+    padding: 1.35rem;
+  }
+
+  .newsletter-form-block {
+    display: grid;
+    gap: 0.95rem;
+    align-content: start;
+    padding: 1.2rem;
+  }
+
+  .newsletter-kicker,
+  .newsletter-panel-kicker {
     color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
   .newsletter-shell h2,
   .newsletter-shell h3 {
-    margin-bottom: 0.6rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.55rem;
     color: var(--text);
   }
 
   .newsletter-shell h2 {
-    font-size: clamp(2rem, 3.8vw, 3.4rem);
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    line-height: 1.04;
   }
 
   .newsletter-shell h3 {
-    font-size: 1.55rem;
+    font-size: 1.32rem;
+    line-height: 1.12;
   }
 
   .newsletter-copy {
@@ -92,29 +140,61 @@ const { compact = false } = Astro.props;
     line-height: 1.8;
   }
 
+  .newsletter-points {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1.15rem;
+  }
+
+  .newsletter-points > div {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    padding-top: 0.8rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  }
+
+  .newsletter-points > div:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .newsletter-points span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .newsletter-points p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
   .newsletter-form {
     display: flex;
-    gap: 0.75rem;
-    max-width: 32rem;
-    margin: 1.35rem auto 0;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 0.1rem;
   }
 
   .compact-form {
-    max-width: none;
-    margin: 0;
+    margin-top: 0;
   }
 
   .newsletter-form input {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     height: 3.1rem;
-    border-radius: 999px;
+    border-radius: 18px;
     border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
     color: var(--text);
-    padding: 0 1.1rem;
-    font-family: var(--font-mono);
-    font-size: 0.88rem;
+    padding: 0 1rem;
+    font-family: var(--font-body);
+    font-size: 0.94rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
@@ -127,52 +207,59 @@ const { compact = false } = Astro.props;
   .newsletter-btn {
     border: none;
     height: 3.1rem;
-    padding: 0 1.3rem;
-    border-radius: 999px;
+    padding: 0 1.2rem;
+    border-radius: 18px;
     background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 68%, white 32%));
     color: #111;
     font-family: var(--font-mono);
     font-size: 0.76rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 20px 34px -24px color-mix(in srgb, var(--color-accent) 62%, transparent);
+    box-shadow: 0 18px 30px -22px color-mix(in srgb, var(--color-accent) 58%, transparent);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .newsletter-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 24px 42px -24px color-mix(in srgb, var(--color-accent) 72%, transparent);
+    box-shadow: 0 22px 36px -22px color-mix(in srgb, var(--color-accent) 66%, transparent);
   }
 
   .newsletter-msg {
-    margin-top: 0.8rem;
+    margin-top: 0.2rem;
     color: var(--color-accent);
     font-size: 0.9rem;
   }
 
   .newsletter-privacy {
-    margin-top: 0.9rem;
     color: var(--text-secondary);
     font-size: 0.78rem;
-    opacity: 0.8;
+    line-height: 1.7;
+    opacity: 0.85;
+  }
+
+  .newsletter-compact-copy {
+    padding-bottom: 0.1rem;
+  }
+
+  @media (max-width: 860px) {
+    .newsletter-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 720px) {
     .newsletter-shell.full,
     .newsletter-shell.compact {
-      padding: 1.35rem;
+      padding: 1rem;
       border-radius: 24px;
     }
 
-    .newsletter-form {
-      flex-direction: column;
-    }
-
-    .newsletter-btn,
-    .newsletter-form input {
-      width: 100%;
+    .newsletter-copy-block,
+    .newsletter-form-block {
+      border-radius: 20px;
+      padding: 1rem;
     }
   }
 </style>
