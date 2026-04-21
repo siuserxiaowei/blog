@@ -145,15 +145,17 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
   font-family: var(--font-heading);
   font-weight: 600;
-  letter-spacing: -0.024em;
-  line-height: 1.04;
+  letter-spacing: -0.008em;
+  line-height: 1.18;
+  text-wrap: pretty;
 }
 
+/* Tighter tracking only for Latin-heavy displays;
+   CJK needs breathing room, not negative letter-spacing. */
 .display-serif {
-  font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.018em;
-  line-height: 1.04;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
 }
 
 .display-serif em,
@@ -161,6 +163,10 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 400;
+}
+
+.display-serif {
+  font-family: var(--font-serif);
 }
 
 p {
