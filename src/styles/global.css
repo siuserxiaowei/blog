@@ -68,7 +68,7 @@ body {
     linear-gradient(180deg, color-mix(in srgb, var(--bg) 90%, #04070c) 0%, var(--bg) 50%, color-mix(in srgb, var(--bg) 84%, #020407) 100%);
   color: var(--text);
   font-family: var(--font-body);
-  line-height: 1.65;
+  line-height: 1.78;
   text-rendering: optimizeLegibility;
   transition: background-color 0.25s ease, color 0.25s ease;
 }

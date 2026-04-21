@@ -308,14 +308,14 @@ const categories = [...new Set(enriched.map(c => c.cat))];
 
     <!-- 列表 + 详情 -->
     <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
-      <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 lg:gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 lg:gap-12">
         <!-- 左侧列表 -->
         <aside>
           <div class="flex items-center justify-between px-1 mb-3">
             <span class="section-kicker">// 列表</span>
             <span id="list-count" class="text-xs" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
           </div>
-          <div class="space-y-3 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
+          <div class="space-y-4 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
             {enriched.map(c => (
               <button
                 data-id={c.id}
@@ -346,13 +346,13 @@ const categories = [...new Set(enriched.map(c => c.cat))];
         </aside>
 
         <!-- 右侧详情 -->
-        <section class="space-y-6">
+        <section class="space-y-8">
           {enriched.map((c, i) => (
-            <div data-detail={c.id} class:list={["detail-panel space-y-5", i !== 0 && "hidden"]}>
+            <div data-detail={c.id} class:list={["detail-panel space-y-7", i !== 0 && "hidden"]}>
 
               <!-- 主卡 -->
-              <div class="glass-card gradient-border p-6 md:p-9" style="border-radius: var(--radius-xl);">
-                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
+              <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
                   <div class="flex-1 min-w-0 space-y-3">
                     <div class="flex flex-wrap items-center gap-2">
                       <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
@@ -377,7 +377,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
                 </div>
 
                 <!-- 时间轴 -->
-                <div class="mb-8">
+                <div class="mb-10">
                   <p class="section-kicker mb-5">// 关键时间节点</p>
                   <div class="relative pt-2">
                     <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
@@ -398,7 +398,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
                 </div>
 
                 <!-- 定位 / 打法 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div>
                     <p class="section-kicker mb-3">// 赛事定位</p>
                     <p class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text-secondary); background: color-mix(in srgb, var(--surface) 55%, transparent); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">{c.desc}</p>
@@ -410,7 +410,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
                 </div>
 
                 <!-- 奖励 / 卖点 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
                   <div>
                     <p class="section-kicker mb-3">// 核心奖励 / 资源</p>
                     <div class="flex flex-wrap gap-1.5">
@@ -431,7 +431,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
               </div>
 
               <!-- 优势 / 难点 -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
                   <p class="section-kicker mb-3" style="color: var(--color-accent-2);">// + 优势</p>
                   <ul class="space-y-2">
@@ -478,7 +478,8 @@ const categories = [...new Set(enriched.map(c => c.cat))];
   /* ============ 列表项 ============ */
   .cp-list-item {
     cursor: pointer;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
+    padding-block: 1.1rem !important;
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
     border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
     backdrop-filter: blur(12px);
