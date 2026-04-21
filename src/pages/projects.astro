@@ -3,133 +3,374 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const projects = [
+interface Project {
+  title: string;
+  titleEn: string;
+  description: string;
+  tags: string[];
+  link?: string;
+  github?: string;
+  status: 'active' | 'completed' | 'archived';
+  era: string;
+}
+
+const projects: Project[] = [
   {
     title: 'AI 语音机器人',
+    titleEn: 'Voice Agent',
     description: '基于大语言模型的智能语音交互系统，支持多轮对话、情感识别和自定义话术流程，为企业提供智能外呼和客服解决方案。',
     tags: ['AI', 'LLM', 'Voice', 'SaaS'],
-    link: '',
-    github: '',
     status: 'active',
+    era: '2025 —'
   },
   {
     title: '个人博客',
-    description: '你正在看的这个网站。基于 Astro 6 构建的极简奢华风个人博客，支持暗色/亮色主题、Markdown 写作、Admin CMS 管理后台。',
+    titleEn: 'This site',
+    description: '你正在看的这个网站。基于 Astro 6 构建的暗色工作台式个人站，支持暗/亮主题、Markdown 写作、Admin CMS 管理后台。',
     tags: ['Astro', 'Tailwind CSS', 'GitHub API'],
     link: 'https://siuserxiaowei.com',
     github: 'https://github.com/siuserxiaowei/blog',
     status: 'active',
+    era: '2024 —'
   },
   {
     title: 'Admin CMS',
+    titleEn: 'Content workbench',
     description: '为个人博客打造的轻量级内容管理系统。纯静态 SPA 架构，通过 GitHub API 直接管理 Markdown 文章，零后端依赖。',
     tags: ['SPA', 'GitHub API', 'Markdown'],
     link: 'https://siuserxiaowei.com/admin',
-    github: '',
     status: 'active',
+    era: '2025 —'
   },
   {
     title: 'Claude Code 用量监控',
+    titleEn: 'Usage monitor',
     description: '实时监控 Claude Code API 用量的自动化代理，自动采集数据、可视化展示，帮助开发者掌控 AI 开支。',
     tags: ['n8n', 'Automation', 'Monitoring'],
-    link: '',
-    github: '',
     status: 'active',
-  },
+    era: '2025 —'
+  }
 ];
 
-const statusMap: Record<string, { label: string; color: string }> = {
-  active: { label: '进行中', color: '#22c55e' },
-  completed: { label: '已完成', color: 'var(--color-accent)' },
-  archived: { label: '已归档', color: 'var(--text-secondary)' },
+const statusMap: Record<Project['status'], { label: string; tone: 'accent' | 'accent-2' | 'muted' }> = {
+  active: { label: 'Active', tone: 'accent-2' },
+  completed: { label: 'Shipped', tone: 'accent' },
+  archived: { label: 'Archived', tone: 'muted' }
 };
 ---
 
-<BaseLayout title="项目 - siuser小伟" description="我的产品与项目展示">
+<BaseLayout title="项目 · siuser小伟" description="公开推进中的产品与项目清单">
   <Header />
 
   <main class="flex-1">
-    <section class="mx-auto px-6 pt-16 pb-8 md:pt-24 md:pb-12" style="max-width: var(--container-max);">
-      <div class="animate-fade-in stagger-1 flex items-center gap-3 mb-3">
-        <p class="text-xs tracking-[0.2em] uppercase" style="color: var(--color-accent);">Projects</p>
-        <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 项目展示</span>
+
+    <!-- Hero -->
+    <section class="mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24" style="max-width: var(--container-max);">
+      <div class="projects-hero">
+        <div class="animate-fade-in stagger-1 flex items-center gap-3 mb-4">
+          <p class="section-kicker">Projects</p>
+          <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// {projects.length} entries</span>
+        </div>
+
+        <h1 class="animate-fade-in stagger-2 projects-headline display-serif">
+          公开在做的<em>things</em>，<br />
+          用来生成外部约束。
+        </h1>
+
+        <p class="animate-fade-in stagger-3 projects-lede">
+          项目存在的意义不是放在简历里，而是逼我持续推进。
+          它们和文章、工具、比赛雷达一起构成这个工作台的外部反馈回路。
+        </p>
       </div>
-      <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-4" style="font-family: var(--font-heading); color: var(--text);" data-i18n="projects.title">
-        项目展示
-      </h1>
-      <p class="animate-fade-in stagger-3 text-base mb-4" style="color: var(--text-secondary);" data-i18n="projects.desc">
-        我参与和打造的一些产品与项目
-      </p>
-      <div class="animate-fade-in stagger-3 divider-accent mb-12"></div>
     </section>
 
-    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
-      <div class="grid gap-6 md:grid-cols-2">
-        {projects.map((project, index) => (
-          <div
-            class="group relative glass-card shine-hover gradient-border p-6 rounded-xl transition-all duration-300 hover:shadow-md hover:-translate-y-1"
-          >
-            <!-- Header -->
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={`background: color-mix(in srgb, var(--color-accent) 12%, transparent); color: var(--color-accent); font-family: var(--font-mono); font-weight: 500;`}>
-                  {String(index + 1).padStart(2, '0')}
+    <!-- Project ledger -->
+    <section class="mx-auto px-6 pb-32" style="max-width: var(--container-max);">
+      <div class="projects-ledger">
+        {projects.map((project, index) => {
+          const status = statusMap[project.status];
+          return (
+            <article class="project-entry animate-fade-in">
+              <div class="project-rule"></div>
+
+              <div class="project-row">
+                <div class="project-index">
+                  <span class="index-num">{String(index + 1).padStart(2, '0')}</span>
+                  <span class="index-era">{project.era}</span>
                 </div>
-                <div>
-                  <h3 class="text-base font-medium transition-colors duration-200 group-hover:text-[var(--color-accent)]" style="color: var(--text);">{project.title}</h3>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="w-1.5 h-1.5 rounded-full" style={`background: ${statusMap[project.status].color};`}></span>
-                    <span class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{statusMap[project.status].label}</span>
+
+                <div class="project-main">
+                  <header class="project-header">
+                    <div>
+                      <h2 class="project-title display-serif">{project.title}</h2>
+                      <p class="project-titleEn">{project.titleEn}</p>
+                    </div>
+                    <span class={`status-chip status-chip-${status.tone}`}>
+                      <span class="status-dot"></span>{status.label}
+                    </span>
+                  </header>
+
+                  <p class="project-desc">{project.description}</p>
+
+                  <div class="project-tags">
+                    {project.tags.map((tag) => (
+                      <span>{tag}</span>
+                    ))}
+                  </div>
+
+                  <div class="project-links">
+                    {project.link && (
+                      <a href={project.link} target="_blank" rel="noopener">
+                        <span>Visit site</span>
+                        <em>↗</em>
+                      </a>
+                    )}
+                    {project.github && (
+                      <a href={project.github} target="_blank" rel="noopener">
+                        <span>Source</span>
+                        <em>↗</em>
+                      </a>
+                    )}
+                    {!project.link && !project.github && (
+                      <span class="project-private">// 尚未公开</span>
+                    )}
                   </div>
                 </div>
               </div>
-              <!-- Arrow indicator -->
-              <svg class="w-4 h-4 transition-all duration-200 group-hover:text-[var(--color-accent)] group-hover:translate-x-1" style="color: var(--text-secondary); opacity: 0.3;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </div>
+            </article>
+          );
+        })}
 
-            <!-- Description -->
-            <p class="text-sm leading-relaxed mb-4" style="color: var(--text-secondary);">
-              {project.description}
-            </p>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-2 mb-4">
-              {project.tags.map(tag => (
-                <span class="text-[11px] px-2 py-0.5 rounded-full" style="background: var(--surface-2); color: var(--color-accent); font-family: var(--font-mono);">
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <!-- Links -->
-            <div class="flex items-center gap-4 pt-3 border-t" style="border-color: var(--border);">
-              {project.link && (
-                <a href={project.link} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-[11px] transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary); font-family: var(--font-mono);">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                  Visit
-                </a>
-              )}
-              {project.github && (
-                <a href={project.github} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-[11px] transition-colors duration-200 hover:text-[var(--color-accent)]" style="color: var(--text-secondary); font-family: var(--font-mono);">
-                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                  Source
-                </a>
-              )}
-              {!project.link && !project.github && (
-                <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.4; font-family: var(--font-mono);">// not public yet</span>
-              )}
-            </div>
-          </div>
-        ))}
+        <div class="project-rule project-rule-foot"></div>
       </div>
     </section>
   </main>
 
   <Footer />
 </BaseLayout>
+
+<style>
+  .projects-hero {
+    max-width: 52rem;
+  }
+
+  .projects-headline {
+    margin-top: 1rem;
+    font-size: clamp(2.8rem, 7vw, 5.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.022em;
+  }
+
+  .projects-headline em {
+    color: var(--color-accent);
+  }
+
+  .projects-lede {
+    margin-top: 1.8rem;
+    max-width: 38rem;
+    color: var(--text-secondary);
+    font-size: clamp(1.02rem, 1.4vw, 1.15rem);
+    line-height: 1.85;
+  }
+
+  .projects-ledger {
+    display: grid;
+    gap: 0;
+  }
+
+  .project-entry {
+    padding-top: 2.6rem;
+    padding-bottom: 2.6rem;
+  }
+
+  .project-rule {
+    height: 1px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 35%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 45%, transparent);
+  }
+
+  .project-rule-foot {
+    margin-top: -1px;
+  }
+
+  .project-row {
+    display: grid;
+    grid-template-columns: minmax(9rem, 10rem) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .project-index {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .index-num {
+    font-family: var(--font-serif);
+    font-size: clamp(3.2rem, 5.4vw, 4.8rem);
+    line-height: 0.9;
+    color: var(--color-accent);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  .index-era {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .project-main {
+    min-width: 0;
+  }
+
+  .project-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-title {
+    font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .project-titleEn {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .status-chip {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.32rem 0.7rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 75%, transparent);
+  }
+
+  .status-chip .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+  }
+
+  .status-chip-accent .status-dot {
+    background: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+
+  .status-chip-accent-2 .status-dot {
+    background: var(--color-accent-2);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-2) 22%, transparent);
+  }
+
+  .status-chip-muted .status-dot {
+    background: color-mix(in srgb, var(--text-secondary) 60%, transparent);
+  }
+
+  .status-chip-accent { color: var(--color-accent); }
+  .status-chip-accent-2 { color: var(--color-accent-2); }
+  .status-chip-muted { color: var(--text-secondary); }
+
+  .project-desc {
+    max-width: 42rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.85;
+    text-wrap: pretty;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.4rem;
+  }
+
+  .project-tags span {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .project-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.6rem;
+  }
+
+  .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  }
+
+  .project-links a:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: translateX(2px);
+  }
+
+  .project-links a em {
+    font-style: normal;
+    color: var(--color-accent);
+  }
+
+  .project-private {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+  }
+
+  @media (max-width: 860px) {
+    .project-row {
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+
+    .project-header {
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .project-entry {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .index-num {
+      font-size: 3.4rem;
+    }
+  }
+</style>

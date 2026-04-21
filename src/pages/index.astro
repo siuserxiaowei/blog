@@ -318,7 +318,6 @@ const publishingLanes = [
   .hero-board-head,
   .hero-dispatches-head,
   .entry-footer,
-  .operating-card-foot,
   .entry-head {
     display: flex;
     align-items: center;
@@ -394,7 +393,6 @@ const publishingLanes = [
 
   .hero-board-head span,
   .hero-board-label,
-  .operating-card-head p,
   .entry-eyebrow,
   .entry-tags span,
   .hero-metric span,
@@ -464,7 +462,6 @@ const publishingLanes = [
   }
 
   .hero-board-meta strong,
-  .operating-card-foot strong,
   .hero-metric strong {
     color: var(--text);
     font-size: 0.98rem;
@@ -542,18 +539,12 @@ const publishingLanes = [
     line-height: 1.85;
   }
 
-  .operating-grid,
   .entry-grid,
   .contact-grid {
     display: grid;
     gap: 1rem;
   }
 
-  .operating-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .operating-card,
   .entry-card,
   .contact-card,
   .blog-brief {
@@ -561,53 +552,17 @@ const publishingLanes = [
     padding: 1.25rem;
   }
 
-  .operating-card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.95rem;
-  }
-
-  .operating-card-head span {
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .operating-card h3,
   .entry-card h3,
   .blog-brief h3 {
     font-size: 1.42rem;
     line-height: 1.14;
   }
 
-  .operating-card h3 {
-    margin-bottom: 0.65rem;
-  }
-
-  .operating-card p,
   .entry-copy,
   .blog-brief p,
   .contact-copy {
     color: var(--text-secondary);
     line-height: 1.8;
-  }
-
-  .operating-card-foot {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-  }
-
-  .operating-card-foot span {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .entry-grid,
@@ -748,7 +703,6 @@ const publishingLanes = [
       grid-template-columns: 1fr;
     }
 
-    .operating-grid,
     .entry-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -764,14 +718,12 @@ const publishingLanes = [
     }
 
     .hero-strip,
-    .operating-grid,
     .entry-grid,
     .contact-grid {
       grid-template-columns: 1fr;
     }
 
     .hero-board,
-    .operating-card,
     .entry-card,
     .blog-brief,
     .contact-card {
