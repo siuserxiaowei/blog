@@ -3,66 +3,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const principles = [
-  {
-    index: '01',
-    titleKey: 'aboutpage.p1.title',
-    descKey: 'aboutpage.p1.desc',
-    title: '持续学习',
-    desc: '保持对新知识的渴望，在变化中寻找不变的规律。'
-  },
-  {
-    index: '02',
-    titleKey: 'aboutpage.p2.title',
-    descKey: 'aboutpage.p2.desc',
-    title: '独立思考',
-    desc: '不盲从权威，用第一性原理拆解问题。'
-  },
-  {
-    index: '03',
-    titleKey: 'aboutpage.p3.title',
-    descKey: 'aboutpage.p3.desc',
-    title: '创造价值',
-    desc: '用技术和产品解决真实问题，创造长期价值。'
-  },
-  {
-    index: '04',
-    titleKey: 'aboutpage.p4.title',
-    descKey: 'aboutpage.p4.desc',
-    title: '分享与连接',
-    desc: '在分享中成长，在连接中发现更多可能。'
-  }
-];
-
 const focusAreas = [
-  'AI 与自动化产品',
-  '产品工程与工具化',
-  '学习系统与公开构建',
-  '长期主义下的个人工作台'
+  { tag: '01', label: 'AI 与自动化产品' },
+  { tag: '02', label: '产品工程与工具化' },
+  { tag: '03', label: '学习系统与公开构建' },
+  { tag: '04', label: '长期主义下的个人工作台' }
 ];
 ---
 
-<BaseLayout title="关于 - siuser小伟" description="了解更多关于我的故事">
+<BaseLayout title="关于 · siuser小伟" description="关于 siuser小伟，以及这个网站为什么会长成现在这样。">
   <Header />
 
   <main class="flex-1">
-    <section class="mx-auto px-6 pt-32 pb-18 md:pt-38 md:pb-22" style="max-width: var(--container-max);">
+
+    <!-- Hero -->
+    <section class="mx-auto px-6 pt-32 pb-14 md:pt-40 md:pb-20" style="max-width: var(--container-max);">
       <div class="about-hero">
-        <div class="scroll-reveal">
+        <div class="scroll-reveal about-hero-copy">
           <p class="section-kicker">About</p>
-          <h1>关于我，也关于这个网站为什么会长成现在这样。</h1>
-          <p class="hero-copy">
-            这里不是把信息堆成一页的个人介绍，而是把我关心的问题、正在做的事情和持续形成的判断整理成一个长期运行的工作台。
+          <h1>关于我，<br/>也关于这个网站<br/>为什么长成这样。</h1>
+          <p class="about-lede">
+            这里不是一页信息堆出来的个人介绍。<br/>
+            我把关心的问题、正在做的事情、持续形成的判断，<br/>
+            整理成一个长期运行的工作台。
           </p>
         </div>
 
-        <aside class="scroll-reveal surface-card gradient-border about-panel">
+        <aside class="scroll-reveal surface-card gradient-border about-focus">
           <p class="section-kicker">Current Focus</p>
-          <div class="about-panel-list">
-            {focusAreas.map((item, index) => (
-              <div class="about-panel-row">
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <p>{item}</p>
+          <div class="about-focus-list">
+            {focusAreas.map((item) => (
+              <div class="about-focus-row">
+                <span>{item.tag}</span>
+                <p>{item.label}</p>
               </div>
             ))}
           </div>
@@ -70,73 +43,45 @@ const focusAreas = [
       </div>
     </section>
 
+    <!-- Narrative -->
     <section class="mx-auto px-6 pb-16 md:pb-20" style="max-width: var(--container-max);">
-      <div class="about-story">
-        <article class="scroll-reveal surface-card about-story-card">
-          <p class="section-kicker">Narrative</p>
-          <div class="story-copy">
-            <p>
-              <span data-i18n="aboutpage.intro1">你好，我是 siuser小伟。欢迎来到我的个人空间。</span>
-            </p>
-            <p>
-              <span data-i18n="aboutpage.intro2">这里是我记录思考、分享洞察的地方。我相信技术的力量，也相信持续学习和创造的价值。在这个快速变化的时代，保持好奇心和独立思考尤为重要。</span>
-            </p>
-            <p>
-              <span data-i18n="aboutpage.intro3">我关注的领域包括但不限于：人工智能、产品设计、创业与商业思维。希望通过这个博客，能与志同道合的人建立连接。</span>
-            </p>
-          </div>
-        </article>
-
-        <article class="scroll-reveal surface-card about-side-card">
-          <p class="section-kicker">What This Site Does</p>
-          <div class="about-side-list">
-            <div>
-              <span>01</span>
-              <p>把想法写成文章，而不是留在备忘录里。</p>
-            </div>
-            <div>
-              <span>02</span>
-              <p>把重复的小问题做成工具，而不是每次重新搜索。</p>
-            </div>
-            <div>
-              <span>03</span>
-              <p>把公开构建中的项目和机会整理成可持续更新的系统。</p>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="mx-auto px-6 pb-18 md:pb-22" style="max-width: var(--container-max);">
-      <div class="section-row scroll-reveal">
-        <div class="section-head">
-          <p class="section-kicker">Principles</p>
-          <h2><span data-i18n="aboutpage.principles">信条</span></h2>
-        </div>
-        <p class="section-side-copy">这些不是漂亮话，而是我希望网站结构、写作方式和项目推进方式都能体现出来的准则。</p>
-      </div>
-
-      <div class="principles-grid">
-        {principles.map((item) => (
-          <article class="scroll-reveal surface-card card-hover principle-card">
-            <div class="principle-head">
-              <span>{item.index}</span>
-            </div>
-            <h3 data-i18n={item.titleKey}>{item.title}</h3>
-            <p data-i18n={item.descKey}>{item.desc}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
-      <div class="scroll-reveal surface-card gradient-border contact-card">
-        <div>
-          <p class="section-kicker">Contact</p>
-          <h2><span data-i18n="aboutpage.contact">联系我</span></h2>
-          <p class="contact-copy">
-            <span data-i18n="aboutpage.contact.desc">如果你对我写的内容感兴趣，或者想聊聊合作的可能性，欢迎通过以下方式联系我。</span>
+      <article class="scroll-reveal about-story">
+        <p class="section-kicker">Narrative</p>
+        <div class="story-copy">
+          <p>我是 siuser小伟。独立开发者，AI 语音机器人方案商，也在持续做一些自己用、也能给别人用的小产品。</p>
+          <p>
+            早些年在无锡做制造业咨询，见过工厂一线怎么算账、怎么走政策。后来转到技术方向，发现好产品总是来自「真的有人在用、真的有问题要解决」。
+            现在这个网站就是我把判断、实验和正在做的东西整理出来的地方——先让自己能高效运转，再让来的人能快速进入。
           </p>
+          <p>
+            关注方向是 AI 产品、自动化、内容工具、学习系统这几个交叉地带。写东西的时候优先记录真实进展，做工具的时候优先解决高频动作，推项目的时候优先让它公开可见。
+          </p>
+        </div>
+
+        <div class="story-pillars">
+          <div class="story-pillar">
+            <span>Write</span>
+            <p>把判断写成可被引用的日志，不是自我介绍。</p>
+          </div>
+          <div class="story-pillar">
+            <span>Build</span>
+            <p>重复动作沉淀成浏览器内的工具，少记少搜。</p>
+          </div>
+          <div class="story-pillar">
+            <span>Ship</span>
+            <p>公开推进的项目和比赛雷达，用外部约束逼迭代。</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Contact -->
+    <section class="mx-auto px-6 pb-24" style="max-width: var(--container-max);">
+      <div class="scroll-reveal surface-card gradient-border contact-card">
+        <div class="contact-lead">
+          <p class="section-kicker">Contact</p>
+          <h2>如果你在做类似方向，<br/>欢迎直接找我。</h2>
+          <p class="contact-copy">AI、自动化、内容产品、学习工具这些方向都可以聊。希望结识一起做东西的人，而不是交换名片。</p>
         </div>
 
         <div class="contact-links">
@@ -161,126 +106,164 @@ const focusAreas = [
 </BaseLayout>
 
 <style>
-  .about-hero,
-  .about-story {
+  .about-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.04fr) minmax(300px, 0.96fr);
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+    gap: 1.5rem;
     align-items: start;
   }
 
-  .about-hero h1,
-  .section-head h2,
-  .contact-card h2 {
-    margin-top: 0.35rem;
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 1.02;
-  }
-
-  .hero-copy,
-  .story-copy,
-  .section-side-copy,
-  .contact-copy {
-    color: var(--text-secondary);
-    line-height: 1.85;
-  }
-
-  .hero-copy {
-    max-width: 42rem;
+  .about-hero h1 {
     margin-top: 1rem;
-    font-size: 1rem;
+    font-size: clamp(2.4rem, 5.4vw, 4.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
   }
 
-  .about-panel,
-  .about-story-card,
-  .about-side-card,
-  .principle-card,
-  .contact-card {
+  .about-lede {
+    max-width: 44rem;
+    margin-top: 1.5rem;
+    color: var(--text-secondary);
+    font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+    line-height: 1.8;
+  }
+
+  .about-focus {
+    padding: 1.35rem;
     border-radius: 28px;
-    padding: 1.25rem;
-  }
-
-  .about-panel-list,
-  .about-side-list,
-  .story-copy,
-  .contact-links {
     display: grid;
-    gap: 0.8rem;
+    gap: 1rem;
   }
 
-  .about-panel-row,
-  .about-side-list > div,
-  .contact-links a,
-  .principle-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.8rem;
+  .about-focus-list {
+    display: grid;
+    gap: 0.25rem;
   }
 
-  .about-panel-row,
-  .about-side-list > div {
-    padding-top: 0.85rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  .about-focus-row {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: baseline;
+    padding: 0.8rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
   }
 
-  .about-panel-row:first-child,
-  .about-side-list > div:first-child {
-    padding-top: 0;
+  .about-focus-row:first-child {
     border-top: none;
+    padding-top: 0.25rem;
   }
 
-  .about-panel-row span,
-  .about-side-list span,
-  .principle-head span {
+  .about-focus-row span {
     color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+
+  .about-focus-row p {
+    color: var(--text);
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .about-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .story-copy {
+    display: grid;
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .story-copy p {
+    color: var(--text);
+    font-size: 1.02rem;
+    line-height: 1.95;
+    text-wrap: pretty;
+  }
+
+  .story-copy p:first-child {
+    color: var(--text);
+    font-size: 1.22rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+  }
+
+  .story-pillars {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 2.3rem;
+  }
+
+  .story-pillar {
+    padding-left: 1rem;
+    border-left: 1px solid color-mix(in srgb, var(--color-accent) 28%, var(--border));
+  }
+
+  .story-pillar span {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    white-space: nowrap;
   }
 
-  .about-panel-row p,
-  .about-side-list p,
-  .principle-card p {
+  .story-pillar p {
     color: var(--text-secondary);
-    line-height: 1.75;
-  }
-
-  .section-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
-    gap: 1rem;
-    align-items: end;
-    margin-bottom: 1.2rem;
-  }
-
-  .principles-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .principle-card h3 {
-    margin-top: 0.7rem;
-    margin-bottom: 0.5rem;
-    font-size: 1.35rem;
-    line-height: 1.12;
+    font-size: 0.95rem;
+    line-height: 1.6;
   }
 
   .contact-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(320px, 0.7fr);
-    gap: 1rem;
+    gap: 2rem;
+    padding: 2rem 1.5rem;
+    border-radius: 28px;
+  }
+
+  .contact-lead h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+  }
+
+  .contact-copy {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  .contact-links {
+    display: grid;
+    gap: 0.65rem;
+    align-content: start;
   }
 
   .contact-links a {
+    display: flex;
     align-items: center;
-    padding: 0.95rem 1rem;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
     border-radius: 18px;
     border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 84%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .contact-links a:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--color-accent) 38%, var(--border));
   }
 
   .contact-links span {
@@ -297,31 +280,23 @@ const focusAreas = [
     text-transform: uppercase;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 980px) {
     .about-hero,
     .about-story,
-    .section-row,
     .contact-card {
       grid-template-columns: 1fr;
     }
 
-    .principles-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 720px) {
-    .principles-grid {
-      grid-template-columns: 1fr;
+    .about-hero h1 br {
+      display: none;
     }
 
-    .about-panel,
-    .about-story-card,
-    .about-side-card,
-    .principle-card,
-    .contact-card {
-      border-radius: 24px;
-      padding: 1rem;
+    .about-lede br {
+      display: none;
+    }
+
+    .contact-lead h2 br {
+      display: none;
     }
   }
 </style>
@@ -329,7 +304,6 @@ const focusAreas = [
 <script is:inline>
   (() => {
     const revealElements = document.querySelectorAll('.scroll-reveal');
-
     if (!revealElements.length) return;
 
     const observer = new IntersectionObserver((entries) => {

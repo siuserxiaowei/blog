@@ -9,81 +9,80 @@ interface Tool {
   nameEn: string;
   desc: string;
   cat: string;
-  icon: string;
   status: 'live' | 'soon';
   href?: string;
 }
 
 const tools: Tool[] = [
-  { id: 'json-formatter', name: 'JSON 格式化', nameEn: 'JSON Formatter', desc: '美化、压缩、校验 JSON,精确错误定位', cat: '数据格式', icon: '📦', status: 'live' },
-  { id: 'json-yaml', name: 'JSON ↔ YAML', nameEn: 'JSON YAML', desc: 'JSON 与 YAML 双向转换', cat: '数据格式', icon: '🔁', status: 'live' },
-  { id: 'json-csv', name: 'JSON ↔ CSV', nameEn: 'JSON CSV', desc: 'JSON 数组与 CSV 互转,自动识别表头', cat: '数据格式', icon: '📊', status: 'live' },
-  { id: 'json-diff', name: 'JSON 差异对比', nameEn: 'JSON Diff', desc: '对比两个 JSON 找出新增/删除/修改字段', cat: '数据格式', icon: '🔀', status: 'live' },
-  { id: 'xml-formatter', name: 'XML 格式化', nameEn: 'XML Formatter', desc: '美化、压缩、校验 XML', cat: '数据格式', icon: '📄', status: 'live' },
-  { id: 'sql-formatter', name: 'SQL 格式化', nameEn: 'SQL Formatter', desc: '美化 SQL 语句,支持多种方言', cat: '数据格式', icon: '🗃️', status: 'live' },
+  { id: 'json-formatter', name: 'JSON 格式化', nameEn: 'JSON Formatter', desc: '美化、压缩、校验 JSON,精确错误定位', cat: '数据格式', status: 'live' },
+  { id: 'json-yaml', name: 'JSON ↔ YAML', nameEn: 'JSON YAML', desc: 'JSON 与 YAML 双向转换', cat: '数据格式', status: 'live' },
+  { id: 'json-csv', name: 'JSON ↔ CSV', nameEn: 'JSON CSV', desc: 'JSON 数组与 CSV 互转,自动识别表头', cat: '数据格式', status: 'live' },
+  { id: 'json-diff', name: 'JSON 差异对比', nameEn: 'JSON Diff', desc: '对比两个 JSON 找出新增/删除/修改字段', cat: '数据格式', status: 'live' },
+  { id: 'xml-formatter', name: 'XML 格式化', nameEn: 'XML Formatter', desc: '美化、压缩、校验 XML', cat: '数据格式', status: 'live' },
+  { id: 'sql-formatter', name: 'SQL 格式化', nameEn: 'SQL Formatter', desc: '美化 SQL 语句,支持多种方言', cat: '数据格式', status: 'live' },
 
-  { id: 'base64', name: 'Base64 编解码', nameEn: 'Base64 Encoder', desc: '字符串/文件 Base64 编码与解码', cat: '编码转换', icon: '🔤', status: 'live' },
-  { id: 'url-encode', name: 'URL 编解码', nameEn: 'URL Encoder', desc: 'URL 编码、百分比编码与还原', cat: '编码转换', icon: '🔗', status: 'live' },
-  { id: 'html-entities', name: 'HTML 实体转义', nameEn: 'HTML Entities', desc: 'HTML 特殊字符与实体编码互转', cat: '编码转换', icon: '🏷️', status: 'live' },
-  { id: 'unicode', name: 'Unicode 转换', nameEn: 'Unicode Converter', desc: '文本与 Unicode 转义字符互转', cat: '编码转换', icon: 'Ω', status: 'live' },
-  { id: 'binary-text', name: '文本 ↔ 二进制', nameEn: 'Text Binary', desc: '文本与 ASCII 二进制 / 十六进制互转', cat: '编码转换', icon: '01', status: 'live' },
-  { id: 'image-base64', name: '图片 ↔ Base64', nameEn: 'Image Base64', desc: '图片转 Data URI,可直接嵌入 HTML/CSS', cat: '编码转换', icon: '🖼️', status: 'live' },
-  { id: 'encoding-toolkit', name: '编码工具包', nameEn: 'Encoding Toolkit', desc: 'Base32 / Base58 / Hex / 摩尔斯 / ROT13', cat: '编码转换', icon: '🔣', status: 'live' },
+  { id: 'base64', name: 'Base64 编解码', nameEn: 'Base64 Encoder', desc: '字符串/文件 Base64 编码与解码', cat: '编码转换', status: 'live' },
+  { id: 'url-encode', name: 'URL 编解码', nameEn: 'URL Encoder', desc: 'URL 编码、百分比编码与还原', cat: '编码转换', status: 'live' },
+  { id: 'html-entities', name: 'HTML 实体转义', nameEn: 'HTML Entities', desc: 'HTML 特殊字符与实体编码互转', cat: '编码转换', status: 'live' },
+  { id: 'unicode', name: 'Unicode 转换', nameEn: 'Unicode Converter', desc: '文本与 Unicode 转义字符互转', cat: '编码转换', status: 'live' },
+  { id: 'binary-text', name: '文本 ↔ 二进制', nameEn: 'Text Binary', desc: '文本与 ASCII 二进制 / 十六进制互转', cat: '编码转换', status: 'live' },
+  { id: 'image-base64', name: '图片 ↔ Base64', nameEn: 'Image Base64', desc: '图片转 Data URI,可直接嵌入 HTML/CSS', cat: '编码转换', status: 'live' },
+  { id: 'encoding-toolkit', name: '编码工具包', nameEn: 'Encoding Toolkit', desc: 'Base32 / Base58 / Hex / 摩尔斯 / ROT13', cat: '编码转换', status: 'live' },
 
-  { id: 'hash', name: '哈希计算', nameEn: 'Hash', desc: 'MD5 / SHA-1 / SHA-256 / SHA-512 文本与文件', cat: '加密哈希', icon: '#', status: 'live' },
-  { id: 'hmac', name: 'HMAC 签名', nameEn: 'HMAC', desc: '基于密钥的哈希消息认证码', cat: '加密哈希', icon: '🔐', status: 'live' },
-  { id: 'jwt', name: 'JWT 解析', nameEn: 'JWT Parser', desc: '解析 JSON Web Token 头部与载荷', cat: '加密哈希', icon: '🎫', status: 'live' },
-  { id: 'aes', name: 'AES 加解密', nameEn: 'AES', desc: 'AES-GCM 256 对称加密,密码派生密钥', cat: '加密哈希', icon: '🛡️', status: 'live' },
-  { id: 'otp', name: 'TOTP 验证器', nameEn: 'TOTP', desc: 'RFC 6238 实时 6 位验证码', cat: '加密哈希', icon: '🔢', status: 'live' },
-  { id: 'basic-auth', name: 'Basic Auth 生成', nameEn: 'Basic Auth', desc: '生成 HTTP Basic 认证头', cat: '加密哈希', icon: '🔑', status: 'live' },
+  { id: 'hash', name: '哈希计算', nameEn: 'Hash', desc: 'MD5 / SHA-1 / SHA-256 / SHA-512 文本与文件', cat: '加密哈希', status: 'live' },
+  { id: 'hmac', name: 'HMAC 签名', nameEn: 'HMAC', desc: '基于密钥的哈希消息认证码', cat: '加密哈希', status: 'live' },
+  { id: 'jwt', name: 'JWT 解析', nameEn: 'JWT Parser', desc: '解析 JSON Web Token 头部与载荷', cat: '加密哈希', status: 'live' },
+  { id: 'aes', name: 'AES 加解密', nameEn: 'AES', desc: 'AES-GCM 256 对称加密,密码派生密钥', cat: '加密哈希', status: 'live' },
+  { id: 'otp', name: 'TOTP 验证器', nameEn: 'TOTP', desc: 'RFC 6238 实时 6 位验证码', cat: '加密哈希', status: 'live' },
+  { id: 'basic-auth', name: 'Basic Auth 生成', nameEn: 'Basic Auth', desc: '生成 HTTP Basic 认证头', cat: '加密哈希', status: 'live' },
 
-  { id: 'uuid', name: 'UUID 生成器', nameEn: 'UUID Generator', desc: '批量生成 UUID v4 / v7 / 短 ID', cat: '生成器', icon: '🆔', status: 'live' },
-  { id: 'ulid', name: 'ULID 生成', nameEn: 'ULID', desc: '字典序可排序的唯一标识符', cat: '生成器', icon: '🎲', status: 'live' },
-  { id: 'password', name: '密码生成器', nameEn: 'Password Generator', desc: '生成强密码,可控字符集与长度', cat: '生成器', icon: '🔑', status: 'live' },
-  { id: 'token', name: 'Token 生成器', nameEn: 'Token Generator', desc: '生成 API token / 随机字符串', cat: '生成器', icon: '🪙', status: 'live' },
-  { id: 'lorem', name: 'Lorem Ipsum', nameEn: 'Lorem Ipsum', desc: '生成中英文占位文本', cat: '生成器', icon: '📝', status: 'live' },
-  { id: 'qrcode', name: '二维码生成', nameEn: 'QR Code', desc: '文本 / 链接 / WiFi / vCard 二维码', cat: '生成器', icon: '⬛', status: 'live' },
+  { id: 'uuid', name: 'UUID 生成器', nameEn: 'UUID Generator', desc: '批量生成 UUID v4 / v7 / 短 ID', cat: '生成器', status: 'live' },
+  { id: 'ulid', name: 'ULID 生成', nameEn: 'ULID', desc: '字典序可排序的唯一标识符', cat: '生成器', status: 'live' },
+  { id: 'password', name: '密码生成器', nameEn: 'Password Generator', desc: '生成强密码,可控字符集与长度', cat: '生成器', status: 'live' },
+  { id: 'token', name: 'Token 生成器', nameEn: 'Token Generator', desc: '生成 API token / 随机字符串', cat: '生成器', status: 'live' },
+  { id: 'lorem', name: 'Lorem Ipsum', nameEn: 'Lorem Ipsum', desc: '生成中英文占位文本', cat: '生成器', status: 'live' },
+  { id: 'qrcode', name: '二维码生成', nameEn: 'QR Code', desc: '文本 / 链接 / WiFi / vCard 二维码', cat: '生成器', status: 'live' },
 
-  { id: 'timestamp', name: '时间戳转换', nameEn: 'Timestamp', desc: 'Unix 时间戳与日期互转,实时显示', cat: '时间日期', icon: '⏱️', status: 'live' },
-  { id: 'cron', name: 'Cron 表达式', nameEn: 'Cron Parser', desc: '解析 Cron 并预测未来 10 次执行', cat: '时间日期', icon: '⏰', status: 'live' },
-  { id: 'date-diff', name: '日期计算器', nameEn: 'Date Diff', desc: '两日期相差、日期加减、年龄计算', cat: '时间日期', icon: '📅', status: 'live' },
+  { id: 'timestamp', name: '时间戳转换', nameEn: 'Timestamp', desc: 'Unix 时间戳与日期互转,实时显示', cat: '时间日期', status: 'live' },
+  { id: 'cron', name: 'Cron 表达式', nameEn: 'Cron Parser', desc: '解析 Cron 并预测未来 10 次执行', cat: '时间日期', status: 'live' },
+  { id: 'date-diff', name: '日期计算器', nameEn: 'Date Diff', desc: '两日期相差、日期加减、年龄计算', cat: '时间日期', status: 'live' },
 
-  { id: 'markdown-html', name: 'Markdown ↔ HTML', nameEn: 'Markdown HTML', desc: 'Markdown 与 HTML 双向转换,支持 GFM', cat: '文本处理', icon: 'M↓', status: 'live' },
-  { id: 'text-diff', name: '文本对比', nameEn: 'Text Diff', desc: '两段文本逐行高亮差异', cat: '文本处理', icon: '⇄', status: 'live' },
-  { id: 'case-converter', name: '大小写转换', nameEn: 'Case Converter', desc: 'camel / snake / kebab / Pascal 等', cat: '文本处理', icon: 'Aa', status: 'live' },
-  { id: 'text-stats', name: '文本统计', nameEn: 'Text Stats', desc: '字数/字符/行数/段落/中英文/阅读时长', cat: '文本处理', icon: '📈', status: 'live' },
-  { id: 'regex', name: '正则测试', nameEn: 'Regex Tester', desc: '正则匹配高亮、捕获组、替换', cat: '文本处理', icon: '/.*/', status: 'live' },
-  { id: 'slug', name: 'Slug 生成', nameEn: 'Slugify', desc: '生成 URL 友好的 slug', cat: '文本处理', icon: '🔧', status: 'live' },
-  { id: 'line-tools', name: '行处理', nameEn: 'Line Tools', desc: '排序 / 去重 / 反转 / 加前后缀', cat: '文本处理', icon: '≡', status: 'live' },
-  { id: 'html-stripper', name: 'HTML 去标签', nameEn: 'HTML Stripper', desc: '提取纯文本,可仅去属性/注释/script', cat: '文本处理', icon: '🧹', status: 'live' },
-  { id: 'ascii-art', name: 'ASCII 艺术字', nameEn: 'ASCII Art', desc: '文本转大字体 ASCII 艺术', cat: '文本处理', icon: '█A', status: 'live' },
+  { id: 'markdown-html', name: 'Markdown ↔ HTML', nameEn: 'Markdown HTML', desc: 'Markdown 与 HTML 双向转换,支持 GFM', cat: '文本处理', status: 'live' },
+  { id: 'text-diff', name: '文本对比', nameEn: 'Text Diff', desc: '两段文本逐行高亮差异', cat: '文本处理', status: 'live' },
+  { id: 'case-converter', name: '大小写转换', nameEn: 'Case Converter', desc: 'camel / snake / kebab / Pascal 等', cat: '文本处理', status: 'live' },
+  { id: 'text-stats', name: '文本统计', nameEn: 'Text Stats', desc: '字数/字符/行数/段落/中英文/阅读时长', cat: '文本处理', status: 'live' },
+  { id: 'regex', name: '正则测试', nameEn: 'Regex Tester', desc: '正则匹配高亮、捕获组、替换', cat: '文本处理', status: 'live' },
+  { id: 'slug', name: 'Slug 生成', nameEn: 'Slugify', desc: '生成 URL 友好的 slug', cat: '文本处理', status: 'live' },
+  { id: 'line-tools', name: '行处理', nameEn: 'Line Tools', desc: '排序 / 去重 / 反转 / 加前后缀', cat: '文本处理', status: 'live' },
+  { id: 'html-stripper', name: 'HTML 去标签', nameEn: 'HTML Stripper', desc: '提取纯文本,可仅去属性/注释/script', cat: '文本处理', status: 'live' },
+  { id: 'ascii-art', name: 'ASCII 艺术字', nameEn: 'ASCII Art', desc: '文本转大字体 ASCII 艺术', cat: '文本处理', status: 'live' },
 
-  { id: 'url-parser', name: 'URL 解析', nameEn: 'URL Parser', desc: '解析 URL 各组成部分与查询参数', cat: '网络工具', icon: '🌐', status: 'live' },
-  { id: 'http-status', name: 'HTTP 状态码', nameEn: 'HTTP Status', desc: 'HTTP 状态码完整速查表', cat: '网络工具', icon: '🚦', status: 'live' },
-  { id: 'mime-types', name: 'MIME 类型查询', nameEn: 'MIME Types', desc: '文件扩展名与 MIME 类型互查', cat: '网络工具', icon: '📎', status: 'live' },
-  { id: 'user-agent', name: 'UA 解析', nameEn: 'User Agent', desc: '识别浏览器、操作系统、设备', cat: '网络工具', icon: '💻', status: 'live' },
-  { id: 'ipv4-subnet', name: 'IPv4 子网', nameEn: 'IPv4 Subnet', desc: 'CIDR 解析、网络号、广播、范围', cat: '网络工具', icon: '🌍', status: 'live' },
-  { id: 'curl-to-fetch', name: 'curl → 代码', nameEn: 'curl to code', desc: '把 curl 命令转成 fetch / axios 代码', cat: '网络工具', icon: '↻', status: 'live' },
-  { id: 'og-generator', name: 'Open Graph', nameEn: 'OG Meta', desc: '生成 OG + Twitter Card 元标签,实时预览', cat: '网络工具', icon: '📱', status: 'live' },
+  { id: 'url-parser', name: 'URL 解析', nameEn: 'URL Parser', desc: '解析 URL 各组成部分与查询参数', cat: '网络工具', status: 'live' },
+  { id: 'http-status', name: 'HTTP 状态码', nameEn: 'HTTP Status', desc: 'HTTP 状态码完整速查表', cat: '网络工具', status: 'live' },
+  { id: 'mime-types', name: 'MIME 类型查询', nameEn: 'MIME Types', desc: '文件扩展名与 MIME 类型互查', cat: '网络工具', status: 'live' },
+  { id: 'user-agent', name: 'UA 解析', nameEn: 'User Agent', desc: '识别浏览器、操作系统、设备', cat: '网络工具', status: 'live' },
+  { id: 'ipv4-subnet', name: 'IPv4 子网', nameEn: 'IPv4 Subnet', desc: 'CIDR 解析、网络号、广播、范围', cat: '网络工具', status: 'live' },
+  { id: 'curl-to-fetch', name: 'curl → 代码', nameEn: 'curl to code', desc: '把 curl 命令转成 fetch / axios 代码', cat: '网络工具', status: 'live' },
+  { id: 'og-generator', name: 'Open Graph', nameEn: 'OG Meta', desc: '生成 OG + Twitter Card 元标签,实时预览', cat: '网络工具', status: 'live' },
 
-  { id: 'color', name: '颜色转换', nameEn: 'Color Converter', desc: 'HEX/RGB/HSL/HSV/CMYK 互转,EyeDropper 取色', cat: '颜色图像', icon: '🎨', status: 'live' },
-  { id: 'gradient', name: '渐变生成', nameEn: 'Gradient Maker', desc: '可视化生成 CSS linear/radial/conic 渐变', cat: '颜色图像', icon: '🌈', status: 'live' },
-  { id: 'svg-placeholder', name: 'SVG 占位图', nameEn: 'SVG Placeholder', desc: '自定义尺寸/颜色/文字的 SVG 占位图', cat: '颜色图像', icon: '🟦', status: 'live' },
-  { id: 'image-resize', name: '图片压缩', nameEn: 'Image Resize', desc: '本地压缩,WebP/JPG/PNG 输出', cat: '颜色图像', icon: '🗜️', status: 'live' },
-  { id: 'favicon', name: 'Favicon 生成', nameEn: 'Favicon', desc: '一键生成多尺寸 PNG favicon + HTML', cat: '颜色图像', icon: '⭐', status: 'live' },
+  { id: 'color', name: '颜色转换', nameEn: 'Color Converter', desc: 'HEX/RGB/HSL/HSV/CMYK 互转,EyeDropper 取色', cat: '颜色图像', status: 'live' },
+  { id: 'gradient', name: '渐变生成', nameEn: 'Gradient Maker', desc: '可视化生成 CSS linear/radial/conic 渐变', cat: '颜色图像', status: 'live' },
+  { id: 'svg-placeholder', name: 'SVG 占位图', nameEn: 'SVG Placeholder', desc: '自定义尺寸/颜色/文字的 SVG 占位图', cat: '颜色图像', status: 'live' },
+  { id: 'image-resize', name: '图片压缩', nameEn: 'Image Resize', desc: '本地压缩,WebP/JPG/PNG 输出', cat: '颜色图像', status: 'live' },
+  { id: 'favicon', name: 'Favicon 生成', nameEn: 'Favicon', desc: '一键生成多尺寸 PNG favicon + HTML', cat: '颜色图像', status: 'live' },
 
-  { id: 'mermaid', name: 'Mermaid 预览', nameEn: 'Mermaid', desc: '实时渲染流程图/时序图/饼图/甘特图', cat: '开发辅助', icon: '📐', status: 'live' },
-  { id: 'chmod', name: 'Chmod 计算', nameEn: 'Chmod Calc', desc: 'Linux 文件权限可视化计算', cat: '开发辅助', icon: '🔓', status: 'live' },
-  { id: 'rem-px', name: 'REM ↔ PX', nameEn: 'REM PX', desc: '前端字号单位换算 + 对照表', cat: '开发辅助', icon: '📏', status: 'live' },
-  { id: 'keycode', name: 'Keycode 速查', nameEn: 'Keycode', desc: '按键代码、修饰符、Unicode', cat: '开发辅助', icon: '⌨️', status: 'live' },
-  { id: 'number-base', name: '进制转换', nameEn: 'Base Convert', desc: '二进制/八进制/十进制/十六进制互转', cat: '开发辅助', icon: '🔢', status: 'live' },
-  { id: 'css-formatter', name: 'CSS 格式化', nameEn: 'CSS Formatter', desc: '美化与压缩 CSS', cat: '开发辅助', icon: '🎀', status: 'live' },
-  { id: 'js-formatter', name: 'JS / HTML 格式化', nameEn: 'JS HTML Formatter', desc: 'Prettier 格式化 JS / TS / HTML', cat: '开发辅助', icon: '✨', status: 'live' },
-  { id: 'math-eval', name: '数学计算器', nameEn: 'Math Eval', desc: '支持 sin/cos/log/sqrt 等函数与历史', cat: '开发辅助', icon: '🧮', status: 'live' },
-  { id: 'temp-percent', name: '温度 / 百分比', nameEn: 'Temp & Percent', desc: '°C/°F/K 互转 + 百分比计算', cat: '开发辅助', icon: '🌡️', status: 'live' },
-  { id: 'roman', name: '罗马数字', nameEn: 'Roman Numeral', desc: '阿拉伯数字 ↔ 罗马数字', cat: '开发辅助', icon: 'Ⅻ', status: 'live' },
-  { id: 'wx2x', name: '公众号 → X', nameEn: 'WeChat to X', desc: '微信公众号文章转 X (Twitter) Articles', cat: '开发辅助', icon: '𝕏', status: 'live', href: '/tools/wx2x' },
-  { id: 'english-learning', name: '英语学习导航', nameEn: 'English Learning', desc: '语雀英语学习清单整理版，支持搜索和分类浏览', cat: '学习资源', icon: '🆎', status: 'live' },
+  { id: 'mermaid', name: 'Mermaid 预览', nameEn: 'Mermaid', desc: '实时渲染流程图/时序图/饼图/甘特图', cat: '开发辅助', status: 'live' },
+  { id: 'chmod', name: 'Chmod 计算', nameEn: 'Chmod Calc', desc: 'Linux 文件权限可视化计算', cat: '开发辅助', status: 'live' },
+  { id: 'rem-px', name: 'REM ↔ PX', nameEn: 'REM PX', desc: '前端字号单位换算 + 对照表', cat: '开发辅助', status: 'live' },
+  { id: 'keycode', name: 'Keycode 速查', nameEn: 'Keycode', desc: '按键代码、修饰符、Unicode', cat: '开发辅助', status: 'live' },
+  { id: 'number-base', name: '进制转换', nameEn: 'Base Convert', desc: '二进制/八进制/十进制/十六进制互转', cat: '开发辅助', status: 'live' },
+  { id: 'css-formatter', name: 'CSS 格式化', nameEn: 'CSS Formatter', desc: '美化与压缩 CSS', cat: '开发辅助', status: 'live' },
+  { id: 'js-formatter', name: 'JS / HTML 格式化', nameEn: 'JS HTML Formatter', desc: 'Prettier 格式化 JS / TS / HTML', cat: '开发辅助', status: 'live' },
+  { id: 'math-eval', name: '数学计算器', nameEn: 'Math Eval', desc: '支持 sin/cos/log/sqrt 等函数与历史', cat: '开发辅助', status: 'live' },
+  { id: 'temp-percent', name: '温度 / 百分比', nameEn: 'Temp & Percent', desc: '°C/°F/K 互转 + 百分比计算', cat: '开发辅助', status: 'live' },
+  { id: 'roman', name: '罗马数字', nameEn: 'Roman Numeral', desc: '阿拉伯数字 ↔ 罗马数字', cat: '开发辅助', status: 'live' },
+  { id: 'wx2x', name: '公众号 → X', nameEn: 'WeChat to X', desc: '微信公众号文章转 X (Twitter) Articles', cat: '开发辅助', status: 'live', href: '/tools/wx2x' },
+  { id: 'english-learning', name: '英语学习导航', nameEn: 'English Learning', desc: '语雀英语学习清单整理版，支持搜索和分类浏览', cat: '学习资源', status: 'live' },
 ];
 
 const toolById = new Map(tools.map((tool) => [tool.id, tool]));
@@ -177,7 +176,7 @@ const getToolMark = (tool: Tool) => {
 
           <div class="tools-hero-stats">
             <div>
-              <span class="k">Live</span>
+              <span class="k">Live tools</span>
               <strong>{liveCount}</strong>
             </div>
             <div>
@@ -185,23 +184,12 @@ const getToolMark = (tool: Tool) => {
               <strong>{categories.length}</strong>
             </div>
             <div>
-              <span class="k">Mode</span>
-              <strong>Browser only</strong>
+              <span class="k">Runtime</span>
+              <strong>浏览器本地</strong>
             </div>
-          </div>
-
-          <div class="tools-trust-row">
-            <div class="metric-tile tools-trust-card">
-              <span>运行方式</span>
-              <strong>本地浏览器内完成</strong>
-            </div>
-            <div class="metric-tile tools-trust-card">
-              <span>设计原则</span>
-              <strong>快开、少跳转、少记忆</strong>
-            </div>
-            <div class="metric-tile tools-trust-card">
-              <span>适用场景</span>
-              <strong>开发、内容、学习、调试</strong>
+            <div>
+              <span class="k">Upload</span>
+              <strong>Zero</strong>
             </div>
           </div>
         </div>
@@ -217,20 +205,6 @@ const getToolMark = (tool: Tool) => {
             {categories.map((cat) => (
               <button class="tools-chip" data-cat-filter={cat} type="button">{cat}</button>
             ))}
-          </div>
-          <div class="tools-search-notes">
-            <div>
-              <span>01</span>
-              <p>先按关键词搜，再按分类收窄。</p>
-            </div>
-            <div>
-              <span>02</span>
-              <p>带有学习属性的资源也会收进来，而不只限于开发工具。</p>
-            </div>
-            <div>
-              <span>03</span>
-              <p>所有 live 工具都优先保证浏览器内可直接使用。</p>
-            </div>
           </div>
         </div>
       </section>
@@ -417,9 +391,9 @@ const getToolMark = (tool: Tool) => {
 
   .tools-hero-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.8rem;
-    margin-top: 1.45rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.6rem;
   }
 
   .tools-hero-stats > div,
@@ -514,59 +488,6 @@ const getToolMark = (tool: Tool) => {
     color: #111;
     border-color: transparent;
     background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 74%, white 26%));
-  }
-
-  .tools-search-notes {
-    display: grid;
-    gap: 0.65rem;
-    padding-top: 0.25rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
-  }
-
-  .tools-search-notes > div {
-    display: grid;
-    grid-template-columns: 2.1rem minmax(0, 1fr);
-    gap: 0.7rem;
-    align-items: start;
-  }
-
-  .tools-search-notes span {
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .tools-search-notes p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-  }
-
-  .tools-trust-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.8rem;
-    margin-top: 1rem;
-  }
-
-  .tools-trust-card {
-    padding: 0.95rem 1rem;
-  }
-
-  .tools-trust-card span {
-    display: block;
-    margin-bottom: 0.35rem;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .tools-trust-card strong {
-    color: var(--text);
-    font-size: 0.98rem;
   }
 
   .collections-section,
@@ -835,8 +756,14 @@ const getToolMark = (tool: Tool) => {
     .collection-grid,
     .featured-grid,
     .tool-grid,
-    .tools-hero-stats,
-    .tools-trust-row {
+    .tools-hero-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tools-hero,
+    .collection-grid,
+    .featured-grid,
+    .tool-grid {
       grid-template-columns: 1fr;
     }
 

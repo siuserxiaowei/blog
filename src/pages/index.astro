@@ -174,43 +174,17 @@ const publishingLanes = [
 
     <section
       id="about"
-      class="mx-auto px-6 py-20 md:py-22"
+      class="mx-auto px-6 py-16 md:py-20"
       style="max-width: var(--container-max); scroll-margin-top: 7rem;"
     >
-      <div class="section-row scroll-reveal">
-        <div class="section-head">
-          <p class="section-kicker">Operating System</p>
-          <h2>这个网站围绕三件事组织，而不是围绕“自我介绍”。</h2>
-        </div>
-        <p class="section-side-copy">
-          视觉和结构都只服务一个目标: 让人快速明白我在做什么、最近在推进什么、以及下一步该从哪里进入。
-        </p>
-      </div>
-
-      <div class="operating-grid">
-        {operatingSystem.map((item) => (
-          <article class="scroll-reveal surface-card card-hover operating-card">
-            <div class="operating-card-head">
-              <span>{item.index}</span>
-              <p>{item.label}</p>
-            </div>
-            <h3>{item.title}</h3>
-            <p>{item.desc}</p>
-            <div class="operating-card-foot">
-              <span>{item.note}</span>
-              <strong>{item.proof}</strong>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="mx-auto px-6 py-8 md:py-10" style="max-width: var(--container-max);">
       <div class="section-row scroll-reveal">
         <div class="section-head">
           <p class="section-kicker">Entry Points</p>
           <h2>先从最有用的三个入口开始。</h2>
         </div>
+        <p class="section-side-copy">
+          视觉和结构只服务一个目标：让人快速明白我在做什么、最近在推进什么、下一步从哪里进入。
+        </p>
       </div>
 
       <div class="entry-grid">
