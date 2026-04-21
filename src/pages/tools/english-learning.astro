@@ -1,0 +1,569 @@
+---
+import ToolLayout from '../../components/ToolLayout.astro';
+
+type LinkItem = {
+  title: string;
+  url: string;
+  desc?: string;
+};
+
+type Section = {
+  id: string;
+  name: string;
+  icon: string;
+  items: LinkItem[];
+};
+
+const sourceUrl = 'https://www.yuque.com/eureka9527/0007/lzc2cvvh0704g8or';
+
+const sections: Section[] = [
+  {
+    id: 'dictionary',
+    name: '英语词典',
+    icon: '📚',
+    items: [
+      { title: '柯林斯英语词典', url: 'https://www.collinsdictionary.com/', desc: '英英词典与用法例句' },
+      { title: 'OneLook 同义词', url: 'https://www.onelook.com/', desc: '词义联想与近义词搜索' },
+      { title: 'Thesaurus', url: 'https://www.thesaurus.com/', desc: '同义词与反义词' },
+      { title: '剑桥词典', url: 'https://dictionary.cambridge.org/', desc: '英英/英汉释义与发音' },
+      { title: '韦氏词典', url: 'https://www.merriam-webster.com/', desc: '权威英英词典' },
+      { title: '朗文词典', url: 'https://www.ldoceonline.com/', desc: '学习型词典' },
+      { title: '维基词典', url: 'https://en.wiktionary.org/wiki/Wiktionary:Main_Page', desc: '词源与词形变化' },
+      { title: 'Free Dictionary', url: 'https://www.thefreedictionary.com/', desc: '词典与短语用法' },
+      { title: 'Power Thesaurus', url: 'https://www.powerthesaurus.org/', desc: '语义相关词扩展' },
+      { title: 'Rhymer', url: 'https://rhymer.com/', desc: '英语押韵查询' },
+      { title: 'Etymonline', url: 'https://www.etymonline.com/', desc: '在线词源字典' },
+    ],
+  },
+  {
+    id: 'lookup',
+    name: '单词查询',
+    icon: '🔎',
+    items: [
+      { title: '趣词词源词典', url: 'https://www.quword.com/ciyuan/s/', desc: '查词源与构词法' },
+      { title: 'Text Mechanic 词频统计', url: 'https://textmechanic.com/text-tools/basic-text-tools/count-characters-words-lines/', desc: '字符/单词/句子/行数统计' },
+      { title: 'OneLook Thesaurus', url: 'https://www.onelook.com/thesaurus/', desc: '描述反查单词' },
+      { title: '海词词典', url: 'https://dict.cn/', desc: '在线词典与翻译' },
+      { title: 'Vocabulary.com', url: 'https://www.vocabulary.com/', desc: '深挖单词多种用法' },
+      { title: 'Ducky', url: 'https://ducky.pages.dev/', desc: '背单词与雅思词汇' },
+      { title: 'Memword', url: 'https://danci.0231019.top/', desc: '记单词工具' },
+      { title: 'Urban Dictionary', url: 'https://www.urbandictionary.com/', desc: '网络梗词与俚语' },
+      { title: '中国核心语汇', url: 'https://www.cnkeywords.net/index', desc: '多语言百科词汇库' },
+      { title: '103976 英语单词库', url: 'https://github.com/1eez/103976', desc: 'SQL / CSV / Excel 词库' },
+      { title: '在线英语发音纠正', url: 'https://corrector.justsong.cn/', desc: '发音纠错' },
+      { title: 'Forvo', url: 'https://forvo.com/', desc: '真人发音库' },
+      { title: 'YouGlish', url: 'https://youglish.com/', desc: '在 YouTube 里找发音例句' },
+      { title: 'Voscreen', url: 'https://www.voscreen.com/', desc: '影视片段听力练习' },
+      { title: 'ELLLO', url: 'https://www.elllo.org/index.htm', desc: '在线英语听力练习' },
+      { title: 'EnglishClub', url: 'https://www.englishclub.com/', desc: '词汇/语法/听力/口语' },
+      { title: '巴别英语', url: 'https://www.babelabc.com/', desc: '听力与口语练习' },
+      { title: 'AI 备考雅思口语', url: 'https://learningprompt.wiki/zh-Hans/docs/ai-101/best-practice/learning/learning-IELTS', desc: 'AI 辅助口语备考' },
+      { title: 'Storynory', url: 'https://www.storynory.com/', desc: '少儿英文有声书' },
+      { title: 'Playphrase', url: 'https://www.playphrase.me/#/search', desc: '影视短语发音片段' },
+      { title: 'VoiceTube', url: 'https://www.voicetube.com/', desc: '口语与听力素材' },
+      { title: 'ESL Lab', url: 'https://www.esl-lab.com/', desc: '听力练习与口语材料' },
+    ],
+  },
+  {
+    id: 'sites',
+    name: '学习网站',
+    icon: '🌍',
+    items: [
+      { title: '给力英语网', url: 'http://www.geilien.cn/', desc: '英语学习门户与真题资源' },
+      { title: 'Visuwords', url: 'https://visuwords.com/', desc: '交互式单词关系图' },
+      { title: 'English Writing', url: 'https://github.com/yzy1996/English-Writing', desc: '英语用法资料整理' },
+      { title: 'Loecsen', url: 'https://www.loecsen.com/zh', desc: '免费在线课程，多语言支持' },
+      { title: 'Bilinguis', url: 'http://zh.bilinguis.com/book/', desc: '双语读物' },
+      { title: '沉浸语言学习', url: 'https://jiangzilong.notion.site/09128b7095974b188c9640d5333917b5', desc: '沉浸式学习方法' },
+      { title: 'Language Learning Site', url: 'https://languagelearning.site/', desc: '外语教材下载' },
+      { title: '形式中文', url: 'https://ishare20.github.io/formalizedChinese/docs/intro/', desc: '用英文语法理解中文' },
+      { title: '英语学习导航', url: 'https://nav.guidebook.top/english', desc: '数字生活指南导航' },
+      { title: 'UMOOCs', url: 'https://umoocs.unipus.cn/', desc: '中国高校外语慕课平台' },
+      { title: 'Nortech Plus', url: 'https://www.nortechplus.com/', desc: '儿童英语学习资料' },
+      { title: 'ESLBUZZ', url: 'https://www.eslbuzz.com/', desc: '免费的英语课程' },
+      { title: '看漫画学英语', url: 'https://mangapanda.onl/search', desc: '漫画阅读素材' },
+      { title: '可可英语双语新闻', url: 'http://www.kekenet.com/read/news/', desc: '中英对照新闻' },
+      { title: 'WordReference Forum', url: 'https://forum.wordreference.com/forums/english-only.6/', desc: '语言学习论坛' },
+      { title: '英语固定搭配查询', url: 'https://idioms.thefreedictionary.com/', desc: '英语习语与固定搭配' },
+      { title: '沪江英语', url: 'https://www.hjenglish.com/', desc: '英语常见问题与语法词汇' },
+      { title: '英语语法网', url: 'http://www.yygrammar.com/', desc: '语法详解' },
+      { title: '柯帕斯英语网', url: 'https://www.cpsenglish.com/', desc: '语法、词汇与答疑' },
+      { title: 'Luma Language', url: 'https://www.lumalanguage.com/', desc: '学习前 1000 个高频词' },
+      { title: '唐库学习', url: 'http://www.tanglib.com/', desc: '世界名著英汉对照阅读' },
+      { title: 'Woodward English', url: 'https://www.woodwardenglish.com/', desc: '全英文课程' },
+    ],
+  },
+  {
+    id: 'tools',
+    name: '学习工具',
+    icon: '🧰',
+    items: [
+      { title: 'Insta Speak', url: 'https://app.insta-speak.com/', desc: 'AI 英语/雅思口语分析' },
+      { title: 'Microsoft Editor Grammar Checker', url: 'https://www.microsoft.com/zh-cn/microsoft-365/microsoft-editor/grammar-checker', desc: '免费在线语法检查' },
+      { title: 'IELTS9', url: 'https://www.ielts9.me/', desc: '雅思作文批改评分' },
+      { title: 'Write & Improve', url: 'https://writeandimprove.com/workbooks#/wi-workbooks/7485eb41-a047-4d23-ae25-5afb7387eba9', desc: '剑桥出品的写作改进工具' },
+      { title: 'Writer Grammar Checker', url: 'https://writer.com/grammar-checker/', desc: '在线语法检查器' },
+      { title: 'Speak & Improve', url: 'https://speakandimprove.com/', desc: '剑桥 AI 口语练习' },
+      { title: '1000 Words SimpleBot', url: 'https://app.myshell.ai/zh/bot/ec703952118841268b8b5e4005466308', desc: '只用 1000 个单词对话的机器人' },
+      { title: 'Earthworm', url: 'https://github.com/cuixueshe/earthworm/blob/main/README.zh-CN.md', desc: '通过连词构句学英语' },
+      { title: 'Typing Word', url: 'https://github.com/zyronon/typing-word', desc: '打字背单词' },
+      { title: 'Typing Word 在线版', url: 'https://typing-word.ttentau.top/#/practice', desc: '在线练习入口' },
+      { title: 'Transider', url: 'https://www.jedxie.work/', desc: '随手记单词与翻译记录' },
+      { title: 'Essay.art', url: 'https://www.essay.art/', desc: 'GPT 批改雅思/托福作文' },
+      { title: 'Word Wind', url: 'https://word-wind.pages.dev/', desc: '丝滑背单词' },
+      { title: 'Word Wind 项目', url: 'https://github.com/heygsc/word-wind', desc: '开源仓库' },
+      { title: 'DashPlayer', url: 'https://solidspoon.xyz/app/dash-player/', desc: '英语学习视频播放器' },
+      { title: 'DashPlayer 项目', url: 'https://github.com/solidSpoon/DashPlayer', desc: '开源仓库' },
+      { title: 'Engoo Daily News', url: 'https://engoo.com/app/daily-news', desc: '按难度筛选文章与练习' },
+      { title: 'WordForest', url: 'https://wordforest.cn/', desc: '简洁实用的单词学习工具' },
+      { title: 'Siphon', url: 'https://siphon.ink/', desc: '学单词应用' },
+      { title: '混阅', url: 'https://www.appinn.com/mixread/', desc: '中英混合阅读方法介绍' },
+      { title: '100 Words 新百词斩助手', url: 'https://100-words.pages.dev/', desc: '浏览器辅助背词' },
+      { title: 'Earthworm 在线版', url: 'http://earthworm.cuixueshe.com/', desc: '网页使用入口' },
+    ],
+  },
+  {
+    id: 'grammar',
+    name: '语法词汇',
+    icon: '🧠',
+    items: [
+      { title: 'English Note', url: 'https://github.com/hzpt-inet-club/english-note', desc: '从 0 开始学英语语法' },
+      { title: '程序员英语词汇宝典', url: 'https://github.com/Wei-Xia/most-frequent-technology-english-words', desc: '技术英语高频词汇' },
+      { title: 'New Concept English', url: 'https://github.com/protogenesis/NewConceptEnglish', desc: '新概念英语笔记' },
+      { title: 'Friends 剧本 PDF', url: 'https://github.com/cj1128/learn-english-with-friends', desc: '老友记剧本学习资料' },
+      { title: 'ECDICT', url: 'https://github.com/skywind3000/ECDICT', desc: '双解词典数据库' },
+      { title: 'Enpuz', url: 'http://enpuz.com/', desc: '在线英语句子语法分析' },
+      { title: '程序员易错发音', url: 'https://github.com/shimohq/chinese-programmer-wrong-pronunciation', desc: '中国程序员常见误读' },
+      { title: '解谜英语语法', url: 'http://www.yinwang.org/blog-cn/2018/11/23/grammar', desc: '英语语法思路文章' },
+      { title: '计算机专业术语中英文对照', url: 'https://github.com/EarsEyesMouth/computerese-cross-references', desc: '技术术语词表' },
+      { title: 'Kajweb Dict', url: 'https://github.com/kajweb/dict', desc: '英语词库与字典资源' },
+      { title: 'FreeMdict 下载', url: 'https://downloads.freemdict.com/#%E4%B8%AD%E6%96%87', desc: '免费词典下载' },
+      { title: 'Search FreeMdict', url: 'https://search.freemdict.com/', desc: '搜索英语书籍与词典' },
+      { title: 'COCA 20000 词表', url: 'https://github.com/ninja33/ninja33.github.io/blob/master/_posts/2017-03-06-anki-coca-20000-apkg.md', desc: 'Anki 词表资源' },
+      { title: 'English Corpora', url: 'https://www.english-corpora.org/', desc: '在线语料库' },
+      { title: '1000 Most Common Words', url: 'https://www.gonaturalenglish.com/1000-most-common-words-in-the-english-language/', desc: '1000 个最常用英语单词' },
+      { title: 'English Vocabulary Word List', url: 'https://github.com/jnoodle/English-Vocabulary-Word-List', desc: '常用英语词汇表' },
+    ],
+  },
+  {
+    id: 'guides',
+    name: '学习指南',
+    icon: '🗺️',
+    items: [
+      { title: 'A Programmer’s Guide to English', url: 'https://github.com/yujiangshui/A-Programmers-Guide-to-English', desc: '程序员英语学习指南' },
+      { title: '如何学好英语？', url: 'https://jacksonwuu.github.io/blog/thinking/%E5%A6%82%E4%BD%95%E5%AD%A6%E5%A5%BD%E8%8B%B1%E8%AF%AD%EF%BC%9F/', desc: '学习方法文章' },
+      { title: 'English Level Up Tips', url: 'https://byoungd.gitbook.io/english-level-up-tips/', desc: '高效学习英语' },
+      { title: '无障碍英文工作沟通经验', url: 'https://www.kenshinji.me/wo-shi-ru-he-cong-ya-ba-ying-yu-dao-wu-zhang-ai-ying-wen-gong-zuo-gou-tong-de/', desc: '从哑巴英语到工作沟通' },
+      { title: '背单词计划表', url: 'https://exam4.us/', desc: '词汇计划工具' },
+      { title: '人人都能用英语', url: 'https://github.com/xiaolai/everyone-can-use-english', desc: '学习方法论' },
+      { title: '离谱的英语学习指南', url: 'https://github.com/byoungd/English-level-up-tips', desc: 'GitHub 版教程' },
+      { title: '英文阅读与单词学习方法', url: 'https://zhuanlan.zhihu.com/p/136959984', desc: '工具与方法分享' },
+      { title: 'Terry’s English Learning Guide', url: 'https://github.com/terrytyli/terrys-english-learning-guide', desc: '程序员向英语学习指南' },
+      { title: 'English Introduction', url: 'https://bewaters.me/limxtop/2021/08/18/English-introduction/', desc: '英语自学指南' },
+      { title: '成年人英语速成指南', url: 'https://abetterweb3.notion.site/a769cd3afb7d4bf19727391df27d1cdb', desc: '附资源与工具' },
+      { title: 'COCA 词频表使用', url: 'https://juniway.github.io/English/english-process-coca-list/', desc: '高频词表使用方法' },
+      { title: '如何提高英语水平', url: 'https://linghao.io/posts/improve-english#Popover19-toggle', desc: '提升路径分享' },
+      { title: '零基础学英语课程', url: 'https://space.bilibili.com/160507280/channel/collectiondetail?sid=48449', desc: 'B 站课程合集' },
+      { title: '如何不靠词汇量学习英语', url: 'https://github.com/dekuofa1995/MyNotes/blob/main/20230425T165757--how-i-learn-english__english_learning.org', desc: '实践总结' },
+      { title: 'Phonics 自然拼读常见规则', url: 'https://blog.esonwong.com/phonics/', desc: '自然拼读规则' },
+      { title: 'How to Learn English', url: 'https://www.antimoon.com/', desc: '经典英语学习站' },
+      { title: '沉浸式语言学习实践', url: 'https://notes.dabing.one/post?note-id=3a433c0b-e2e1-4722-8a88-a17e9aa2b927&note-id=230b533c-e5b5-4b34-a178-ccce37c8a74e&active-note-id=230b533c-e5b5-4b34-a178-ccce37c8a74e', desc: '沉浸式方法笔记' },
+      { title: '重拾英语学习', url: 'https://molezz.net/share/goback-to-learning-English', desc: '经验与路线总结' },
+      { title: 'Refold 路线图', url: 'https://refold.la/roadmap/', desc: '从 0 开始学外语路线图' },
+      { title: 'Refold 中文解读', url: 'https://zhuanlan.zhihu.com/p/671671625', desc: '路线图中文版本' },
+      { title: '一个月提升英文阅读', url: 'https://siphon.ink/docs/english/reading-in-month.html', desc: '阅读能力提升方法' },
+    ],
+  },
+  {
+    id: 'tests',
+    name: '英语测试',
+    icon: '📝',
+    items: [
+      { title: 'English Number Test', url: 'https://english-number.com/number-test', desc: '英语数字听力练习' },
+      { title: 'Youzack', url: 'https://www.youzack.com/', desc: '精听与背单词' },
+      { title: 'Burning Vocabulary 真题', url: 'https://zhenti.burningvocabulary.com/', desc: '英语真题在线' },
+      { title: 'Preply Vocabulary Test', url: 'https://preply.com/en/learn/english/test-your-vocab', desc: '词汇量测试' },
+      { title: 'A Real Me 词汇量测试', url: 'https://www.arealme.com/vocabulary-size-test/en/', desc: '支持多语言词汇量测试' },
+      { title: 'IELTS Online Tests', url: 'https://ieltsonlinetests.com/zh-hans/ielts-exam-library', desc: '雅思真题在线测试' },
+      { title: 'Gel IELTS 模拟系统', url: 'https://cdielts.gelielts.com/', desc: '雅思机考模拟' },
+      { title: 'Test English', url: 'https://test-english.com/', desc: 'KET / PET / FCE / IELTS / TOEIC / TOEFL' },
+      { title: 'EnglishTag', url: 'https://www.englishtag.com/tests/intro.asp', desc: '英语级别测试' },
+      { title: 'LanguageLevel', url: 'https://www.languagelevel.com/index.php', desc: '多语言水平测试' },
+      { title: 'Atomic Learning', url: 'https://atomiclearning.app/', desc: '英语听力练习' },
+      { title: 'DailyDictation', url: 'https://dailydictation.com/', desc: '通过听写练英语' },
+      { title: 'VocaTest', url: 'https://vocatest.online/', desc: '英语词汇量测试' },
+    ],
+  },
+];
+
+const allItems = sections.flatMap(section =>
+  section.items.map(item => ({
+    ...item,
+    sectionId: section.id,
+    sectionName: section.name,
+  }))
+);
+
+const totalCount = allItems.length;
+const sectionCount = sections.length;
+
+function getHostname(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+---
+
+<ToolLayout
+  title="英语学习导航"
+  description="把语雀里的英语学习资源整理成一个可搜索、可筛选的工具页，词典、听力、写作、测试和学习路线一页收齐。"
+  category="学习资源"
+  icon="🆎"
+>
+  <section class="resource-hero tool-card">
+    <div class="resource-hero-top">
+      <div>
+        <p class="resource-kicker">SOURCE CURATED</p>
+        <h2>英语学习工具与资源导航</h2>
+      </div>
+      <a class="tool-btn tool-btn-ghost" href={sourceUrl} target="_blank" rel="noreferrer">
+        查看语雀原文
+      </a>
+    </div>
+
+    <p class="resource-intro">
+      这页内容来自你给的语雀清单，按用途做了去重整理。更适合直接检索和跳转，而不是在长文里一条条翻。
+    </p>
+
+    <div class="resource-meta-grid">
+      <div class="resource-meta-card">
+        <span class="k">资源数量</span>
+        <strong>{totalCount}</strong>
+      </div>
+      <div class="resource-meta-card">
+        <span class="k">分类数量</span>
+        <strong>{sectionCount}</strong>
+      </div>
+      <div class="resource-meta-card">
+        <span class="k">整理方式</span>
+        <strong>去重 + 分组</strong>
+      </div>
+    </div>
+
+    <div class="resource-controls">
+      <input
+        id="resource-search"
+        type="search"
+        class="tool-input"
+        placeholder="搜索词典、发音、雅思、语法、写作、测试..."
+      />
+      <div class="resource-chip-row">
+        <button class="resource-chip is-active" type="button" data-filter="all">全部</button>
+        {sections.map(section => (
+          <button class="resource-chip" type="button" data-filter={section.id}>{section.name}</button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="resource-empty" class="resource-empty hidden">
+    <div class="resource-empty-icon">∅</div>
+    <p>没有匹配到结果，换个关键词试试。</p>
+  </section>
+
+  <div class="resource-sections">
+    {sections.map(section => (
+      <section class="resource-section tool-card" data-section={section.id}>
+        <div class="resource-section-head">
+          <div class="resource-section-title">
+            <span class="resource-section-icon">{section.icon}</span>
+            <div>
+              <h3>{section.name}</h3>
+              <p>{section.items.length} 个站点</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="resource-grid">
+          {section.items.map(item => (
+            <a
+              class="resource-card"
+              href={item.url}
+              target="_blank"
+              rel="noreferrer"
+              data-resource-card
+              data-searchable={`${item.title} ${item.desc || ''} ${section.name} ${getHostname(item.url)}`.toLowerCase()}
+            >
+              <div class="resource-card-top">
+                <strong>{item.title}</strong>
+                <span>{getHostname(item.url)}</span>
+              </div>
+              {item.desc && <p>{item.desc}</p>}
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</ToolLayout>
+
+<script is:inline>
+  (() => {
+    const search = document.getElementById('resource-search');
+    const chips = Array.from(document.querySelectorAll('.resource-chip'));
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    const cards = Array.from(document.querySelectorAll('[data-resource-card]'));
+    const empty = document.getElementById('resource-empty');
+    let currentFilter = 'all';
+
+    function sync() {
+      const keyword = (search?.value || '').trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const element = card;
+        const matchesKeyword = !keyword || (element.dataset.searchable || '').includes(keyword);
+        const parent = element.closest('[data-section]');
+        const matchesFilter = currentFilter === 'all' || parent?.getAttribute('data-section') === currentFilter;
+        const visible = matchesKeyword && matchesFilter;
+        element.classList.toggle('hidden', !visible);
+        if (visible) visibleCount += 1;
+      });
+
+      sections.forEach(section => {
+        const hasVisibleCard = section.querySelector('[data-resource-card]:not(.hidden)');
+        section.classList.toggle('hidden', !hasVisibleCard);
+      });
+
+      empty?.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        currentFilter = chip.getAttribute('data-filter') || 'all';
+        chips.forEach(item => item.classList.remove('is-active'));
+        chip.classList.add('is-active');
+        sync();
+      });
+    });
+
+    search?.addEventListener('input', sync);
+    sync();
+  })();
+</script>
+
+<style>
+  .resource-hero {
+    margin-bottom: 1.5rem;
+  }
+
+  .resource-hero-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .resource-kicker {
+    margin: 0 0 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+
+  .resource-hero h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    color: var(--text);
+  }
+
+  .resource-intro {
+    margin: 0 0 1rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .resource-meta-grid {
+    display: grid;
+    gap: 0.9rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 1.1rem;
+  }
+
+  .resource-meta-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg);
+    padding: 0.9rem 1rem;
+  }
+
+  .resource-meta-card .k {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .resource-meta-card strong {
+    color: var(--text);
+    font-size: 1.05rem;
+  }
+
+  .resource-controls {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .resource-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .resource-chip {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-mono);
+  }
+
+  .resource-chip:hover,
+  .resource-chip.is-active {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 48%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  }
+
+  .resource-section + .resource-section {
+    margin-top: 1.25rem;
+  }
+
+  .resource-section-head {
+    margin-bottom: 1rem;
+  }
+
+  .resource-section-title {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+  }
+
+  .resource-section-title h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.3rem;
+  }
+
+  .resource-section-title p {
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .resource-section-icon {
+    width: 2.7rem;
+    height: 2.7rem;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 26%, transparent);
+    font-size: 1.2rem;
+  }
+
+  .resource-grid {
+    display: grid;
+    gap: 0.9rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .resource-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg);
+    padding: 1rem;
+    text-decoration: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .resource-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--color-accent) 42%, var(--border));
+    box-shadow: 0 18px 40px -28px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+
+  .resource-card-top {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .resource-card strong {
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .resource-card span {
+    flex-shrink: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+
+  .resource-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .resource-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+  }
+
+  .resource-empty-icon {
+    font-size: 3rem;
+    opacity: 0.35;
+    margin-bottom: 0.6rem;
+  }
+
+  @media (min-width: 900px) {
+    .resource-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .resource-hero-top {
+      flex-direction: column;
+    }
+
+    .resource-meta-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .resource-card-top {
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+  }
+</style>
