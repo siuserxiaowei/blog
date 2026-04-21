@@ -26,17 +26,19 @@ function formatDate(dateStr: string) {
 
     <div class="blog-card-body">
       <div class="blog-card-meta">
+        <span class="blog-card-kind">Dispatch</span>
         <time>{formatDate(date)}</time>
-        <div class="blog-card-tags">
-          {tags.slice(0, 3).map((tag) => (
-            <span>{tag}</span>
-          ))}
-        </div>
       </div>
 
       <div class="blog-card-content">
         <h3>{title}</h3>
         <p>{description}</p>
+      </div>
+
+      <div class="blog-card-tags">
+        {tags.slice(0, 3).map((tag) => (
+          <span>{tag}</span>
+        ))}
       </div>
 
       <div class="blog-card-footer">
@@ -73,7 +75,7 @@ function formatDate(dateStr: string) {
 
   .blog-card-body {
     display: grid;
-    gap: 1.1rem;
+    gap: 1rem;
     padding: 1.45rem;
   }
 
@@ -82,12 +84,15 @@ function formatDate(dateStr: string) {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    flex-wrap: wrap;
     color: var(--text-secondary);
     font-family: var(--font-mono);
     font-size: 0.73rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
+  }
+
+  .blog-card-kind {
+    color: var(--color-accent);
   }
 
   .blog-card-tags {
@@ -98,9 +103,14 @@ function formatDate(dateStr: string) {
 
   .blog-card-tags span {
     border-radius: 999px;
-    padding: 0.25rem 0.55rem;
+    padding: 0.28rem 0.58rem;
     border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
     background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .blog-card-content h3 {
@@ -118,7 +128,7 @@ function formatDate(dateStr: string) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 1rem;
+    padding-top: 1.05rem;
     border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
     color: var(--text);
     font-family: var(--font-mono);

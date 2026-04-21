@@ -18,28 +18,71 @@ const todayLabel = new Date().toLocaleDateString('en-US', {
   year: 'numeric'
 }).toUpperCase();
 
-const sections = [
+const operatingSystem = [
+  {
+    index: '01',
+    label: 'Write',
+    title: '把判断写成公开日志',
+    desc: '文章不是装饰，而是把真实的产品判断、实验过程和学习路径记录下来。',
+    note: 'Blog / RSS / newsletter',
+    proof: `${totalPosts} 篇已发布`
+  },
+  {
+    index: '02',
+    label: 'Build',
+    title: '把重复问题做成工具',
+    desc: '工具页承担的是效率任务。高频动作直接固定成浏览器内可用的小产品。',
+    note: 'Browser-first toolbox',
+    proof: '60+ tools live'
+  },
+  {
+    index: '03',
+    label: 'Ship',
+    title: '让项目和比赛形成外部约束',
+    desc: '项目展示和比赛雷达不是补充页面，而是推动更新频率和判断密度的外部机制。',
+    note: 'Projects / competitions',
+    proof: '持续公开迭代'
+  }
+];
+
+const signalStrip = [
+  { k: 'Published', v: `${totalPosts} dispatches` },
+  { k: 'Toolbox', v: '60+ browser tools' },
+  { k: 'Cadence', v: 'Ship weekly' },
+  { k: 'Focus', v: 'AI / automation / learning systems' }
+];
+
+const entryPoints = [
   {
     title: '工具箱',
     eyebrow: 'Browser-first utilities',
     href: '/tools',
-    desc: '把高频开发小需求都收进一个更快的工具目录里，直接打开就能用。',
-    stat: '60+ tools'
+    desc: '把 JSON、编码、哈希、时间、颜色、文本处理这些高频动作收进一个真正能用的目录。',
+    stat: '60+ live tools',
+    tags: ['快开即用', '浏览器内运行', '无上传']
   },
   {
     title: '项目展示',
     eyebrow: 'Products in progress',
     href: '/projects',
-    desc: '集中展示我在做的 AI、自动化和个人产品，保持公开迭代。',
-    stat: '4 active bets'
+    desc: '集中展示我正在做的 AI、自动化和个人产品，保留持续迭代的上下文。',
+    stat: '公开推进中',
+    tags: ['AI 产品', '自动化', '公开构建']
   },
   {
     title: '比赛雷达',
     eyebrow: 'Opportunity scanner',
     href: '/competitions',
-    desc: '收集创业、黑客松和创新比赛的信息，降低搜集成本。',
-    stat: 'Always updating'
-  },
+    desc: '把创业比赛、黑客松和创新项目搜集成可以快速扫描的机会页面。',
+    stat: '持续更新',
+    tags: ['信息整理', '机会发现', '降低搜索成本']
+  }
+];
+
+const publishingLanes = [
+  '产品判断和拆解',
+  'AI 工具与自动化实验',
+  '公开构建中的项目记录'
 ];
 ---
 
@@ -47,133 +90,141 @@ const sections = [
   <Header />
 
   <main class="flex-1">
-    <section id="home" class="home-hero mx-auto px-6 pt-32 pb-18 md:pt-40 md:pb-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
-      <div class="home-grid">
-        <div class="scroll-reveal">
+    <section
+      id="home"
+      class="mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-22"
+      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
+    >
+      <div class="hero-shell">
+        <div class="scroll-reveal hero-copy">
           <div class="hero-meta-row">
-            <span class="hero-chip">Independent Dispatch</span>
+            <span class="pill-note">Independent Workbench</span>
             <span class="hero-date">{todayLabel}</span>
           </div>
 
           <h1 class="hero-title">
-            做产品，写判断，<br />
-            <span class="text-shimmer">把过程公开出来。</span>
+            这里不是个人简历，<br />
+            <span class="text-shimmer">是一个持续运行的工作台。</span>
           </h1>
 
-          <p class="hero-copy">
-            这里是我的个人网站，也是一个持续发布中的工作台。
-            我关注 AI、自动化、产品工程和学习系统，把思考写成文章，把问题做成工具。
+          <p class="hero-copy-text">
+            我把 AI、自动化、产品工程和学习系统相关的工作公开发布出来。
+            一部分写成文章，一部分做成工具，一部分继续推进成项目。
           </p>
 
           <div class="hero-actions">
             <a href="#blog" class="hero-btn hero-btn-primary btn-glow">看最新文章</a>
             <a href="/tools" class="hero-btn hero-btn-ghost">进入工具箱</a>
           </div>
-
-          <div class="hero-stats">
-            <div>
-              <span class="k">Articles</span>
-              <strong>{totalPosts}</strong>
-            </div>
-            <div>
-              <span class="k">Focus</span>
-              <strong>AI + Product</strong>
-            </div>
-            <div>
-              <span class="k">Mode</span>
-              <strong>Ship Weekly</strong>
-            </div>
-          </div>
         </div>
 
-        <aside class="scroll-reveal hero-panel surface-card gradient-border">
-          <div class="hero-panel-head">
-            <p>Currently shipping</p>
-            <span>live</span>
+        <aside class="scroll-reveal hero-board surface-card gradient-border">
+          <div class="hero-board-head">
+            <p class="section-kicker">Site Model</p>
+            <span>updated weekly</span>
           </div>
 
-          <div class="hero-panel-block">
-            <h2>当前重点</h2>
-            <ul>
-              <li>把个人网站做成更像产品，而不是单纯博客。</li>
-              <li>持续扩展浏览器内可用的开发工具箱。</li>
-              <li>围绕 AI 语音与自动化做更明确的产品判断。</li>
-            </ul>
+          <div class="hero-board-list">
+            {operatingSystem.map((item) => (
+              <article class="hero-board-row">
+                <div class="hero-board-index">{item.index}</div>
+                <div>
+                  <p class="hero-board-label">{item.label}</p>
+                  <h2>{item.title}</h2>
+                  <p>{item.desc}</p>
+                  <div class="hero-board-meta">
+                    <span>{item.note}</span>
+                    <strong>{item.proof}</strong>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
 
-          <div class="hero-panel-block">
-            <h3>Recent dispatches</h3>
-            <div class="hero-dispatches">
-              {posts.map((post) => (
-                <a href={`/blog/${post.id}`} class="hero-dispatch">
-                  <span>{post.data.title}</span>
-                  <em>{post.data.date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</em>
-                </a>
-              ))}
+          <div class="section-rule"></div>
+
+          <div class="hero-dispatches">
+            <div class="hero-dispatches-head">
+              <p class="section-kicker">Recent Dispatches</p>
+              <a href="/blog">全部文章 ↗</a>
             </div>
+
+            {posts.map((post) => (
+              <a href={`/blog/${post.id}`} class="hero-dispatch">
+                <span>{post.data.title}</span>
+                <em>{post.data.date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</em>
+              </a>
+            ))}
           </div>
         </aside>
       </div>
-    </section>
 
-    <section id="about" class="mx-auto px-6 py-20 md:py-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
-      <div class="section-head scroll-reveal">
-        <p class="section-kicker">About</p>
-        <h2>我希望这个网站看起来像我做事的方式。</h2>
-      </div>
-
-      <div class="about-grid">
-        <div class="scroll-reveal about-copy">
-          <p>
-            我不太想把这里做成标准模板式个人主页。相比“展示简历”，我更在意把正在发生的东西放上来：
-            现在在研究什么、正在做什么产品、哪些判断成立、哪些尝试应该放弃。
-          </p>
-          <p>
-            所以这个站会同时是三种东西：一个写作空间、一个工具目录、一个正在成形的产品工作台。
-            它应该清晰、克制、有一点编辑感，也要足够像一个真正会持续更新的系统。
-          </p>
-        </div>
-
-        <div class="about-principles">
-          <div class="scroll-reveal glass-card spotlight principle-card">
-            <span>01</span>
-            <h3>先有判断，再有实现</h3>
-            <p>先想清楚为什么做，再决定怎么做。</p>
+      <div class="hero-strip">
+        {signalStrip.map((item) => (
+          <div class="metric-tile scroll-reveal hero-metric">
+            <span>{item.k}</span>
+            <strong>{item.v}</strong>
           </div>
-          <div class="scroll-reveal glass-card spotlight principle-card">
-            <span>02</span>
-            <h3>公开迭代</h3>
-            <p>把过程写出来，网站本身也成为作品的一部分。</p>
-          </div>
-          <div class="scroll-reveal glass-card spotlight principle-card">
-            <span>03</span>
-            <h3>用工具减掉重复劳动</h3>
-            <p>把高频小需求积累成真正能复用的系统。</p>
-          </div>
-          <div class="scroll-reveal glass-card spotlight principle-card">
-            <span>04</span>
-            <h3>长期主义但不拖延</h3>
-            <p>方向看长期，执行看每一周有没有新东西上线。</p>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
 
-    <section class="mx-auto px-6 py-10 md:py-12" style="max-width: var(--container-max);">
-      <div class="section-head scroll-reveal">
-        <p class="section-kicker">Entry Points</p>
-        <h2>把内容、工具和项目分得更清楚。</h2>
+    <section
+      id="about"
+      class="mx-auto px-6 py-20 md:py-22"
+      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
+    >
+      <div class="section-row scroll-reveal">
+        <div class="section-head">
+          <p class="section-kicker">Operating System</p>
+          <h2>这个网站围绕三件事组织，而不是围绕“自我介绍”。</h2>
+        </div>
+        <p class="section-side-copy">
+          视觉和结构都只服务一个目标: 让人快速明白我在做什么、最近在推进什么、以及下一步该从哪里进入。
+        </p>
+      </div>
+
+      <div class="operating-grid">
+        {operatingSystem.map((item) => (
+          <article class="scroll-reveal surface-card card-hover operating-card">
+            <div class="operating-card-head">
+              <span>{item.index}</span>
+              <p>{item.label}</p>
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+            <div class="operating-card-foot">
+              <span>{item.note}</span>
+              <strong>{item.proof}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mx-auto px-6 py-8 md:py-10" style="max-width: var(--container-max);">
+      <div class="section-row scroll-reveal">
+        <div class="section-head">
+          <p class="section-kicker">Entry Points</p>
+          <h2>先从最有用的三个入口开始。</h2>
+        </div>
       </div>
 
       <div class="entry-grid">
-        {sections.map((section, index) => (
-          <a href={section.href} class="scroll-reveal surface-card card-hover gradient-border entry-card">
-            <span class="entry-index">{String(index + 1).padStart(2, '0')}</span>
-            <p class="entry-kicker">{section.eyebrow}</p>
-            <h3>{section.title}</h3>
-            <p class="entry-copy">{section.desc}</p>
+        {entryPoints.map((entry) => (
+          <a href={entry.href} class="scroll-reveal surface-card card-hover gradient-border entry-card">
+            <p class="entry-eyebrow">{entry.eyebrow}</p>
+            <h3>{entry.title}</h3>
+            <p class="entry-copy">{entry.desc}</p>
+
+            <div class="entry-tags">
+              {entry.tags.map((tag) => (
+                <span>{tag}</span>
+              ))}
+            </div>
+
             <div class="entry-footer">
-              <span>{section.stat}</span>
+              <span>{entry.stat}</span>
               <span>进入 ↗</span>
             </div>
           </a>
@@ -181,32 +232,58 @@ const sections = [
       </div>
     </section>
 
-    <section id="blog" class="mx-auto px-6 py-20 md:py-24" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+    <section
+      id="blog"
+      class="mx-auto px-6 py-20 md:py-24"
+      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
+    >
       <div class="section-row scroll-reveal">
         <div class="section-head">
           <p class="section-kicker">Writing</p>
-          <h2>最近写下来的东西。</h2>
+          <h2>最近写下来的判断和实验。</h2>
         </div>
-        <a href="/blog" class="section-link">全部文章 ↗</a>
+        <p class="section-side-copy">
+          优先记录真实进展，不写空泛总结。文章会围绕下面三类主题持续更新。
+        </p>
       </div>
 
-      <div class="blog-list">
-        {posts.map((post) => (
-          <div class="scroll-reveal">
-            <BlogCard
-              title={post.data.title}
-              description={post.data.description}
-              date={post.data.date.toISOString()}
-              tags={post.data.tags}
-              slug={post.id}
-              image={post.data.image}
-            />
+      <div class="blog-shell">
+        <aside class="scroll-reveal surface-card blog-brief">
+          <p class="section-kicker">Reading Guide</p>
+          <h3>内容主线</h3>
+          <div class="blog-lanes">
+            {publishingLanes.map((lane) => (
+              <div class="blog-lane">
+                <span></span>
+                <p>{lane}</p>
+              </div>
+            ))}
           </div>
-        ))}
+          <a href="/blog" class="blog-brief-link">全部文章 ↗</a>
+        </aside>
+
+        <div class="blog-list">
+          {posts.map((post) => (
+            <div class="scroll-reveal">
+              <BlogCard
+                title={post.data.title}
+                description={post.data.description}
+                date={post.data.date.toISOString()}
+                tags={post.data.tags}
+                slug={post.id}
+                image={post.data.image}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
 
-    <section id="contact" class="mx-auto px-6 py-18 md:py-22" style="max-width: var(--container-max); scroll-margin-top: 7rem;">
+    <section
+      id="contact"
+      class="mx-auto px-6 py-18 md:py-22"
+      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
+    >
       <div class="contact-grid">
         <div class="scroll-reveal">
           <Newsletter />
@@ -214,9 +291,9 @@ const sections = [
 
         <div class="scroll-reveal surface-card gradient-border contact-card">
           <p class="section-kicker">Contact</p>
-          <h2>保持联系，或者直接来聊合作。</h2>
+          <h2>如果你也在做类似方向，欢迎直接联系我。</h2>
           <p class="contact-copy">
-            如果你喜欢我在做的方向，或者你也在做 AI、自动化、内容产品这类东西，欢迎直接联系我。
+            AI、自动化、内容产品、学习工具这些方向都可以聊。这里更希望结识一起做东西的人，而不只是交换名片。
           </p>
 
           <div class="contact-links">
@@ -242,81 +319,84 @@ const sections = [
 </BaseLayout>
 
 <style>
-  .home-grid {
+  .hero-shell {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
-    gap: 2rem;
-    align-items: end;
+    grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+    gap: 1.25rem;
+    align-items: stretch;
   }
 
-  .hero-meta-row {
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+    padding-right: 0.5rem;
+  }
+
+  .hero-meta-row,
+  .hero-board-head,
+  .hero-dispatches-head,
+  .entry-footer,
+  .operating-card-foot {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .hero-chip,
-  .hero-date,
-  .section-kicker,
-  .entry-kicker {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  .hero-chip,
-  .section-kicker {
-    color: var(--color-accent);
   }
 
   .hero-date {
     color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
   .hero-title {
-    font-size: clamp(3.5rem, 8vw, 7rem);
+    margin-top: 1.25rem;
+    font-size: clamp(3.6rem, 8vw, 7.2rem);
     line-height: 0.9;
-    margin-bottom: 1.3rem;
+    letter-spacing: -0.05em;
   }
 
-  .hero-copy {
+  .hero-copy-text {
     max-width: 42rem;
+    margin-top: 1.25rem;
     color: var(--text-secondary);
-    font-size: clamp(1rem, 1.55vw, 1.22rem);
-    line-height: 1.85;
+    font-size: clamp(1rem, 1.5vw, 1.18rem);
+    line-height: 1.9;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.85rem;
-    margin-top: 1.6rem;
+    margin-top: 1.7rem;
   }
 
   .hero-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 3.2rem;
+    min-height: 3.15rem;
     border-radius: 999px;
-    padding: 0 1.25rem;
+    padding: 0 1.2rem;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
 
   .hero-btn-primary {
-    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 70%, white 30%));
+    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 76%, white 24%));
     color: #111;
   }
 
   .hero-btn-ghost {
     border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
     color: var(--text);
   }
 
@@ -324,90 +404,102 @@ const sections = [
     transform: translateY(-1px);
   }
 
-  .hero-stats {
+  .hero-board {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.9rem;
-    margin-top: 1.8rem;
-  }
-
-  .hero-stats > div,
-  .principle-card,
-  .entry-card,
-  .contact-card {
-    border-radius: 24px;
-    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
-  }
-
-  .hero-stats > div {
-    padding: 1rem;
-  }
-
-  .hero-stats .k {
-    display: block;
-    margin-bottom: 0.35rem;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hero-stats strong {
-    font-size: 1.02rem;
-  }
-
-  .hero-panel {
-    padding: 1.35rem;
+    gap: 1rem;
+    padding: 1.25rem;
     border-radius: 28px;
   }
 
-  .hero-panel-head,
-  .entry-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
+  .hero-board-head span,
+  .hero-board-label,
+  .operating-card-head p,
+  .entry-eyebrow,
+  .entry-tags span,
+  .hero-metric span,
+  .blog-brief-link,
+  .contact-links em {
     color: var(--text-secondary);
     font-family: var(--font-mono);
     font-size: 0.72rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .hero-board-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .hero-board-row {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+
+  .hero-board-index {
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .hero-panel-head span {
-    border-radius: 999px;
-    padding: 0.28rem 0.55rem;
-    color: var(--text);
-    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  .hero-board-row h2 {
+    margin-top: 0.28rem;
+    margin-bottom: 0.45rem;
+    font-size: 1.45rem;
+    line-height: 1.04;
   }
 
-  .hero-panel-block + .hero-panel-block {
-    margin-top: 1.25rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  }
-
-  .hero-panel-block h2,
-  .hero-panel-block h3 {
-    margin-bottom: 0.7rem;
-    font-size: 1.8rem;
-  }
-
-  .hero-panel-block ul {
-    margin: 0;
-    padding-left: 1.05rem;
+  .hero-board-row p:last-of-type {
     color: var(--text-secondary);
+    line-height: 1.75;
   }
 
-  .hero-panel-block li + li {
-    margin-top: 0.55rem;
+  .hero-board-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .hero-board-meta span {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-board-meta strong,
+  .operating-card-foot strong,
+  .hero-metric strong {
+    color: var(--text);
+    font-size: 0.98rem;
   }
 
   .hero-dispatches {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.65rem;
+  }
+
+  .hero-dispatches-head a {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .hero-dispatch {
@@ -417,13 +509,12 @@ const sections = [
     gap: 1rem;
     padding: 0.85rem 0.95rem;
     border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
     background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
   }
 
   .hero-dispatch span {
-    color: var(--text);
-    line-height: 1.4;
+    line-height: 1.45;
   }
 
   .hero-dispatch em {
@@ -431,173 +522,264 @@ const sections = [
     font-style: normal;
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     white-space: nowrap;
+  }
+
+  .hero-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-top: 0.95rem;
+  }
+
+  .hero-metric {
+    padding: 1rem 1.05rem;
+  }
+
+  .hero-metric span {
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .section-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+    gap: 1.2rem;
+    align-items: end;
+    margin-bottom: 1.4rem;
   }
 
   .section-head h2,
   .contact-card h2 {
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 0.98;
     margin-top: 0.35rem;
+    font-size: clamp(2.1rem, 4vw, 3.7rem);
+    line-height: 0.98;
   }
 
-  .section-row {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-link {
+  .section-side-copy {
     color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    line-height: 1.85;
   }
 
-  .about-grid,
+  .operating-grid,
+  .entry-grid,
   .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 1.35rem;
-    margin-top: 1.5rem;
-  }
-
-  .about-copy {
-    display: grid;
     gap: 1rem;
-    color: var(--text-secondary);
-    font-size: 1.02rem;
-    line-height: 1.9;
   }
 
-  .about-principles {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.95rem;
+  .operating-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .principle-card,
+  .operating-card,
   .entry-card,
-  .contact-card {
-    padding: 1.15rem;
+  .contact-card,
+  .blog-brief {
+    border-radius: 28px;
+    padding: 1.25rem;
   }
 
-  .principle-card span,
-  .entry-index {
-    display: inline-block;
-    margin-bottom: 0.8rem;
+  .operating-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .operating-card-head span {
     color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.84rem;
-    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  .principle-card h3,
-  .entry-card h3 {
-    margin-bottom: 0.55rem;
-    font-size: 1.6rem;
+  .operating-card h3,
+  .entry-card h3,
+  .blog-brief h3 {
+    font-size: 1.65rem;
+    line-height: 1.08;
   }
 
-  .principle-card p,
+  .operating-card h3 {
+    margin-bottom: 0.65rem;
+  }
+
+  .operating-card p,
   .entry-copy,
+  .blog-brief p,
   .contact-copy {
     color: var(--text-secondary);
-    line-height: 1.75;
+    line-height: 1.8;
   }
 
-  .entry-grid {
-    display: grid;
+  .operating-card-foot {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .operating-card-foot span {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .entry-grid,
+  .contact-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
   }
 
   .entry-card {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .entry-copy {
+    flex: 1;
+  }
+
+  .entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .entry-tags span {
+    padding: 0.28rem 0.58rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 86%, transparent);
   }
 
   .entry-footer {
-    margin-top: 1.2rem;
+    margin-top: 0.2rem;
     padding-top: 1rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    color: var(--text-secondary);
+  }
+
+  .blog-shell {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .blog-brief {
+    height: fit-content;
+  }
+
+  .blog-brief h3 {
+    margin-top: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .blog-lanes {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .blog-lane {
+    display: grid;
+    grid-template-columns: 0.7rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+  }
+
+  .blog-lane span {
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-top: 0.45rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+
+  .blog-brief-link {
+    display: inline-flex;
+    margin-top: 1.25rem;
   }
 
   .blog-list {
     display: grid;
     gap: 1rem;
-    margin-top: 1.5rem;
+  }
+
+  .contact-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   }
 
   .contact-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: grid;
+    gap: 1rem;
   }
 
   .contact-links {
     display: grid;
     gap: 0.7rem;
-    margin-top: 1.3rem;
   }
 
   .contact-links a {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.95rem 1rem;
+    padding: 0.9rem 0.95rem;
     border-radius: 18px;
-    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .contact-links a:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--color-accent) 28%, var(--border));
   }
 
   .contact-links span {
     color: var(--text);
+    font-weight: 600;
   }
 
-  .contact-links em {
-    color: var(--text-secondary);
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-  }
-
-  @media (max-width: 1024px) {
-    .home-grid,
-    .about-grid,
-    .contact-grid,
-    .entry-grid {
+  @media (max-width: 1120px) {
+    .hero-shell,
+    .section-row,
+    .blog-shell {
       grid-template-columns: 1fr;
     }
 
-    .about-principles {
+    .operating-grid,
+    .entry-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero-strip {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 860px) {
     .hero-title {
-      font-size: 3.2rem;
+      font-size: clamp(3rem, 15vw, 4.8rem);
     }
 
-    .hero-stats,
-    .about-principles {
+    .hero-strip,
+    .operating-grid,
+    .entry-grid,
+    .contact-grid {
       grid-template-columns: 1fr;
     }
 
-    .section-row {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .hero-dispatch {
-      align-items: flex-start;
-      flex-direction: column;
+    .hero-board,
+    .operating-card,
+    .entry-card,
+    .blog-brief,
+    .contact-card {
+      border-radius: 24px;
     }
   }
 </style>
@@ -605,6 +787,7 @@ const sections = [
 <script is:inline>
   (() => {
     const revealElements = document.querySelectorAll('.scroll-reveal');
+
     if (!revealElements.length) return;
 
     const observer = new IntersectionObserver((entries) => {
@@ -616,13 +799,5 @@ const sections = [
     }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
 
     revealElements.forEach((element) => observer.observe(element));
-
-    document.querySelectorAll('.spotlight').forEach((element) => {
-      element.addEventListener('mousemove', (event) => {
-        const rect = element.getBoundingClientRect();
-        element.style.setProperty('--spot-x', `${event.clientX - rect.left - 140}px`);
-        element.style.setProperty('--spot-y', `${event.clientY - rect.top - 140}px`);
-      });
-    });
   })();
 </script>

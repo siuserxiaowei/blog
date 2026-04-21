@@ -86,10 +86,56 @@ const tools: Tool[] = [
   { id: 'english-learning', name: '英语学习导航', nameEn: 'English Learning', desc: '语雀英语学习清单整理版，支持搜索和分类浏览', cat: '学习资源', icon: '🆎', status: 'live' },
 ];
 
+const toolById = new Map(tools.map((tool) => [tool.id, tool]));
 const categories = [...new Set(tools.map((tool) => tool.cat))];
 const liveCount = tools.filter((tool) => tool.status === 'live').length;
 const featuredIds = new Set(['english-learning', 'json-formatter', 'timestamp', 'color']);
 const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
+
+const categoryMeta: Record<string, string> = {
+  '数据格式': '把结构化数据整理到可继续处理的状态。',
+  '编码转换': '处理文本、文件、URL 和图片之间的常见编码问题。',
+  '加密哈希': '做签名、摘要、令牌和基础安全处理时先从这里找。',
+  '生成器': '创建密码、ID、二维码和占位内容。',
+  '时间日期': '处理时间戳、Cron、日期计算等周期问题。',
+  '文本处理': '面向复制、清洗、比较和格式转换的文本工具。',
+  '网络工具': '适合 HTTP、URL、MIME、UA 等浏览器与接口场景。',
+  '颜色图像': '前端设计、素材处理和视觉调试会更常用。',
+  '开发辅助': '开发过程里的杂项高频动作，追求快开快用。',
+  '学习资源': '把外部资源整理成更易搜索和浏览的站内入口。'
+};
+
+const collections = [
+  {
+    eyebrow: 'Format & transform',
+    title: '处理一段结构化数据',
+    desc: 'JSON、YAML、CSV、Markdown 这些输入先整理干净，再继续处理。',
+    ids: ['json-formatter', 'json-yaml', 'json-csv', 'markdown-html']
+  },
+  {
+    eyebrow: 'Security & identity',
+    title: '生成凭据或做基础安全处理',
+    desc: '生成密码、Token、UUID，或者快速做哈希、HMAC、JWT 解析。',
+    ids: ['password', 'token', 'uuid', 'hash']
+  },
+  {
+    eyebrow: 'Web & frontend',
+    title: '调试浏览器和接口问题',
+    desc: 'URL、状态码、curl 转代码、颜色和渐变这些动作更适合直接在线完成。',
+    ids: ['url-parser', 'http-status', 'curl-to-fetch', 'color']
+  },
+  {
+    eyebrow: 'Learning & writing',
+    title: '做学习和内容处理相关任务',
+    desc: '英语学习导航、文本统计、差异比较、Slug 和行处理都更适合放在一处。',
+    ids: ['english-learning', 'text-stats', 'text-diff', 'line-tools']
+  }
+].map((collection) => ({
+  ...collection,
+  items: collection.ids.map((id) => toolById.get(id)).filter(Boolean) as Tool[]
+}));
+
+const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
 ---
 
 <BaseLayout
@@ -102,10 +148,15 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     <div class="mx-auto px-6" style="max-width: var(--container-max);">
       <section class="tools-hero scroll-reveal">
         <div class="tools-hero-copy">
+          <div class="tools-meta-row">
+            <span class="pill-note">Browser-first toolbox</span>
+            <span class="tools-hero-note">zero upload</span>
+          </div>
+
           <p class="section-kicker">Toolbox</p>
-          <h1>把高频小需求，做成可以直接打开的工具。</h1>
+          <h1>把高频问题，收成一个真正能用的目录产品。</h1>
           <p>
-            一个纯前端、零上传、以效率为中心的浏览器工具目录。与其每次重新搜索，不如把常用动作固定成自己的工作台。
+            这里不是简单的“工具集合页”。目标是把开发、写作、调试和学习里最常出现的小动作，沉淀成随手可开的浏览器工作台。
           </p>
 
           <div class="tools-hero-stats">
@@ -122,6 +173,21 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
               <strong>Browser only</strong>
             </div>
           </div>
+
+          <div class="tools-trust-row">
+            <div class="metric-tile tools-trust-card">
+              <span>运行方式</span>
+              <strong>本地浏览器内完成</strong>
+            </div>
+            <div class="metric-tile tools-trust-card">
+              <span>设计原则</span>
+              <strong>快开、少跳转、少记忆</strong>
+            </div>
+            <div class="metric-tile tools-trust-card">
+              <span>适用场景</span>
+              <strong>开发、内容、学习、调试</strong>
+            </div>
+          </div>
         </div>
 
         <div class="tools-search-card surface-card gradient-border">
@@ -136,35 +202,78 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
               <button class="tools-chip" data-cat-filter={cat} type="button">{cat}</button>
             ))}
           </div>
+          <div class="tools-search-notes">
+            <div>
+              <span>01</span>
+              <p>先按关键词搜，再按分类收窄。</p>
+            </div>
+            <div>
+              <span>02</span>
+              <p>带有学习属性的资源也会收进来，而不只限于开发工具。</p>
+            </div>
+            <div>
+              <span>03</span>
+              <p>所有 live 工具都优先保证浏览器内可直接使用。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="collections-section scroll-reveal">
+        <div class="section-row">
+          <div>
+            <p class="section-kicker">Quick Paths</p>
+            <h2>按任务找工具，不用先猜分类。</h2>
+          </div>
+          <p class="directory-note">目录页先解决“我现在要做什么”，再解决“它属于哪一类”。</p>
+        </div>
+
+        <div class="collection-grid">
+          {collections.map((collection) => (
+            <article class="collection-card surface-card card-hover">
+              <div class="collection-head">
+                <p class="collection-kicker">{collection.eyebrow}</p>
+                <span>{collection.items.length} tools</span>
+              </div>
+              <h3>{collection.title}</h3>
+              <p>{collection.desc}</p>
+
+              <div class="collection-links">
+                {collection.items.map((tool) => (
+                  <a href={getToolHref(tool)}>
+                    <span>{tool.name}</span>
+                    <em>{tool.nameEn}</em>
+                  </a>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       <section class="featured-section scroll-reveal">
         <div class="section-row">
           <div>
-            <p class="section-kicker">Featured</p>
-            <h2>几个值得先打开的入口。</h2>
+            <p class="section-kicker">Start Here</p>
+            <h2>几个值得优先打开的入口。</h2>
           </div>
         </div>
 
         <div class="featured-grid">
-          {featuredTools.map((tool) => {
-            const href = tool.href || `/tools/${tool.id}`;
-            return (
-              <a href={href} class="featured-card surface-card card-hover gradient-border">
-                <div class="featured-card-head">
-                  <span class="featured-icon">{tool.icon}</span>
-                  <span class="featured-status">live</span>
-                </div>
-                <h3>{tool.name}</h3>
-                <p>{tool.desc}</p>
-                <div class="featured-footer">
-                  <span>{tool.cat}</span>
-                  <span>{tool.nameEn}</span>
-                </div>
-              </a>
-            );
-          })}
+          {featuredTools.map((tool) => (
+            <a href={getToolHref(tool)} class="featured-card surface-card card-hover gradient-border">
+              <div class="featured-card-head">
+                <span class="featured-icon">{tool.icon}</span>
+                <span class="featured-status">live</span>
+              </div>
+              <h3>{tool.name}</h3>
+              <p>{tool.desc}</p>
+              <div class="featured-footer">
+                <span>{tool.cat}</span>
+                <span>{tool.nameEn}</span>
+              </div>
+            </a>
+          ))}
         </div>
       </section>
 
@@ -189,12 +298,13 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
                 <div>
                   <p class="tool-section-kicker">{cat}</p>
                   <h3>{tools.filter((tool) => tool.cat === cat).length} 个可用工具</h3>
+                  <p class="tool-section-copy">{categoryMeta[cat]}</p>
                 </div>
               </div>
 
               <div class="tool-grid">
                 {tools.filter((tool) => tool.cat === cat).map((tool) => {
-                  const href = tool.href || (tool.status === 'live' ? `/tools/${tool.id}` : '#');
+                  const href = tool.status === 'live' ? getToolHref(tool) : '#';
                   return (
                     <a
                       href={href}
@@ -212,6 +322,10 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
                       <h4>{tool.name}</h4>
                       <p class="tool-card-en">{tool.nameEn}</p>
                       <p class="tool-card-desc">{tool.desc}</p>
+                      <div class="tool-card-footer">
+                        <span>{tool.cat}</span>
+                        <span>{tool.status}</span>
+                      </div>
                     </a>
                   );
                 })}
@@ -233,18 +347,32 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
 
   .tools-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
     gap: 1.2rem;
-    align-items: end;
-    margin-bottom: 1.4rem;
+    align-items: stretch;
+    margin-bottom: 1.2rem;
+  }
+
+  .tools-meta-row,
+  .collection-head,
+  .featured-card-head,
+  .featured-footer,
+  .tool-card-head,
+  .tool-card-footer,
+  .section-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
   .tools-hero h1,
   .featured-section h2,
+  .collections-section h2,
   .tools-directory h2 {
     margin-top: 0.35rem;
-    font-size: clamp(2.6rem, 5vw, 4.9rem);
-    line-height: 0.94;
+    font-size: clamp(2.6rem, 5vw, 5rem);
+    line-height: 0.96;
   }
 
   .tools-hero-copy > p:last-of-type {
@@ -252,7 +380,20 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     margin-top: 1rem;
     color: var(--text-secondary);
     font-size: 1rem;
-    line-height: 1.85;
+    line-height: 1.9;
+  }
+
+  .tools-hero-note,
+  .directory-note,
+  .collection-kicker,
+  .tool-section-kicker,
+  .tools-search-label,
+  .tool-card-footer span {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .tools-hero-stats {
@@ -264,10 +405,11 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
 
   .tools-hero-stats > div,
   .tools-search-card,
+  .collection-card,
   .featured-card,
   .tool-section,
   .tool-card-item {
-    border-radius: 24px;
+    border-radius: 26px;
   }
 
   .tools-hero-stats > div {
@@ -277,8 +419,6 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
   }
 
   .tools-hero-stats .k,
-  .tool-section-kicker,
-  .directory-note,
   .tools-search-label {
     color: var(--text-secondary);
     font-family: var(--font-mono);
@@ -295,12 +435,13 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
   }
 
   .tools-search-card {
+    display: grid;
+    gap: 0.95rem;
     padding: 1.2rem;
   }
 
   .tools-search-label {
     display: block;
-    margin-bottom: 0.8rem;
   }
 
   .tools-search-box {
@@ -335,7 +476,6 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1rem;
   }
 
   .tools-chip {
@@ -357,16 +497,133 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 74%, white 26%));
   }
 
+  .tools-search-notes {
+    display: grid;
+    gap: 0.65rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  }
+
+  .tools-search-notes > div {
+    display: grid;
+    grid-template-columns: 2.1rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+  }
+
+  .tools-search-notes span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .tools-search-notes p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .tools-trust-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .tools-trust-card {
+    padding: 0.95rem 1rem;
+  }
+
+  .tools-trust-card span {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .tools-trust-card strong {
+    color: var(--text);
+    font-size: 0.98rem;
+  }
+
+  .collections-section,
+  .featured-section {
+    margin-top: 1.6rem;
+  }
+
   .section-row {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1rem;
     margin-bottom: 1.2rem;
   }
 
-  .featured-section {
-    margin-top: 1.6rem;
+  .collection-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.95rem;
+  }
+
+  .collection-card {
+    display: grid;
+    gap: 0.9rem;
+    padding: 1.15rem;
+  }
+
+  .collection-head span {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .collection-card h3 {
+    font-size: 1.55rem;
+    line-height: 1.08;
+  }
+
+  .collection-card p {
+    color: var(--text-secondary);
+    line-height: 1.78;
+  }
+
+  .collection-links {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .collection-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .collection-links a:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--color-accent) 28%, var(--border));
+  }
+
+  .collection-links span {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .collection-links em {
+    color: var(--text-secondary);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .featured-grid {
@@ -378,15 +635,6 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
   .featured-card {
     display: block;
     padding: 1rem;
-  }
-
-  .featured-card-head,
-  .featured-footer,
-  .tool-card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
   }
 
   .featured-icon,
@@ -469,6 +717,13 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     line-height: 1.05;
   }
 
+  .tool-section-copy {
+    max-width: 36rem;
+    margin-top: 0.45rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
   .tool-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -509,6 +764,12 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
     font-size: 0.92rem;
   }
 
+  .tool-card-footer {
+    margin-top: 0.95rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid color-mix(in srgb, var(--border) 62%, transparent);
+  }
+
   .tools-empty {
     padding: 3rem 1rem;
     text-align: center;
@@ -523,6 +784,7 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
 
   @media (max-width: 1120px) {
     .tools-hero,
+    .collection-grid,
     .featured-grid,
     .tool-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -531,9 +793,11 @@ const featuredTools = tools.filter((tool) => featuredIds.has(tool.id));
 
   @media (max-width: 860px) {
     .tools-hero,
+    .collection-grid,
     .featured-grid,
     .tool-grid,
-    .tools-hero-stats {
+    .tools-hero-stats,
+    .tools-trust-row {
       grid-template-columns: 1fr;
     }
 

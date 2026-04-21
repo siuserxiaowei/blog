@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent: #f2b36b;
-  --color-accent-2: #8bd3c7;
-  --color-accent-dark: #c78338;
+  --color-accent: #e7b171;
+  --color-accent-2: #97d4ca;
+  --color-accent-dark: #bb7c3d;
 
-  --color-bg-dark: #09111b;
-  --color-surface-dark: #101926;
-  --color-surface-dark-2: #162233;
-  --color-border-dark: #243245;
-  --color-text-dark: #f5efe6;
-  --color-text-dark-secondary: #a2b0c1;
+  --color-bg-dark: #08111a;
+  --color-surface-dark: #101924;
+  --color-surface-dark-2: #16202d;
+  --color-border-dark: #253548;
+  --color-text-dark: #f5f0e8;
+  --color-text-dark-secondary: #9dabbd;
 
-  --color-bg-light: #f3ede2;
-  --color-surface-light: #fffaf2;
-  --color-surface-light-2: #ece2d3;
-  --color-border-light: #d7c9b6;
+  --color-bg-light: #f2ebdf;
+  --color-surface-light: #fffaf3;
+  --color-surface-light-2: #ece1d2;
+  --color-border-light: #d8cab7;
   --color-text-light: #10151c;
   --color-text-light-secondary: #5c625e;
 
@@ -27,6 +27,7 @@
   --container-narrow: 760px;
   --radius-xl: 28px;
   --radius-lg: 18px;
+  --radius-md: 14px;
 }
 
 :root {
@@ -61,9 +62,9 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 28%),
-    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--color-accent-2) 14%, transparent), transparent 22%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg) 82%, #05080d) 0%, var(--bg) 40%, color-mix(in srgb, var(--bg) 96%, #000) 100%);
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--color-accent-2) 11%, transparent), transparent 24%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 90%, #04070c) 0%, var(--bg) 50%, color-mix(in srgb, var(--bg) 84%, #020407) 100%);
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.65;
@@ -79,9 +80,9 @@ body::before {
   background-image:
     linear-gradient(color-mix(in srgb, var(--border) 16%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--border) 16%, transparent) 1px, transparent 1px);
-  background-size: 120px 120px;
-  opacity: 0.18;
-  mask-image: radial-gradient(circle at center, black 24%, transparent 78%);
+  background-size: 96px 96px;
+  opacity: 0.12;
+  mask-image: radial-gradient(circle at center, black 22%, transparent 82%);
 }
 
 .site-backdrop {
@@ -95,24 +96,24 @@ body::before {
   position: absolute;
   display: block;
   border-radius: 999px;
-  filter: blur(80px);
-  opacity: 0.45;
+  filter: blur(110px);
+  opacity: 0.32;
 }
 
 .site-backdrop .orb-a {
   top: -8rem;
-  right: -6rem;
-  width: 26rem;
-  height: 26rem;
-  background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  right: -4rem;
+  width: 22rem;
+  height: 22rem;
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .site-backdrop .orb-b {
-  left: -9rem;
-  bottom: 8rem;
-  width: 22rem;
-  height: 22rem;
-  background: color-mix(in srgb, var(--color-accent-2) 18%, transparent);
+  left: -6rem;
+  bottom: 10rem;
+  width: 18rem;
+  height: 18rem;
+  background: color-mix(in srgb, var(--color-accent-2) 16%, transparent);
 }
 
 .site-backdrop .gridline {
@@ -120,7 +121,7 @@ body::before {
   inset: 0;
   background:
     linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), color-mix(in srgb, var(--border) 50%, transparent) calc(50% - 1px), color-mix(in srgb, var(--border) 50%, transparent) calc(50% + 1px), transparent calc(50% + 1px), transparent 100%);
-  opacity: 0.18;
+  opacity: 0.08;
 }
 
 .page-content {
@@ -130,7 +131,7 @@ body::before {
 @keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -183,9 +184,9 @@ strong {
 .glass-card {
   background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-2) 88%, transparent));
   border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 24px 48px -34px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .card-hover,
@@ -201,18 +202,18 @@ strong {
 .card-hover:hover,
 .lift-card:hover,
 .glass-card:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--color-accent) 36%, var(--border));
-  box-shadow: 0 32px 70px -36px color-mix(in srgb, var(--color-accent) 26%, transparent);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-accent) 28%, var(--border));
+  box-shadow: 0 26px 54px -38px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .btn-glow {
-  box-shadow: 0 18px 34px -20px color-mix(in srgb, var(--color-accent) 54%, transparent);
+  box-shadow: 0 16px 28px -18px color-mix(in srgb, var(--color-accent) 44%, transparent);
 }
 
 .btn-glow:hover {
   transform: translateY(-1px);
-  box-shadow: 0 22px 40px -20px color-mix(in srgb, var(--color-accent) 62%, transparent);
+  box-shadow: 0 20px 34px -18px color-mix(in srgb, var(--color-accent) 52%, transparent);
 }
 
 .shine-hover,
@@ -252,11 +253,11 @@ strong {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.45;
+  opacity: 0.28;
 }
 
 .gradient-border:hover::before {
-  opacity: 0.88;
+  opacity: 0.52;
 }
 
 .spotlight::before {
@@ -267,14 +268,14 @@ strong {
   left: var(--spot-x, -200px);
   top: var(--spot-y, -200px);
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 16%, transparent) 0%, transparent 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 12%, transparent) 0%, transparent 68%);
   pointer-events: none;
   transition: opacity 0.2s ease;
   opacity: 0;
 }
 
 .spotlight:hover::before {
-  opacity: 1;
+  opacity: 0.7;
 }
 
 .tilt-card:hover {
@@ -286,7 +287,7 @@ strong {
 }
 
 .gold-shadow:hover {
-  box-shadow: 0 28px 60px -32px color-mix(in srgb, var(--color-accent) 26%, transparent);
+  box-shadow: 0 24px 46px -30px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .divider-accent,
@@ -308,6 +309,35 @@ strong {
   text-transform: uppercase;
 }
 
+.section-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 40%, transparent), color-mix(in srgb, var(--border) 72%, transparent), transparent);
+}
+
+.pill-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metric-tile {
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  box-shadow: 0 24px 46px -36px rgba(0, 0, 0, 0.35);
+}
+
 .text-gradient,
 .text-shimmer {
   background: linear-gradient(120deg, var(--text) 0%, color-mix(in srgb, var(--color-accent) 86%, white 14%) 42%, color-mix(in srgb, var(--color-accent-2) 90%, white 10%) 74%, var(--text) 100%);
@@ -318,7 +348,7 @@ strong {
 }
 
 .text-shimmer {
-  animation: shimmer 8s linear infinite;
+  animation: shimmer 10s linear infinite;
 }
 
 @keyframes shimmer {
@@ -343,7 +373,7 @@ strong {
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(18px);
   transition: opacity 0.8s cubic-bezier(.2, .7, .2, 1), transform 0.8s cubic-bezier(.2, .7, .2, 1);
 }
 
@@ -464,12 +494,27 @@ strong {
   }
 
   .site-backdrop .orb-a {
-    width: 18rem;
-    height: 18rem;
+    width: 16rem;
+    height: 16rem;
   }
 
   .site-backdrop .orb-b {
-    width: 16rem;
-    height: 16rem;
+    width: 14rem;
+    height: 14rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

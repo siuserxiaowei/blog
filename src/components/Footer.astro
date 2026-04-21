@@ -6,10 +6,10 @@ const year = new Date().getFullYear();
   <div class="mx-auto footer-shell" style="max-width: var(--container-max);">
     <div class="footer-top">
       <div>
-        <p class="footer-kicker">Independent Dispatch</p>
+        <p class="footer-kicker">Open Workbench</p>
         <h2>siuser小伟</h2>
         <p class="footer-copy">
-          记录技术、产品与学习过程中的真实判断。把想法做成东西，再把过程公开出来。
+          写判断，做工具，持续把工作的过程公开出来。这里不是简历页，而是一个会持续更新的独立工作台。
         </p>
       </div>
 
@@ -35,10 +35,10 @@ const year = new Date().getFullYear();
 <style>
   .footer-shell {
     border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
-    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 78%, transparent), color-mix(in srgb, var(--surface-2) 90%, transparent));
-    border-radius: 30px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, transparent), color-mix(in srgb, var(--surface-2) 94%, transparent));
+    border-radius: 28px;
     padding: 2rem;
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 24px 48px -36px rgba(0, 0, 0, 0.35);
   }
 
   .footer-top {
@@ -54,7 +54,7 @@ const year = new Date().getFullYear();
     color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
@@ -79,6 +79,10 @@ const year = new Date().getFullYear();
   .footer-links a,
   .footer-socials a {
     color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     transition: color 0.2s ease, transform 0.2s ease;
   }
 
