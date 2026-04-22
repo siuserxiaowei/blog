@@ -44,8 +44,18 @@ const competitions = [
     winning:['深圳落户意向','团队完整度','供应链贴近度','行业决赛对口'],
     timeline:[{event:'第 18 届启动(预计)',date:'2026-04-28',critical:false},{event:'报名截止(参考 17 届)',date:'2026-06-16',critical:true},{event:'行业决赛(参考)',date:'2026-09-30',critical:true},{event:'总决赛(参考)',date:'2026-11-15',critical:true}],
     url:'https://stic.sz.gov.cn/xxgk/ztzl/cxcyds/' },
-  { id:'spark', name:'立创星火计划', fullName:'嘉立创 · 立创开源硬件「星火计划 2026」', org:'嘉立创 / 立创开源硬件平台 OSHWHub', rel:'A', loc:'线上（深圳）', date:'2026-01-19 至 2026-11-30', deadlineISO:'2026-11-30', tier:'A', cat:'工程量产', match:8.5, suit:'高',
-    desc:'嘉立创 2026 星火计划 1 月 19 日启动，分初级/高阶/悬赏三赛道，总奖池 30 万元。评分为「官方评分 + 人气指标（点赞/收藏/评论）+ 公众投票」加权，定期评选 Top 30。高阶赛道可获最高 2 万元打样/SMT/3D 打印/CNC 资助。',
+  { id:'jlcspark', name:'星火硬件创新大赛', fullName:'2026 全球「星火」硬件创新大赛（首届）', org:'嘉立创 · 福田区政府指导 · 中科院科创中心 / 青年科学家产学研创新联合体（联合主办）', rel:'A+', loc:'深圳福田', date:'2026 年 1 - 7 月', deadlineISO:'2026-04-30', tier:'S', cat:'工程量产', match:9.1, suit:'很高',
+    desc:'嘉立创主办的首届非开源工程验证大赛，福田区政府指导，中科院科技创新发展中心、青年科学家产学研创新联合体联合主办。强调「可实现、可验证、可落地」的工程路径，而不是概念 PPT。参赛项目 IP 完全归参赛方，赛事不要求任何形式的开源或授权。入围项目进工程加速营（6-9 至 7-18），配导师辅导 + 试产支持 + 产业对接，决赛 7 月下旬深圳。赛道 A 具身智能与机器人关键硬件，赛道 B AI 边缘计算与智能终端。',
+    strategy:'用真实原型或样机报名，打「工程可行性 + 量产路径 + 独立 IP」牌，不走开源叙事。适合有公司实体且成立 ≤3 年的方案商。',
+    audience:'个人开发者 / 初创团队 / 成立 ≤3 年的初创企业，硬件方案商、具身智能、AI 边缘终端团队尤其对口',
+    rewards:['一等奖 2-3 项 · 现金+产业对接+投资机构定向路演','二等奖 1-2 项','三等奖 3-5 项 · 纳入赛事重点项目库持续跟进','优秀奖若干 · 赛事官方认证与展示','工程加速营导师辅导','试产支持 + 产业资源对接'],
+    pros:['中科院 + 福田区政府双背书','非开源机制保护核心 IP','工程加速营给真实试产通道','决赛配投资机构路演','嘉立创制造资源真实'],
+    cons:['报名窗口紧（到 4-30）','初创企业要求成立 ≤3 年','要求原型/工程验证方案，纯概念阶段不适合','评审周期长（1 月至 7 月）'],
+    winning:['原型/样机可演示','工程可行性验证','量产路径清晰','独立 IP 或明确归属'],
+    timeline:[{event:'报名开启',date:'2026-01-30',critical:false},{event:'报名截止',date:'2026-04-30',critical:true},{event:'海选评审',date:'2026-05-19',critical:false},{event:'初选评审(线上路演)',date:'2026-06-05',critical:true},{event:'工程加速营结束',date:'2026-07-18',critical:false},{event:'决赛入围评审',date:'2026-07-22',critical:true},{event:'总决赛 + 颁奖(深圳)',date:'2026-07-31',critical:true}],
+    url:'https://www.jlc-bbs.com/spark-competition/home' },
+  { id:'spark', name:'立创星火开源计划', fullName:'嘉立创 · 立创开源硬件「星火计划 2026」（OSHWHub 年度扶持）', org:'嘉立创 / 立创开源硬件平台 OSHWHub', rel:'A', loc:'线上（深圳）', date:'2026-01-19 至 2026-11-30', deadlineISO:'2026-11-30', tier:'A', cat:'工程量产', match:8.0, suit:'高',
+    desc:'嘉立创旗下 OSHWHub 社区的年度开源硬件扶持计划（与同名非开源「星火硬件创新大赛」是两条独立赛事）。2026 赛季 1-19 启动，分初级 / 高阶 / 悬赏三赛道，总奖池 30 万元。评分为「官方评分 + 人气指标 + 公众投票」加权，定期评选 Top 30。高阶赛道最高 2 万元打样 / SMT / 3D 打印 / CNC 资助。',
     strategy:'在 OSHWHub 发布开源项目，配合工程文档和社区互动运营，挑战高阶赛道冲击 2 万元物料资助。',
     audience:'有开源硬件项目的个人/团队',
     rewards:['总奖池 30 万元（Top 30 奖杯+现金）','高阶赛道最高 2 万元打样/SMT/CNC 资助','初级赛道 ≤2000 元元器件补贴','悬赏赛道命题奖励'],
@@ -252,16 +262,16 @@ const categories = [...new Set(enriched.map(c => c.cat))];
         <div>
           <p class="section-kicker mb-4">// Priority Matrix</p>
           <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
-            BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> Red Dot
+            星火硬件 <span style="color: var(--text-secondary); font-weight: 400;">›</span> BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国
           </h2>
           <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            窗口最短的是 <strong style="color: var(--color-accent);">BEYOND HACK DAY（5-8 截止）</strong>，澳门现场极限开发 + 嘉立创星火百万奖池 + 100+ 投资机构对接，对硬件方案商是最短的资本 / 产业接入。<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15 截止）</strong>奖池 68 万、决赛进 HDC2026 松山湖。创客中国第 11 届 7-10 截止，政策兑现率高。Red Dot Design Concept 2026 Late 4-29 截止，是国际背书最快的路径。
+            <strong style="color: var(--color-accent);">「星火」硬件创新大赛（4-30 截止）</strong>是首届 + 非开源 + 福田区政府 / 中科院科创中心联合背书，IP 归参赛方，入围进工程加速营 + 试产 + 投资路演 —— 对方案商是规格最高的一场。接着是 <strong style="color: var(--color-accent);">BEYOND HACK DAY（5-8 截止）</strong>澳门极限开发 + 嘉立创百万奖池 + 100+ 投资机构。<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15 截止）</strong>奖池 68 万、决赛 HDC2026。创客中国第 11 届 7-10 截止，政策兑现最稳。
           </p>
           <div class="flex flex-wrap gap-2">
+            <span class="pill-note"><span class="dot-accent"></span>工程 · 星火硬件 · 4-30</span>
             <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
             <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
             <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
-            <span class="pill-note"><span class="dot-accent2"></span>国际 · Red Dot · 4-29</span>
           </div>
         </div>
 
