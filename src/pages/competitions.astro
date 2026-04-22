@@ -225,7 +225,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
 <BaseLayout title="AI 硬件赛事雷达 · siuser小伟" description="AI 硬件方案商的赛事与行业活动调研看板。">
   <Header />
 
-  <main class="flex-1 cp-main">
+  <main class="flex-1">
 
     <!-- Hero -->
     <section class="mx-auto px-6 pt-16 pb-10 md:pt-24" style="max-width: var(--container-max);">
@@ -498,13 +498,6 @@ const categories = [...new Set(enriched.map(c => c.cat))];
 </BaseLayout>
 
 <style is:global>
-  /* ============ Page-scoped palette: cool blue for the radar ============ */
-  .cp-main {
-    --color-accent: oklch(0.80 0.085 232);     /* soft sky blue */
-    --color-accent-2: oklch(0.87 0.055 215);   /* pale aqua */
-    --color-accent-dark: oklch(0.60 0.12 238); /* deeper indigo-blue */
-  }
-
   /* ============ Filter rows ============ */
   .filter-rows {
     display: grid;
@@ -578,12 +571,12 @@ const categories = [...new Set(enriched.map(c => c.cat))];
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent), 0 0 16px -4px color-mix(in srgb, var(--color-accent) 50%, transparent);
   }
 
-  /* Cool-blue palette wants a cool-dark ink, not the warm-gold ink */
-  .cp-main .tier-S,
-  .cp-main .urgent-badge,
-  .cp-main .filter-chip.is-on,
-  .cp-main .cta-button {
-    color: #061826;
+  /* Dark ink on accent fills */
+  .tier-S,
+  .urgent-badge,
+  .filter-chip.is-on,
+  .cta-button {
+    color: var(--color-accent-ink);
   }
   .tier-A {
     color: var(--color-accent-2);

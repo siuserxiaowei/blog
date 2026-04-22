@@ -16,143 +16,115 @@ function formatDate(dateStr: string) {
 }
 ---
 
-<a href={`/blog/${slug}`} class="group block">
-  <article class="blog-card surface-card card-hover gradient-border rounded-[24px]">
+<a href={`/blog/${slug}`} class="blog-card">
+  <article>
+    <div class="blog-card-meta">
+      <time>{formatDate(date)}</time>
+      {tags.length > 0 && (
+        <span class="blog-card-tags">
+          {tags.slice(0, 3).map((tag, i) => (
+            <span>{tag}{i < Math.min(tags.length, 3) - 1 ? ' · ' : ''}</span>
+          ))}
+        </span>
+      )}
+    </div>
+
     {image && (
       <div class="blog-card-media">
         <img src={image} alt={title} loading="lazy" />
       </div>
     )}
 
-    <div class="blog-card-body">
-      <div class="blog-card-meta">
-        <span class="blog-card-kind">Dispatch</span>
-        <time>{formatDate(date)}</time>
-      </div>
+    <h3 class="blog-card-title display-serif">{title}</h3>
+    <p class="blog-card-desc">{description}</p>
 
-      <div class="blog-card-content">
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-
-      <div class="blog-card-tags">
-        {tags.slice(0, 3).map((tag) => (
-          <span>{tag}</span>
-        ))}
-      </div>
-
-      <div class="blog-card-footer">
-        <span>Read dispatch</span>
-        <span class="blog-card-arrow">↗</span>
-      </div>
-    </div>
+    <span class="blog-card-read">阅读 <em>→</em></span>
   </article>
 </a>
 
 <style>
   .blog-card {
-    overflow: hidden;
+    display: block;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    transition: border-color 0.15s ease;
+  }
+
+  .blog-card:hover {
+    color: var(--text);
+    border-bottom-color: var(--border-strong);
+  }
+
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+
+  .blog-card-tags {
+    color: var(--text-muted);
   }
 
   .blog-card-media {
+    margin-bottom: 1.1rem;
     aspect-ratio: 2.35 / 1;
     overflow: hidden;
-    border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
   }
 
   .blog-card-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(.2, .7, .2, 1), filter 0.4s ease;
-    filter: saturate(0.92) contrast(1.02);
+    transition: transform 0.4s ease;
   }
 
-  .group:hover .blog-card-media img {
-    transform: scale(1.04);
-    filter: saturate(1.02) contrast(1.05);
+  .blog-card:hover .blog-card-media img {
+    transform: scale(1.02);
   }
 
-  .blog-card-body {
-    display: grid;
-    gap: 1rem;
-    padding: 1.45rem;
-  }
-
-  .blog-card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.73rem;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-  }
-
-  .blog-card-kind {
-    color: var(--color-accent);
-  }
-
-  .blog-card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-  }
-
-  .blog-card-tags span {
-    border-radius: 999px;
-    padding: 0.28rem 0.58rem;
-    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 88%, transparent);
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .blog-card-content h3 {
-    margin-bottom: 0.6rem;
-    font-size: clamp(1.32rem, 1.7vw, 1.7rem);
-    line-height: 1.12;
-  }
-
-  .blog-card-content p {
-    color: var(--text-secondary);
-    line-height: 1.75;
-  }
-
-  .blog-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 1.05rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  .blog-card-title {
+    font-size: clamp(1.55rem, 2.6vw, 2.1rem);
+    line-height: 1.1;
+    margin-bottom: 0.7rem;
     color: var(--text);
+    transition: color 0.15s ease;
+  }
+
+  .blog-card:hover .blog-card-title {
+    color: var(--color-accent);
+  }
+
+  .blog-card-desc {
+    max-width: 48rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .blog-card-read {
+    color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 
-  .blog-card-arrow {
-    color: var(--color-accent);
+  .blog-card-read em {
+    font-style: normal;
     transition: transform 0.2s ease;
+    display: inline-block;
   }
 
-  .group:hover .blog-card-arrow {
-    transform: translate(2px, -2px);
-  }
-
-  @media (max-width: 680px) {
-    .blog-card-body {
-      padding: 1.15rem;
-    }
-
-    .blog-card-content h3 {
-      font-size: 1.28rem;
-    }
+  .blog-card:hover .blog-card-read em {
+    transform: translateX(3px);
   }
 </style>

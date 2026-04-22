@@ -12,80 +12,29 @@ const allPosts = (await getCollection('blog'))
 
 const posts = allPosts.slice(0, 3);
 const totalPosts = allPosts.length;
-const todayLabel = new Date().toLocaleDateString('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric'
-}).toUpperCase();
 
-const operatingSystem = [
+const lanes = [
   {
-    index: '01',
     label: 'Write',
     title: '把判断写成公开日志',
     desc: '文章不是装饰，而是把真实的产品判断、实验过程和学习路径记录下来。',
-    note: 'Blog / RSS / newsletter',
-    proof: `${totalPosts} 篇已发布`
+    meta: `${totalPosts} 篇已发布`,
+    href: '/blog'
   },
   {
-    index: '02',
     label: 'Build',
     title: '把重复问题做成工具',
     desc: '工具页承担的是效率任务。高频动作直接固定成浏览器内可用的小产品。',
-    note: 'Browser-first toolbox',
-    proof: '60+ tools live'
+    meta: '60+ 工具在线',
+    href: '/tools'
   },
   {
-    index: '03',
     label: 'Ship',
     title: '让项目和比赛形成外部约束',
     desc: '项目展示和比赛雷达不是补充页面，而是推动更新频率和判断密度的外部机制。',
-    note: 'Projects / competitions',
-    proof: '持续公开迭代'
+    meta: '持续公开迭代',
+    href: '/projects'
   }
-];
-
-const signalStrip = [
-  { k: 'Published', v: `${totalPosts} dispatches` },
-  { k: 'Toolbox', v: '60+ browser tools' },
-  { k: 'Cadence', v: 'Ship weekly' },
-  { k: 'Focus', v: 'AI / automation / learning systems' }
-];
-
-const entryPoints = [
-  {
-    mark: 'TB',
-    title: '工具箱',
-    eyebrow: 'Browser-first utilities',
-    href: '/tools',
-    desc: '把 JSON、编码、哈希、时间、颜色、文本处理这些高频动作收进一个真正能用的目录。',
-    stat: '60+ live tools',
-    tags: ['快开即用', '浏览器内运行', '无上传']
-  },
-  {
-    mark: 'PR',
-    title: '项目展示',
-    eyebrow: 'Products in progress',
-    href: '/projects',
-    desc: '集中展示我正在做的 AI、自动化和个人产品，保留持续迭代的上下文。',
-    stat: '公开推进中',
-    tags: ['AI 产品', '自动化', '公开构建']
-  },
-  {
-    mark: 'RD',
-    title: '比赛雷达',
-    eyebrow: 'Opportunity scanner',
-    href: '/competitions',
-    desc: '把创业比赛、黑客松和创新项目搜集成可以快速扫描的机会页面。',
-    stat: '持续更新',
-    tags: ['信息整理', '机会发现', '降低搜索成本']
-  }
-];
-
-const publishingLanes = [
-  '产品判断和拆解',
-  'AI 工具与自动化实验',
-  '公开构建中的项目记录'
 ];
 ---
 
@@ -93,204 +42,118 @@ const publishingLanes = [
   <Header />
 
   <main class="flex-1">
-    <section
-      id="home"
-      class="mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-22"
-      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
-    >
-      <div class="hero-shell">
-        <div class="scroll-reveal hero-copy">
-          <div class="hero-meta-row">
-            <span class="pill-note">Independent Workbench</span>
-            <span class="hero-date">{todayLabel}</span>
-          </div>
 
-          <h1 class="hero-title">
-            这里不是个人简历，<br />
-            <span class="text-shimmer">是一个持续运行的工作台。</span>
-          </h1>
+    <!-- ===== Hero ===== -->
+    <section id="home" class="container hero-section">
+      <div class="hero-inner">
+        <p class="animate-fade-in stagger-1 section-kicker">Independent Workbench · 2026</p>
 
-          <p class="hero-copy-text">
-            我把 AI、自动化、产品工程和学习系统相关的工作公开发布出来。
-            一部分写成文章，一部分做成工具，一部分继续推进成项目。
-          </p>
+        <h1 class="animate-fade-in stagger-2 hero-title display-serif">
+          这里不是个人<em>简历</em>，<br />
+          而是一个持续<em>运行</em>的工作台。
+        </h1>
 
-          <div class="hero-actions">
-            <a href="#blog" class="hero-btn hero-btn-primary btn-glow">看最新文章</a>
-            <a href="/tools" class="hero-btn hero-btn-ghost">进入工具箱</a>
-          </div>
+        <p class="animate-fade-in stagger-3 hero-lede">
+          我把 AI、自动化、产品工程和学习系统相关的工作公开发布出来。<br class="hide-mobile" />
+          一部分写成文章，一部分做成工具，一部分继续推进成项目。
+        </p>
+
+        <div class="animate-fade-in stagger-4 hero-actions">
+          <a href="#blog" class="btn-primary">看最新文章 →</a>
+          <a href="/tools" class="btn-ghost">进入工具箱</a>
         </div>
-
-        <aside class="scroll-reveal hero-board surface-card gradient-border">
-          <div class="hero-board-head">
-            <p class="section-kicker">Site Model</p>
-            <span>updated weekly</span>
-          </div>
-
-          <div class="hero-board-list">
-            {operatingSystem.map((item) => (
-              <article class="hero-board-row">
-                <div class="hero-board-index">{item.index}</div>
-                <div>
-                  <p class="hero-board-label">{item.label}</p>
-                  <h2>{item.title}</h2>
-                  <p>{item.desc}</p>
-                  <div class="hero-board-meta">
-                    <span>{item.note}</span>
-                    <strong>{item.proof}</strong>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div class="section-rule"></div>
-
-          <div class="hero-dispatches">
-            <div class="hero-dispatches-head">
-              <p class="section-kicker">Recent Dispatches</p>
-              <a href="/blog">全部文章 ↗</a>
-            </div>
-
-            {posts.map((post) => (
-              <a href={`/blog/${post.id}`} class="hero-dispatch">
-                <span>{post.data.title}</span>
-                <em>{post.data.date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</em>
-              </a>
-            ))}
-          </div>
-        </aside>
       </div>
 
-      <div class="hero-strip">
-        {signalStrip.map((item) => (
-          <div class="metric-tile scroll-reveal hero-metric">
-            <span>{item.k}</span>
-            <strong>{item.v}</strong>
-          </div>
-        ))}
-      </div>
+      <div class="divider-accent hero-divider"></div>
     </section>
 
-    <section
-      id="about"
-      class="mx-auto px-6 py-16 md:py-20"
-      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
-    >
-      <div class="section-row scroll-reveal">
-        <div class="section-head">
-          <p class="section-kicker">Entry Points</p>
-          <h2>先从最有用的三个入口开始。</h2>
-        </div>
-        <p class="section-side-copy">
-          视觉和结构只服务一个目标：让人快速明白我在做什么、最近在推进什么、下一步从哪里进入。
-        </p>
+    <!-- ===== Operating model ===== -->
+    <section id="about" class="container model-section">
+      <div class="model-head">
+        <p class="section-kicker">Operating Model</p>
+        <h2 class="display-serif model-heading">
+          三件事撑起这个站：<em>写</em>、<em>做</em>、<em>交付</em>。
+        </h2>
       </div>
 
-      <div class="entry-grid">
-        {entryPoints.map((entry) => (
-          <a href={entry.href} class="scroll-reveal surface-card card-hover gradient-border entry-card">
-            <div class="entry-head">
-              <span class="entry-mark">{entry.mark}</span>
-              <p class="entry-eyebrow">{entry.eyebrow}</p>
+      <div class="lanes">
+        {lanes.map((lane, i) => (
+          <a href={lane.href} class="lane scroll-reveal">
+            <div class="lane-head">
+              <span class="lane-index">{String(i + 1).padStart(2, '0')}</span>
+              <span class="lane-label">{lane.label}</span>
             </div>
-            <h3>{entry.title}</h3>
-            <p class="entry-copy">{entry.desc}</p>
-
-            <div class="entry-tags">
-              {entry.tags.map((tag) => (
-                <span>{tag}</span>
-              ))}
-            </div>
-
-            <div class="entry-footer">
-              <span>{entry.stat}</span>
-              <span>进入 ↗</span>
+            <h3 class="lane-title display-serif">{lane.title}</h3>
+            <p class="lane-desc">{lane.desc}</p>
+            <div class="lane-foot">
+              <span>{lane.meta}</span>
+              <span class="lane-arrow">→</span>
             </div>
           </a>
         ))}
       </div>
     </section>
 
-    <section
-      id="blog"
-      class="mx-auto px-6 py-20 md:py-24"
-      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
-    >
-      <div class="section-row scroll-reveal">
-        <div class="section-head">
-          <p class="section-kicker">Writing</p>
-          <h2>最近写下来的判断和实验。</h2>
-        </div>
-        <p class="section-side-copy">
-          优先记录真实进展，不写空泛总结。文章会围绕下面三类主题持续更新。
-        </p>
+    <!-- ===== Writing ===== -->
+    <section id="blog" class="container blog-section">
+      <div class="blog-head">
+        <p class="section-kicker">Writing</p>
+        <h2 class="display-serif model-heading">最近写下来的判断和实验。</h2>
+        <a href="/blog" class="blog-head-link">全部文章 →</a>
       </div>
 
-      <div class="blog-shell">
-        <aside class="scroll-reveal surface-card blog-brief">
-          <p class="section-kicker">Reading Guide</p>
-          <h3>内容主线</h3>
-          <div class="blog-lanes">
-            {publishingLanes.map((lane) => (
-              <div class="blog-lane">
-                <span></span>
-                <p>{lane}</p>
-              </div>
-            ))}
-          </div>
-          <a href="/blog" class="blog-brief-link">全部文章 ↗</a>
-        </aside>
-
-        <div class="blog-list">
-          {posts.map((post) => (
-            <div class="scroll-reveal">
-              <BlogCard
-                title={post.data.title}
-                description={post.data.description}
-                date={post.data.date.toISOString()}
-                tags={post.data.tags}
-                slug={post.id}
-                image={post.data.image}
-              />
-            </div>
-          ))}
-        </div>
+      <div class="blog-list">
+        {posts.map((post) => (
+          <BlogCard
+            title={post.data.title}
+            description={post.data.description}
+            date={post.data.date.toISOString()}
+            tags={post.data.tags}
+            slug={post.id}
+            image={post.data.image}
+          />
+        ))}
       </div>
     </section>
 
-    <section
-      id="contact"
-      class="mx-auto px-6 py-18 md:py-22"
-      style="max-width: var(--container-max); scroll-margin-top: 7rem;"
-    >
-      <div class="contact-grid">
-        <div class="scroll-reveal">
-          <Newsletter />
+    <!-- ===== Contact ===== -->
+    <section id="contact" class="container contact-section">
+      <div class="contact-inner">
+        <div>
+          <p class="section-kicker">Contact</p>
+          <h2 class="display-serif model-heading contact-h2">
+            做类似方向的，<em>直接找我</em>。
+          </h2>
+          <p class="contact-copy">
+            AI、自动化、内容产品、学习工具这些方向都可以聊。这里希望结识一起做东西的人，<br class="hide-mobile" />
+            而不只是交换名片。
+          </p>
         </div>
 
-        <div class="scroll-reveal surface-card gradient-border contact-card">
-          <p class="section-kicker">Contact</p>
-          <h2>如果你也在做类似方向，欢迎直接联系我。</h2>
-          <p class="contact-copy">
-            AI、自动化、内容产品、学习工具这些方向都可以聊。这里更希望结识一起做东西的人，而不只是交换名片。
-          </p>
-
-          <div class="contact-links">
+        <ul class="contact-links">
+          <li>
             <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">
               <span>GitHub</span>
               <em>@siuserxiaowei</em>
             </a>
+          </li>
+          <li>
             <a href="mailto:hi@siuserxiaowei.com">
               <span>Email</span>
               <em>hi@siuserxiaowei.com</em>
             </a>
+          </li>
+          <li>
             <a href="/rss.xml">
               <span>RSS</span>
               <em>订阅更新</em>
             </a>
-          </div>
-        </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="newsletter-slot">
+        <Newsletter />
       </div>
     </section>
   </main>
@@ -299,133 +162,230 @@ const publishingLanes = [
 </BaseLayout>
 
 <style>
-  .hero-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
-    gap: 2.5rem;
-    align-items: stretch;
+  .container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
-  .hero-copy {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 100%;
-    padding-right: 0.5rem;
-  }
+  .hide-mobile { display: inline; }
+  @media (max-width: 780px) { .hide-mobile { display: none; } }
 
-  .hero-meta-row,
-  .hero-board-head,
-  .hero-dispatches-head,
-  .entry-footer,
-  .entry-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .hero-date {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hero-title {
-    margin-top: 1.25rem;
-    font-size: clamp(2.2rem, 4.4vw, 3.8rem);
-    line-height: 1.22;
-    letter-spacing: -0.005em;
-    font-weight: 500;
-    text-wrap: balance;
-  }
-
-  .hero-copy-text {
-    max-width: 42rem;
-    margin-top: 1.25rem;
-    color: var(--text-secondary);
-    font-size: clamp(0.98rem, 1.25vw, 1.08rem);
-    line-height: 1.9;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    margin-top: 1.7rem;
-  }
-
-  .hero-btn {
+  /* ===== Buttons ===== */
+  .btn-primary,
+  .btn-ghost {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 3.15rem;
-    border-radius: 999px;
+    gap: 0.45rem;
+    height: 2.75rem;
     padding: 0 1.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
 
-  .hero-btn-primary {
-    background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 76%, white 24%));
-    color: #111;
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    border: 1px solid var(--color-accent);
   }
 
-  .hero-btn-ghost {
-    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
-    background: color-mix(in srgb, var(--surface) 82%, transparent);
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: var(--color-accent-ink);
+  }
+
+  .btn-ghost {
+    border: 1px solid var(--border-strong);
+    background: transparent;
     color: var(--text);
   }
 
-  .hero-btn:hover {
-    transform: translateY(-1px);
+  .btn-ghost:hover {
+    border-color: var(--text);
+    color: var(--text);
   }
 
-  .hero-board {
-    display: grid;
-    gap: 1rem;
-    padding: 1.25rem;
-    border-radius: 28px;
+  /* ===== Hero ===== */
+  .hero-section {
+    padding-top: 7rem;
+    padding-bottom: 4rem;
   }
 
-  .hero-board-head span,
-  .hero-board-label,
-  .entry-eyebrow,
-  .entry-tags span,
-  .hero-metric span,
-  .blog-brief-link,
-  .contact-links em {
+  .hero-inner {
+    max-width: 54rem;
+  }
+
+  .hero-title {
+    margin-top: 1.5rem;
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+  }
+
+  .hero-title em {
+    color: var(--color-accent);
+    font-style: italic;
+  }
+
+  .hero-lede {
+    max-width: 42rem;
+    margin-top: 1.75rem;
     color: var(--text-secondary);
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.85;
+  }
+
+  .hero-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .hero-divider {
+    margin-top: 4.5rem;
+  }
+
+  @media (max-width: 780px) {
+    .hero-section { padding-top: 5rem; padding-bottom: 3rem; }
+    .hero-title { font-size: clamp(2.2rem, 9vw, 3.2rem); }
+  }
+
+  /* ===== Sections ===== */
+  .model-section,
+  .blog-section,
+  .contact-section {
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+  }
+
+  .model-head,
+  .blog-head {
+    max-width: 48rem;
+    margin-bottom: 3rem;
+  }
+
+  .model-heading {
+    margin-top: 0.8rem;
+    font-size: clamp(2rem, 4.2vw, 3.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+
+  .model-heading em {
+    color: var(--color-accent);
+    font-style: italic;
+  }
+
+  /* ===== Lanes (Operating Model) ===== */
+  .lanes {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--border);
+  }
+
+  .lane {
+    display: grid;
+    grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr) auto;
+    gap: 2rem;
+    align-items: start;
+    padding: 2.2rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    transition: background 0.15s ease;
+  }
+
+  .lane:hover {
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    color: var(--text);
+  }
+
+  .lane-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .lane-index {
+    font-family: var(--font-heading);
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--color-accent);
+    letter-spacing: -0.02em;
+  }
+
+  .lane-label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .lane-title {
+    font-size: clamp(1.45rem, 2.4vw, 2rem);
+    line-height: 1.15;
+    margin-bottom: 0.6rem;
+  }
+
+  .lane:hover .lane-title {
+    color: var(--color-accent);
+  }
+
+  .lane-desc {
+    color: var(--text-secondary);
+    line-height: 1.75;
+    font-size: 0.98rem;
+  }
+
+  .lane-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    text-align: right;
+    min-width: 8rem;
+  }
+
+  .lane-foot > span:first-child {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
-  .hero-board-list {
-    display: grid;
-    gap: 1rem;
+  .lane-arrow {
+    color: var(--color-accent);
+    font-size: 1.15rem;
+    transition: transform 0.2s ease;
   }
 
-  .hero-board-row {
-    display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr);
-    gap: 0.85rem;
+  .lane:hover .lane-arrow { transform: translateX(4px); }
+
+  @media (max-width: 780px) {
+    .lane {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+      padding: 1.7rem 0;
+    }
+    .lane-index { font-size: 2rem; }
+    .lane-foot { align-items: flex-start; text-align: left; }
   }
 
-  .hero-board-index {
-    width: 3rem;
-    height: 3rem;
-    display: grid;
-    place-items: center;
-    border-radius: 16px;
-    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+  /* ===== Blog ===== */
+  .blog-head {
+    position: relative;
+  }
+
+  .blog-head-link {
+    position: absolute;
+    right: 0;
+    bottom: 0.3rem;
     color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.78rem;
@@ -433,250 +393,53 @@ const publishingLanes = [
     text-transform: uppercase;
   }
 
-  .hero-board-row h2 {
-    margin-top: 0.28rem;
-    margin-bottom: 0.45rem;
-    font-size: 1.28rem;
-    line-height: 1.12;
+  .blog-list {
+    border-top: 1px solid var(--border);
   }
 
-  .hero-board-row p:last-of-type {
-    color: var(--text-secondary);
-    line-height: 1.75;
+  @media (max-width: 680px) {
+    .blog-head-link {
+      position: static;
+      margin-top: 1rem;
+      display: inline-block;
+    }
   }
 
-  .hero-board-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-top: 0.85rem;
-    padding-top: 0.85rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  /* ===== Contact ===== */
+  .contact-section {
+    padding-bottom: 5rem;
   }
 
-  .hero-board-meta span {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .hero-board-meta strong,
-  .hero-metric strong {
-    color: var(--text);
-    font-size: 0.98rem;
-  }
-
-  .hero-dispatches {
+  .contact-inner {
     display: grid;
-    gap: 0.65rem;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
   }
 
-  .hero-dispatches-head a {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  .contact-h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    margin-bottom: 1.3rem;
   }
 
-  .hero-dispatch {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.85rem 0.95rem;
-    border-radius: 18px;
-    border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-  }
-
-  .hero-dispatch span {
-    line-height: 1.45;
-  }
-
-  .hero-dispatch em {
-    color: var(--text-secondary);
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    white-space: nowrap;
-  }
-
-  .hero-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-    margin-top: 2.4rem;
-  }
-
-  .hero-metric {
-    padding: 1rem 1.05rem;
-  }
-
-  .hero-metric span {
-    display: block;
-    margin-bottom: 0.35rem;
-  }
-
-  .section-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
-    gap: 1.5rem;
-    align-items: end;
-    margin-bottom: 2.4rem;
-  }
-
-  .section-head h2,
-  .contact-card h2 {
-    margin-top: 0.35rem;
-    font-size: clamp(1.6rem, 2.6vw, 2.3rem);
-    line-height: 1.22;
-    letter-spacing: -0.005em;
-    font-weight: 500;
-    text-wrap: balance;
-  }
-
-  .section-side-copy {
+  .contact-copy {
+    max-width: 40rem;
     color: var(--text-secondary);
     line-height: 1.85;
   }
 
-  .entry-grid,
-  .contact-grid {
-    display: grid;
-    gap: 1.6rem;
-  }
-
-  .entry-card,
-  .contact-card,
-  .blog-brief {
-    border-radius: 28px;
-    padding: 1.25rem;
-  }
-
-  .entry-card h3,
-  .blog-brief h3 {
-    font-size: 1.42rem;
-    line-height: 1.14;
-  }
-
-  .entry-copy,
-  .blog-brief p,
-  .contact-copy {
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-
-  .entry-grid,
-  .contact-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .entry-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
-
-  .entry-mark {
-    width: 2.5rem;
-    height: 2.5rem;
-    display: grid;
-    place-items: center;
-    border-radius: 16px;
-    border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 84%, transparent);
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .entry-copy {
-    flex: 1;
-  }
-
-  .entry-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-  }
-
-  .entry-tags span {
-    padding: 0.28rem 0.58rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 86%, transparent);
-  }
-
-  .entry-footer {
-    margin-top: 0.2rem;
-    padding-top: 1rem;
-    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    color: var(--text-secondary);
-  }
-
-  .blog-shell {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1fr);
-    gap: 1rem;
-  }
-
-  .blog-brief {
-    height: fit-content;
-  }
-
-  .blog-brief h3 {
-    margin-top: 0.35rem;
-    margin-bottom: 1rem;
-  }
-
-  .blog-lanes {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .blog-lane {
-    display: grid;
-    grid-template-columns: 0.7rem minmax(0, 1fr);
-    gap: 0.7rem;
-    align-items: start;
-  }
-
-  .blog-lane span {
-    width: 0.45rem;
-    height: 0.45rem;
-    margin-top: 0.45rem;
-    border-radius: 999px;
-    background: var(--color-accent);
-  }
-
-  .blog-brief-link {
-    display: inline-flex;
-    margin-top: 1.25rem;
-  }
-
-  .blog-list {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .contact-grid {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  }
-
-  .contact-card {
-    display: grid;
-    gap: 1rem;
-  }
-
   .contact-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    gap: 0.7rem;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .contact-links li {
+    border-bottom: 1px solid var(--border);
   }
 
   .contact-links a {
@@ -684,63 +447,41 @@ const publishingLanes = [
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.9rem 0.95rem;
-    border-radius: 18px;
-    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-    transition: border-color 0.2s ease, transform 0.2s ease;
+    padding: 1rem 0.25rem;
+    color: var(--text);
+    transition: color 0.15s ease, padding 0.15s ease;
   }
 
   .contact-links a:hover {
-    transform: translateY(-1px);
-    border-color: color-mix(in srgb, var(--color-accent) 28%, var(--border));
+    color: var(--color-accent);
+    padding-left: 0.75rem;
   }
 
-  .contact-links span {
-    color: var(--text);
-    font-weight: 600;
+  .contact-links a span {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
   }
 
-  @media (max-width: 1120px) {
-    .hero-shell,
-    .section-row,
-    .blog-shell {
-      grid-template-columns: 1fr;
-    }
+  .contact-links a em {
+    font-style: normal;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+  }
 
-    .entry-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hero-strip {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .newsletter-slot {
+    margin-top: 1rem;
   }
 
   @media (max-width: 860px) {
-    .hero-title {
-      font-size: clamp(1.9rem, 8vw, 2.8rem);
-    }
-
-    .hero-strip,
-    .entry-grid,
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-board,
-    .entry-card,
-    .blog-brief,
-    .contact-card {
-      border-radius: 24px;
-    }
+    .contact-inner { grid-template-columns: 1fr; gap: 2rem; }
   }
 </style>
 
 <script is:inline>
   (() => {
     const revealElements = document.querySelectorAll('.scroll-reveal');
-
     if (!revealElements.length) return;
 
     const observer = new IntersectionObserver((entries) => {

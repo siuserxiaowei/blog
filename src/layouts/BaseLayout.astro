@@ -74,8 +74,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <script is:inline>
     (() => {
       const saved = localStorage.getItem('theme');
-      const fallback = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', saved || fallback);
+      document.documentElement.setAttribute('data-theme', saved || 'light');
     })();
   </script>
 </head>
@@ -84,15 +83,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <div
       id="progress-bar"
       class="fixed top-0 left-0 z-[999] h-[2px] w-0 transition-[width] duration-100"
-      style="background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));"
+      style="background: var(--color-accent);"
     ></div>
   )}
-
-  <div class="site-backdrop" aria-hidden="true">
-    <span class="orb orb-a"></span>
-    <span class="orb orb-b"></span>
-    <span class="gridline"></span>
-  </div>
 
   <div class="page-content relative z-10 flex min-h-screen flex-col">
     <slot />

@@ -2,94 +2,122 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-auto px-6 pb-8 pt-14">
-  <div class="mx-auto footer-shell" style="max-width: var(--container-max);">
+<footer class="site-footer">
+  <div class="footer-inner">
     <div class="footer-top">
-      <div>
-        <p class="footer-kicker">Open Workbench</p>
-        <h2>siuser小伟</h2>
+      <div class="footer-brand">
+        <p class="footer-kicker">Open workbench</p>
+        <h2 class="footer-h2">siuser<em>小伟</em></h2>
         <p class="footer-copy">
-          写判断，做工具，持续把工作的过程公开出来。这里不是简历页，而是一个会持续更新的独立工作台。
+          写判断、做工具、持续把工作过程公开出来。这里不是简历页，而是一个会持续更新的独立工作台。
         </p>
       </div>
 
-      <div class="footer-links">
-        <a href="/blog">文章</a>
-        <a href="/projects">项目</a>
-        <a href="/tools">工具箱</a>
-        <a href="/about">关于</a>
+      <div class="footer-cols">
+        <div>
+          <p class="footer-label">Read</p>
+          <a href="/blog">文章</a>
+          <a href="/rss.xml">RSS</a>
+        </div>
+        <div>
+          <p class="footer-label">Build</p>
+          <a href="/tools">工具箱</a>
+          <a href="/projects">项目</a>
+          <a href="/competitions">比赛雷达</a>
+        </div>
+        <div>
+          <p class="footer-label">Contact</p>
+          <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">GitHub</a>
+          <a href="mailto:hi@siuserxiaowei.com">Email</a>
+          <a href="/about">关于</a>
+        </div>
       </div>
     </div>
 
     <div class="footer-bottom">
       <p>&copy; {year} siuser小伟</p>
-      <div class="footer-socials">
-        <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">GitHub</a>
-        <a href="mailto:hi@siuserxiaowei.com">Email</a>
-        <a href="/rss.xml">RSS</a>
-      </div>
+      <p class="footer-note">All drafts live — 公开构建中</p>
     </div>
   </div>
 </footer>
 
 <style>
-  .footer-shell {
-    border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
-    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, transparent), color-mix(in srgb, var(--surface-2) 94%, transparent));
-    border-radius: 28px;
-    padding: 2rem;
-    box-shadow: 0 24px 48px -36px rgba(0, 0, 0, 0.35);
+  .site-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding: 3.5rem 1.5rem 2rem;
+  }
+
+  .footer-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
   }
 
   .footer-top {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
-    gap: 2rem;
-    padding-bottom: 1.4rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+    gap: 3rem;
+    padding-bottom: 2.5rem;
   }
 
   .footer-kicker {
-    margin-bottom: 0.6rem;
     color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-  }
-
-  .footer-shell h2 {
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
     margin-bottom: 0.8rem;
   }
 
-  .footer-copy {
-    max-width: 34rem;
-    color: var(--text-secondary);
-    line-height: 1.8;
+  .footer-h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    line-height: 1.1;
+    margin-bottom: 0.9rem;
+    letter-spacing: -0.015em;
   }
 
-  .footer-links {
+  .footer-h2 em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .footer-copy {
+    max-width: 30rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .footer-cols {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
     align-content: start;
   }
 
-  .footer-links a,
-  .footer-socials a {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: color 0.2s ease, transform 0.2s ease;
+  .footer-cols > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
   }
 
-  .footer-links a:hover,
-  .footer-socials a:hover {
+  .footer-label {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+
+  .footer-cols a {
     color: var(--text);
-    transform: translateX(2px);
+    font-size: 0.92rem;
+    transition: color 0.15s ease;
+  }
+
+  .footer-cols a:hover {
+    color: var(--color-accent);
   }
 
   .footer-bottom {
@@ -97,28 +125,27 @@ const year = new Date().getFullYear();
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-top: 1.2rem;
-    color: var(--text-secondary);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+
+  .footer-note {
     text-transform: uppercase;
   }
 
-  .footer-socials {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
   @media (max-width: 780px) {
-    .footer-shell {
-      padding: 1.4rem;
-      border-radius: 24px;
-    }
-
     .footer-top {
       grid-template-columns: 1fr;
+      gap: 2.2rem;
+    }
+
+    .footer-cols {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
     }
 
     .footer-bottom {
