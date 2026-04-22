@@ -25,9 +25,10 @@
   --color-accent-dark: #a94425;
 
   /* ===== Typography — editorial ===== */
-  /* Heading: Newsreader for Latin, LXGW WenKai Screen for CJK, both editorial-grade */
-  --font-heading: "Newsreader", "LXGW WenKai Screen", Georgia, "Noto Serif SC", "Times New Roman", serif;
-  /* Body: Geist for Latin, system PingFang/微软雅黑 for CJK (native is best) */
+  /* Heading: Playfair Display for Latin (sharp high-contrast serif),
+     LXGW WenKai Screen for CJK (the best free Chinese webfont right now) */
+  --font-heading: "Playfair Display", "LXGW WenKai Screen", Georgia, "Noto Serif SC", "Times New Roman", serif;
+  /* Body: Geist for Latin, system PingFang/雅黑 for CJK (native beats any webfont) */
   --font-body: "Geist", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", system-ui, "Noto Sans SC", sans-serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
   --font-serif: var(--font-heading);
@@ -117,10 +118,9 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   color: var(--text);
   font-family: var(--font-heading);
-  font-weight: 500;
-  font-optical-sizing: auto;
-  letter-spacing: -0.015em;
-  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
 }
 
 p, ul, ol { margin: 0; }
@@ -269,10 +269,9 @@ em {
 
 .display-serif {
   font-family: var(--font-heading);
-  font-weight: 500;
-  font-optical-sizing: auto;
-  letter-spacing: -0.018em;
-  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.1;
 }
 
 .display-serif em,
