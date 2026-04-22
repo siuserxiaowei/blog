@@ -44,6 +44,16 @@ const competitions = [
     winning:['深圳落户意向','团队完整度','供应链贴近度','行业决赛对口'],
     timeline:[{event:'第 18 届启动(预计)',date:'2026-04-28',critical:false},{event:'报名截止(参考 17 届)',date:'2026-06-16',critical:true},{event:'行业决赛(参考)',date:'2026-09-30',critical:true},{event:'总决赛(参考)',date:'2026-11-15',critical:true}],
     url:'https://stic.sz.gov.cn/xxgk/ztzl/cxcyds/' },
+  { id:'opc', name:'WAIC OPC 先锋挑战赛', fullName:'2026 WAIC Future Tech OPC 独立先锋挑战赛 · 创业赛道', org:'Future Tech（WAIC 世界人工智能大会品牌）· 10 城联合承办', rel:'A+', loc:'北京 / 上海 / 深圳 / 武汉 / 西安 / 成都 / 江苏 / 海南 / 香港 / 新加坡', date:'2026 年 4 - 7 月', deadlineISO:'2026-04-30', tier:'S', cat:'创投曝光', match:9.3, suit:'很高',
+    desc:'WAIC 旗下 Future Tech 面向「一人公司（OPC）」与独立开发者的专项挑战赛，10 城联动。4 月线上闪电战（提交 Demo PPT 或视频，全球筛选 200 席）→ 5 月 10 城线下路演争赛区冠军 → 7 月上海 WAIC 总决赛（10 支顶尖项目直面顶级 VC + 全球媒体）。决赛阶段的价值外挂很重：上海张江 100 万算力/语料/模型券各 100% 补贴 + 免费注册公司；深圳 3 个月免费算力 + 最长 18 个月创业空间 + 种子期最高 5000 万股权投资 + 10 万入户补贴；成都 OPC 专项算力券每年最高 500 万 + 专项扶持基金。',
+    strategy:'以「一人公司 + 行业 Know-how」叙事作为主打（花衍科技就是现成样本：个人方案商 + AI 语音 + 8 万付费教师 + 80 万营收）。4 月只需提交 Demo，先拿入围，再挑深圳 / 上海 / 成都 一个赛区落地拿政府礼包。',
+    audience:'一人公司、独立开发者、有行业 Know-how 的 AI 应用创作者、小而精团队',
+    rewards:['百万级奖金池 · 决赛冠军 5 万现金','免费算力券 + 开发者板卡','WAIC 现场 6 ㎡ 专属展位','顶级 VC 1V1 对接','深圳 · 18 个月优惠空间 + 最高 5000 万股权 + 10 万入户','上海张江 · 100 万算力/语料/模型券 + 免费注册公司','成都 · OPC 每年最高 500 万算力券 + 专项基金','北京石景山 · 免费工位 8 席 + 一站式产业对接'],
+    pros:['WAIC 品牌全球背书','「一人公司」独家专场，叙事稀缺','10 城落地礼包真金白银','决赛直面顶级 VC','报名门槛极低（Demo 即可，不要 BP）'],
+    cons:['报名窗口集中 4 月（参考 4-30 截止）','5 月线下路演要赴所选赛区','200 → 10 筛得狠'],
+    winning:['可演示的 AI 产品 Demo','行业 Know-how 真实','一人 / 极小团队身份','已有付费客户更加分'],
+    timeline:[{event:'线上闪电战截止',date:'2026-04-30',critical:true},{event:'200 项目入围 · 10 城路演',date:'2026-05-31',critical:true},{event:'赛区冠军 → 10 席进决赛',date:'2026-06-30',critical:false},{event:'WAIC 总决赛(上海)',date:'2026-07-26',critical:true}],
+    url:'https://www.worldaic.com.cn/' },
   { id:'jlcspark', name:'星火硬件创新大赛', fullName:'2026 全球「星火」硬件创新大赛（首届）', org:'嘉立创 · 福田区政府指导 · 中科院科创中心 / 青年科学家产学研创新联合体（联合主办）', rel:'A+', loc:'深圳福田', date:'2026 年 1 - 7 月', deadlineISO:'2026-04-30', tier:'S', cat:'工程量产', match:9.1, suit:'很高',
     desc:'嘉立创主办的首届非开源工程验证大赛，福田区政府指导，中科院科技创新发展中心、青年科学家产学研创新联合体联合主办。强调「可实现、可验证、可落地」的工程路径，而不是概念 PPT。参赛项目 IP 完全归参赛方，赛事不要求任何形式的开源或授权。入围项目进工程加速营（6-9 至 7-18），配导师辅导 + 试产支持 + 产业对接，决赛 7 月下旬深圳。赛道 A 具身智能与机器人关键硬件，赛道 B AI 边缘计算与智能终端。',
     strategy:'用真实原型或样机报名，打「工程可行性 + 量产路径 + 独立 IP」牌，不走开源叙事。适合有公司实体且成立 ≤3 年的方案商。',
@@ -215,7 +225,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
 <BaseLayout title="AI 硬件赛事雷达 · siuser小伟" description="AI 硬件方案商的赛事与行业活动调研看板。">
   <Header />
 
-  <main class="flex-1">
+  <main class="flex-1 cp-main">
 
     <!-- Hero -->
     <section class="mx-auto px-6 pt-16 pb-10 md:pt-24" style="max-width: var(--container-max);">
@@ -262,16 +272,16 @@ const categories = [...new Set(enriched.map(c => c.cat))];
         <div>
           <p class="section-kicker mb-4">// Priority Matrix</p>
           <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
-            星火硬件 <span style="color: var(--text-secondary); font-weight: 400;">›</span> BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国
+            星火 + OPC <span style="color: var(--text-secondary); font-weight: 400;">›</span> BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国
           </h2>
           <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            <strong style="color: var(--color-accent);">「星火」硬件创新大赛（4-30 截止）</strong>是首届 + 非开源 + 福田区政府 / 中科院科创中心联合背书，IP 归参赛方，入围进工程加速营 + 试产 + 投资路演 —— 对方案商是规格最高的一场。接着是 <strong style="color: var(--color-accent);">BEYOND HACK DAY（5-8 截止）</strong>澳门极限开发 + 嘉立创百万奖池 + 100+ 投资机构。<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15 截止）</strong>奖池 68 万、决赛 HDC2026。创客中国第 11 届 7-10 截止，政策兑现最稳。
+            同天 <strong style="color: var(--color-accent);">4-30 截止</strong>两场：<strong style="color: var(--color-accent);">「星火」硬件创新大赛</strong>（嘉立创 + 福田政府 + 中科院联合背书，非开源保护 IP，配工程加速营 + 试产）和 <strong style="color: var(--color-accent);">WAIC OPC 先锋赛</strong>（"一人公司"专场，10 城联动 + 各地方政府礼包 + WAIC 总决赛 VC 对接）。接着 <strong style="color: var(--color-accent);">BEYOND HACK（5-8）</strong>澳门极限开发 + 嘉立创百万奖池，<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15）</strong>奖池 68 万。创客中国第 11 届 7-10 截止，政策兑现最稳。
           </p>
           <div class="flex flex-wrap gap-2">
             <span class="pill-note"><span class="dot-accent"></span>工程 · 星火硬件 · 4-30</span>
+            <span class="pill-note"><span class="dot-accent"></span>一人公司 · WAIC OPC · 4-30</span>
             <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
             <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
-            <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
           </div>
         </div>
 
@@ -296,22 +306,25 @@ const categories = [...new Set(enriched.map(c => c.cat))];
     </section>
 
     <!-- 筛选条 -->
-    <section class="mx-auto px-6 pb-6" style="max-width: var(--container-max);">
-      <div class="flex flex-col md:flex-row md:items-center gap-4">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="section-kicker mr-2">// 分类</span>
-          <button data-fcat="全部" class="filter-cat filter-chip is-on">全部</button>
-          {categories.map(cat => (
-            <button data-fcat={cat} class="filter-cat filter-chip">{cat}</button>
-          ))}
+    <section class="mx-auto px-6 pb-8" style="max-width: var(--container-max);">
+      <div class="filter-rows">
+        <div class="filter-row">
+          <span class="section-kicker filter-label">// 分类</span>
+          <div class="filter-group">
+            <button data-fcat="全部" class="filter-cat filter-chip is-on">全部</button>
+            {categories.map(cat => (
+              <button data-fcat={cat} class="filter-cat filter-chip">{cat}</button>
+            ))}
+          </div>
         </div>
-        <span class="hidden md:inline-block" style="color: color-mix(in srgb, var(--border) 80%, transparent);">|</span>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="section-kicker mr-2">// 等级</span>
-          <button data-ftier="全部" class="filter-tier filter-chip is-on">全部</button>
-          {['S','A','B'].map(t => (
-            <button data-ftier={t} class="filter-tier filter-chip">{t} 级</button>
-          ))}
+        <div class="filter-row">
+          <span class="section-kicker filter-label">// 等级</span>
+          <div class="filter-group">
+            <button data-ftier="全部" class="filter-tier filter-chip is-on">全部</button>
+            {['S','A','B'].map(t => (
+              <button data-ftier={t} class="filter-tier filter-chip">{t} 级</button>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -325,7 +338,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
             <span class="section-kicker">// 列表</span>
             <span id="list-count" class="text-xs" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
           </div>
-          <div class="space-y-4 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
+          <div class="space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
             {enriched.map(c => (
               <button
                 data-id={c.id}
@@ -364,7 +377,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
               <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
                   <div class="flex-1 min-w-0 space-y-3">
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2.5">
                       <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
                       <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span>{c.status.label}</span>
                       <span class="pill-note">信用 {c.rel}</span>
@@ -485,6 +498,43 @@ const categories = [...new Set(enriched.map(c => c.cat))];
 </BaseLayout>
 
 <style is:global>
+  /* ============ Page-scoped palette: cool blue for the radar ============ */
+  .cp-main {
+    --color-accent: oklch(0.80 0.085 232);     /* soft sky blue */
+    --color-accent-2: oklch(0.87 0.055 215);   /* pale aqua */
+    --color-accent-dark: oklch(0.60 0.12 238); /* deeper indigo-blue */
+  }
+
+  /* ============ Filter rows ============ */
+  .filter-rows {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .filter-label {
+    white-space: nowrap;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  @media (max-width: 720px) {
+    .filter-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+
   /* ============ 列表项 ============ */
   .cp-list-item {
     cursor: pointer;
@@ -526,6 +576,14 @@ const categories = [...new Set(enriched.map(c => c.cat))];
     color: #1a130b;
     background: var(--color-accent);
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent), 0 0 16px -4px color-mix(in srgb, var(--color-accent) 50%, transparent);
+  }
+
+  /* Cool-blue palette wants a cool-dark ink, not the warm-gold ink */
+  .cp-main .tier-S,
+  .cp-main .urgent-badge,
+  .cp-main .filter-chip.is-on,
+  .cp-main .cta-button {
+    color: #061826;
   }
   .tier-A {
     color: var(--color-accent-2);
