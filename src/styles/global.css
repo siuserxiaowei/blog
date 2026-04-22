@@ -25,9 +25,11 @@
   --color-accent-dark: #a94425;
 
   /* ===== Typography — editorial ===== */
-  --font-heading: "Instrument Serif", "Noto Serif SC", "Source Serif 4", "Times New Roman", serif;
-  --font-body: "Geist", "Noto Sans SC", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "JetBrains Mono", monospace;
+  /* Heading: Newsreader for Latin, LXGW WenKai Screen for CJK, both editorial-grade */
+  --font-heading: "Newsreader", "LXGW WenKai Screen", Georgia, "Noto Serif SC", "Times New Roman", serif;
+  /* Body: Geist for Latin, system PingFang/微软雅黑 for CJK (native is best) */
+  --font-body: "Geist", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", system-ui, "Noto Sans SC", sans-serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
   --font-serif: var(--font-heading);
 
   /* ===== Layout ===== */
@@ -115,9 +117,10 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   color: var(--text);
   font-family: var(--font-heading);
-  font-weight: 400;
-  letter-spacing: -0.012em;
-  line-height: 1.14;
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
+  line-height: 1.18;
 }
 
 p, ul, ol { margin: 0; }
@@ -266,16 +269,17 @@ em {
 
 .display-serif {
   font-family: var(--font-heading);
-  font-weight: 400;
-  letter-spacing: -0.012em;
-  line-height: 1.08;
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.018em;
+  line-height: 1.12;
 }
 
 .display-serif em,
 .serif-italic {
   font-family: var(--font-heading);
   font-style: italic;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .neon-underline {
