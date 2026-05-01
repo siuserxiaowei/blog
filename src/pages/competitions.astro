@@ -15,7 +15,7 @@ const competitions = [
     timeline:[{event:'大赛通知发布',date:'2026-03-10',critical:false},{event:'报名截止',date:'2026-07-10',critical:true},{event:'省赛数据导入截止',date:'2026-07-20',critical:false},{event:'获奖推荐截止',date:'2026-09-10',critical:false},{event:'全国总决赛(上海杨浦)',date:'2026-11-30',critical:true}],
     url:'https://www.cnmaker.org.cn/' },
   { id:'cxcyds', name:'中国创新创业大赛', fullName:'第 15 届中国创新创业大赛(参考上届节奏)', org:'工信部火炬高技术产业开发中心', rel:'A+', loc:'全国', date:'2026 年 5 - 12 月(参考上届)', deadlineISO:'2026-09-15', tier:'S', cat:'政府政策', match:9.0, suit:'很高',
-    desc:'火炬中心主办的硬科技大赛，第 14 届（2025）已于 12 月完赛。截至 2026-04-21 第 15 届全国启动通知尚未发布，参考上届节奏：6 月下发通知、8-10 月地方赛截止、11 月行业赛、12 月全国总决赛。获奖对接地方政府资金、税收、人才政策。',
+    desc:'火炬中心主办的硬科技大赛，第 14 届（2025）已于 12 月完赛。截至 2026-05-01 第 15 届全国启动通知尚未发布，参考上届节奏：6 月下发通知、8-10 月地方赛截止、11 月行业赛、12 月全国总决赛。获奖对接地方政府资金、税收、人才政策。',
     strategy:'突出「硬科技壁垒+研发投入+知识产权」，财务数据对得上科技型中小企业入库标准。',
     audience:'已注册公司、有研发投入和专利的硬科技团队',
     rewards:['行业/专业赛典型：一等 5 万(1 名)/二等 3 万(2)/三等 2 万(3)/优秀 1 万','地方赛奖金差异大，广东/常州赛区一等 10-15 万','地方政策包','火炬中心信用背书'],
@@ -54,6 +54,16 @@ const competitions = [
     winning:['可演示的 AI 产品 Demo','行业 Know-how 真实','一人 / 极小团队身份','已有付费客户更加分'],
     timeline:[{event:'线上闪电战截止',date:'2026-04-30',critical:true},{event:'200 项目入围 · 10 城路演',date:'2026-05-31',critical:true},{event:'赛区冠军 → 10 席进决赛',date:'2026-06-30',critical:false},{event:'WAIC 总决赛(上海)',date:'2026-07-26',critical:true}],
     url:'https://www.worldaic.com.cn/' },
+  { id:'waves', name:'WAVES 有智青年', fullName:'2026 有智青年挑战赛 · 36氪 WAVES', org:'36氪创投研究院（暗涌 Waves）', rel:'A+', loc:'线上报名 · 决赛 WAVES 大会舞台', date:'2026 年 4 - 6 月', deadlineISO:'2026-04-30', tier:'A', cat:'创投曝光', match:8.4, suit:'高',
+    desc:'36氪创投研究院（暗涌 Waves）主办的「增强人类」主题创业赛，4-1 启动 / 4-30 报名截止 / 6 月 WAVES 大会决赛舞台。三赛道：「第二大脑」AI 智能体、「超级外援」智能硬件、「超级个体」一人公司。不看学历 / 融资规模 / 算法新旧，只看产品是否真正让个体变得更强。决赛百万资源包 + 投资人/产业伙伴/媒体直接对接，是中国创投圈最重要的青年舞台之一。',
+    strategy:'最对档的是「超级个体」一人公司赛道：把"个人 + AI 用极低边际成本撬动十人团队商业闭环"讲实在（付费客户、营收、复购），不堆术语。花衍科技的 8 万付费教师 + 80 万营收就是该赛道天然样本，可同时按"行业 Know-how + AI 真实重构教学场景"叙事冲奖。',
+    audience:'全球 AI 创业团队或个人，已有产品原型 / 成熟商业模式，不限学历融资年龄',
+    rewards:['百万资源奖励包','WAVES 大会决赛舞台展示','投资人 1V1 对接','产业伙伴 + 媒体曝光','36氪原生媒体资源','三赛道并行身份覆盖广'],
+    pros:['36氪 WAVES 品牌背书','「超级个体」赛道独家','决赛 VC 含金量极高','门槛低（只看产品力）','一人公司专设通道'],
+    cons:['报名窗口只有一个月（4-1 至 4-30）','奖励明细官方未列出','偏中后期路演型，非极限开发','不发现金为主'],
+    winning:['AI 真正增强个体能力','极小团队跑通商业闭环','付费客户 + 营收数据','行业 Know-how 真实','可演示的产品原型'],
+    timeline:[{event:'报名开启',date:'2026-04-01',critical:false},{event:'报名截止',date:'2026-04-30',critical:true},{event:'WAVES 大会决赛',date:'2026-06-15',critical:true}],
+    url:'https://36kr.com/p/3748145916740100' },
   { id:'jlcspark', name:'星火硬件创新大赛', fullName:'2026 全球「星火」硬件创新大赛（首届）', org:'嘉立创 · 福田区政府指导 · 中科院科创中心 / 青年科学家产学研创新联合体（联合主办）', rel:'A+', loc:'深圳福田', date:'2026 年 1 - 7 月', deadlineISO:'2026-04-30', tier:'S', cat:'工程量产', match:9.1, suit:'很高',
     desc:'嘉立创主办的首届非开源工程验证大赛，福田区政府指导，中科院科技创新发展中心、青年科学家产学研创新联合体联合主办。强调「可实现、可验证、可落地」的工程路径，而不是概念 PPT。参赛项目 IP 完全归参赛方，赛事不要求任何形式的开源或授权。入围项目进工程加速营（6-9 至 7-18），配导师辅导 + 试产支持 + 产业对接，决赛 7 月下旬深圳。赛道 A 具身智能与机器人关键硬件，赛道 B AI 边缘计算与智能终端。',
     strategy:'用真实原型或样机报名，打「工程可行性 + 量产路径 + 独立 IP」牌，不走开源叙事。适合有公司实体且成立 ≤3 年的方案商。',
@@ -206,7 +216,7 @@ const competitions = [
     url:'https://1024.csdn.net/' },
 ];
 
-const TODAY = new Date('2026-04-21');
+const TODAY = new Date('2026-05-01');
 function statusOf(iso) {
   const d = new Date(iso);
   const days = Math.ceil((d.getTime() - TODAY.getTime()) / 86400000);
@@ -231,7 +241,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
     <section class="mx-auto px-6 pt-16 pb-10 md:pt-24" style="max-width: var(--container-max);">
       <div class="animate-fade-in stagger-1 flex items-center gap-3 mb-3">
         <p class="section-kicker">Competition Radar</p>
-        <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 2026-04-21 · 17 items verified</span>
+        <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// 2026-05-01 · 21 items verified</span>
       </div>
       <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-4" style="font-family: var(--font-heading); color: var(--text);">
         AI 硬件 <span class="text-shimmer">赛事雷达</span>
@@ -272,16 +282,16 @@ const categories = [...new Set(enriched.map(c => c.cat))];
         <div>
           <p class="section-kicker mb-4">// Priority Matrix</p>
           <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
-            星火 + OPC <span style="color: var(--text-secondary); font-weight: 400;">›</span> BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国
+            BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> WAVES 决赛
           </h2>
           <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            同天 <strong style="color: var(--color-accent);">4-30 截止</strong>两场：<strong style="color: var(--color-accent);">「星火」硬件创新大赛</strong>（嘉立创 + 福田政府 + 中科院联合背书，非开源保护 IP，配工程加速营 + 试产）和 <strong style="color: var(--color-accent);">WAIC OPC 先锋赛</strong>（"一人公司"专场，10 城联动 + 各地方政府礼包 + WAIC 总决赛 VC 对接）。接着 <strong style="color: var(--color-accent);">BEYOND HACK（5-8）</strong>澳门极限开发 + 嘉立创百万奖池，<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15）</strong>奖池 68 万。创客中国第 11 届 7-10 截止，政策兑现最稳。
+            <strong style="color: var(--color-accent);">4-30 三场刚刚截止</strong>：「星火」硬件创新大赛、WAIC OPC 先锋赛、36氪 <strong style="color: var(--color-accent);">WAVES 有智青年</strong>挑战赛（决赛 6 月）— 错过报名的盯 6 月 WAVES 决赛和下一轮。一周倒计时：<strong style="color: var(--color-accent);">BEYOND HACK（5-8）</strong>澳门极限开发 + 嘉立创百万奖池，<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15）</strong>奖池 68 万。中长线：创客中国第 11 届 7-10 截止，政策兑现最稳。
           </p>
           <div class="flex flex-wrap gap-2">
-            <span class="pill-note"><span class="dot-accent"></span>工程 · 星火硬件 · 4-30</span>
-            <span class="pill-note"><span class="dot-accent"></span>一人公司 · WAIC OPC · 4-30</span>
             <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
             <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
+            <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
+            <span class="pill-note"><span class="dot-accent"></span>决赛 · WAVES · 6 月</span>
           </div>
         </div>
 
@@ -406,7 +416,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
                     <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
                     <div class="relative grid gap-2" style={`grid-template-columns: repeat(${c.timeline.length}, minmax(0, 1fr));`}>
                       {c.timeline.map(n => {
-                        const past = new Date(n.date) < new Date('2026-04-21');
+                        const past = new Date(n.date) < new Date('2026-05-01');
                         const dotClass = past ? 'past' : n.critical ? 'critical' : 'normal';
                         return (
                           <div class="flex flex-col items-center text-center min-w-0 px-1">
@@ -489,7 +499,7 @@ const categories = [...new Set(enriched.map(c => c.cat))];
       </div>
 
       <div class="text-center text-[11px] pt-12 mt-12 border-t" style="color: var(--text-secondary); border-color: color-mix(in srgb, var(--border) 50%, transparent); font-family: var(--font-mono); letter-spacing: 0.05em;">
-        DATA UPDATED · 2026-04-21 · 17 ENTRIES RE-VERIFIED · 带「参考上届」标签的届次尚未官方公告，请以主办方通知为准
+        DATA UPDATED · 2026-05-01 · 21 ENTRIES RE-VERIFIED · 带「参考上届」标签的届次尚未官方公告，请以主办方通知为准
       </div>
     </section>
   </main>
