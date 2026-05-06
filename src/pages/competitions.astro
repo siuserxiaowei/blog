@@ -99,6 +99,31 @@ const categories = getCompetitionCategories(enriched);
     <!-- 筛选条 -->
     <section class="mx-auto px-6 pb-8" style="max-width: var(--container-max);">
       <div class="filter-rows">
+        <div class="radar-control-grid">
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 搜索</span>
+            <input id="radar-search" class="radar-input" type="search" placeholder="搜赛事、赛道、打法" autocomplete="off" />
+          </label>
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 状态</span>
+            <select id="radar-status" class="radar-select">
+              <option value="全部">全部状态</option>
+              <option value="urgent">紧急</option>
+              <option value="ongoing">进行中</option>
+              <option value="upcoming">即将开始</option>
+              <option value="expired">已过期</option>
+            </select>
+          </label>
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 排序</span>
+            <select id="radar-sort" class="radar-select">
+              <option value="match-desc">匹配度高优先</option>
+              <option value="urgent-first">紧急优先</option>
+              <option value="deadline-asc">截止近优先</option>
+              <option value="tier-desc">等级高优先</option>
+            </select>
+          </label>
+        </div>
         <div class="filter-row">
           <span class="section-kicker filter-label">// 分类</span>
           <div class="filter-group">
@@ -133,10 +158,16 @@ const categories = getCompetitionCategories(enriched);
             {enriched.map(c => (
               <button
                 data-id={c.id}
+                data-name={c.name}
+                data-full-name={c.fullName}
                 data-cat={c.cat}
                 data-tier={c.tier}
                 data-status={c.status.kind}
                 data-match={c.match}
+                data-deadline={c.deadlineISO}
+                data-strategy={c.strategy}
+                data-url={c.url}
+                data-search={`${c.name} ${c.fullName} ${c.cat} ${c.tier} ${c.status.label} ${c.desc} ${c.strategy} ${c.org} ${c.loc} ${c.winning.join(' ')}`}
                 class="cp-list-item w-full text-left p-4"
               >
                 <div class="flex items-start justify-between gap-3 mb-2">
@@ -270,9 +301,14 @@ const categories = getCompetitionCategories(enriched);
                   <p class="section-kicker mb-2">// 适合谁</p>
                   <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">{c.audience}</p>
                 </div>
-                <a href={c.url} target="_blank" rel="noopener" class="cta-button shrink-0">
-                  访问官方报名页 <span aria-hidden="true">→</span>
-                </a>
+                <div class="detail-actions">
+                  <button type="button" data-copy-summary={c.id} class="summary-button">
+                    复制参赛摘要
+                  </button>
+                  <a href={c.url} target="_blank" rel="noopener" class="cta-button">
+                    访问官方报名页 <span aria-hidden="true">→</span>
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -295,6 +331,50 @@ const categories = getCompetitionCategories(enriched);
     gap: 1rem;
   }
 
+  .radar-control-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.3fr) minmax(160px, 0.7fr) minmax(180px, 0.8fr);
+    gap: 0.85rem;
+    align-items: end;
+  }
+
+  .radar-field {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .radar-input,
+  .radar-select {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    border-radius: var(--radius-md);
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface) 62%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    padding: 0 0.85rem;
+    font-size: 13px;
+    line-height: 1.2;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .radar-input::placeholder {
+    color: color-mix(in srgb, var(--text-secondary) 78%, transparent);
+  }
+
+  .radar-select {
+    cursor: pointer;
+  }
+
+  .radar-input:focus,
+  .radar-select:focus {
+    border-color: color-mix(in srgb, var(--color-accent) 58%, var(--border));
+    background: color-mix(in srgb, var(--surface) 76%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+
   .filter-row {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
@@ -310,9 +390,14 @@ const categories = getCompetitionCategories(enriched);
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
+    min-width: 0;
   }
 
   @media (max-width: 720px) {
+    .radar-control-grid {
+      grid-template-columns: 1fr;
+    }
+
     .filter-row {
       grid-template-columns: 1fr;
       gap: 0.5rem;
@@ -329,6 +414,7 @@ const categories = getCompetitionCategories(enriched);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     transition: transform 0.24s cubic-bezier(.2,.7,.2,1), border-color 0.2s ease, box-shadow 0.24s ease, background 0.24s ease;
+    overflow-wrap: anywhere;
   }
   .cp-list-item:hover {
     transform: translateY(-2px);
@@ -462,6 +548,8 @@ const categories = getCompetitionCategories(enriched);
     border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
     transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
   .filter-chip:hover {
     color: var(--text);
@@ -503,10 +591,51 @@ const categories = getCompetitionCategories(enriched);
     background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
     box-shadow: 0 16px 28px -18px color-mix(in srgb, var(--color-accent) 52%, transparent);
     transition: transform 0.24s ease, box-shadow 0.24s ease;
+    justify-content: center;
+    min-width: 0;
+    text-align: center;
   }
   .cta-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 22px 36px -18px color-mix(in srgb, var(--color-accent) 62%, transparent);
+  }
+
+  .detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    min-width: min(100%, 320px);
+  }
+
+  .summary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface) 58%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .summary-button:hover {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 48%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--surface));
+    transform: translateY(-1px);
+  }
+
+  .summary-button.is-copied {
+    color: var(--color-accent-ink);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
   }
 
   /* ============ line-clamp ============ */
@@ -521,74 +650,233 @@ const categories = getCompetitionCategories(enriched);
   @media (max-width: 768px) {
     .cp-list-item { padding: 14px; }
     .urgent-chip { padding: 10px; }
+    .detail-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+    .detail-actions > * {
+      width: 100%;
+    }
   }
 </style>
 
 <script is:inline>
   (function () {
-    const items = Array.from(document.querySelectorAll('[data-id]'));
-    const panels = Array.from(document.querySelectorAll('[data-detail]'));
-    const countEl = document.getElementById('list-count');
-    let selectedId = items[0]?.dataset.id;
-    let fCat = '全部', fTier = '全部';
+    const abortKey = '__competitionRadarAbort';
+    const tierRank = { S: 3, A: 2, B: 1 };
+    const statusRank = { urgent: 0, ongoing: 1, upcoming: 2, expired: 3 };
 
-    function applySelect() {
-      items.forEach(it => it.classList.toggle('is-active', it.dataset.id === selectedId));
-      panels.forEach(p => p.classList.toggle('hidden', p.dataset.detail !== selectedId));
+    function getAddressId() {
+      const params = new URLSearchParams(window.location.search);
+      const queryId = params.get('competition') || params.get('event');
+      const hashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
+      return queryId || hashId || '';
     }
 
-    function applyFilter() {
-      let visible = 0;
-      items.forEach(it => {
-        const ok = (fCat === '全部' || it.dataset.cat === fCat) && (fTier === '全部' || it.dataset.tier === fTier);
-        it.classList.toggle('hidden', !ok);
-        if (ok) visible++;
+    function setAddressId(id, mode) {
+      if (!id || !window.history) return;
+      const url = new URL(window.location.href);
+      url.hash = encodeURIComponent(id);
+      window.history[mode === 'replace' ? 'replaceState' : 'pushState']({}, '', url);
+    }
+
+    function initCompetitionRadar() {
+      window[abortKey]?.abort();
+      const controller = new AbortController();
+      window[abortKey] = controller;
+      const { signal } = controller;
+
+      const items = Array.from(document.querySelectorAll('[data-id]'));
+      const panels = Array.from(document.querySelectorAll('[data-detail]'));
+      const countEl = document.getElementById('list-count');
+      const searchEl = document.getElementById('radar-search');
+      const statusEl = document.getElementById('radar-status');
+      const sortEl = document.getElementById('radar-sort');
+      const listEl = items[0]?.parentElement;
+      if (!items.length || !listEl) return;
+
+      const state = {
+        cat: '全部',
+        tier: '全部',
+        status: '全部',
+        search: '',
+        sort: sortEl?.value || 'match-desc',
+        selectedId: items.some(item => item.dataset.id === getAddressId()) ? getAddressId() : items[0].dataset.id,
+      };
+
+      function visibleItems() {
+        return items.filter(item => !item.classList.contains('hidden'));
+      }
+
+      function compareItems(a, b) {
+        const matchA = Number(a.dataset.match || 0);
+        const matchB = Number(b.dataset.match || 0);
+        const deadlineA = Date.parse(a.dataset.deadline || '9999-12-31');
+        const deadlineB = Date.parse(b.dataset.deadline || '9999-12-31');
+        if (state.sort === 'urgent-first') {
+          return (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9) || deadlineA - deadlineB || matchB - matchA;
+        }
+        if (state.sort === 'deadline-asc') {
+          return deadlineA - deadlineB || matchB - matchA;
+        }
+        if (state.sort === 'tier-desc') {
+          return (tierRank[b.dataset.tier] ?? 0) - (tierRank[a.dataset.tier] ?? 0) || matchB - matchA;
+        }
+        return matchB - matchA || deadlineA - deadlineB;
+      }
+
+      function applySort() {
+        items.slice().sort(compareItems).forEach(item => listEl.appendChild(item));
+      }
+
+      function applySelect(options = {}) {
+        const hasPanel = panels.some(panel => panel.dataset.detail === state.selectedId);
+        panels.forEach(panel => panel.classList.toggle('hidden', panel.dataset.detail !== state.selectedId || !hasPanel));
+        items.forEach(item => item.classList.toggle('is-active', item.dataset.id === state.selectedId));
+        if (hasPanel && options.address) setAddressId(state.selectedId, options.address);
+        if (hasPanel && options.scroll) {
+          document.querySelector('[data-detail="' + CSS.escape(state.selectedId) + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      function applyFilter(options = {}) {
+        const query = state.search.trim().toLowerCase();
+        let visible = 0;
+        items.forEach(item => {
+          const haystack = (item.dataset.search || '').toLowerCase();
+          const ok =
+            (state.cat === '全部' || item.dataset.cat === state.cat) &&
+            (state.tier === '全部' || item.dataset.tier === state.tier) &&
+            (state.status === '全部' || item.dataset.status === state.status) &&
+            (!query || haystack.includes(query));
+          item.classList.toggle('hidden', !ok);
+          if (ok) visible++;
+        });
+        if (countEl) countEl.textContent = visible + ' items';
+        applySort();
+
+        const current = items.find(item => item.dataset.id === state.selectedId);
+        if (!current || current.classList.contains('hidden')) {
+          state.selectedId = visibleItems()[0]?.dataset.id || '';
+          applySelect({ address: state.selectedId ? 'replace' : '' });
+          return;
+        }
+        applySelect(options);
+      }
+
+      function setChipState(selector, dataName, value) {
+        document.querySelectorAll(selector).forEach(button => {
+          button.classList.toggle('is-on', button.dataset[dataName] === value);
+        });
+      }
+
+      async function copySummary(id, button) {
+        const item = items.find(entry => entry.dataset.id === id) || items.find(entry => entry.dataset.id === state.selectedId);
+        if (!item) return;
+        const summary = [
+          '赛事：' + (item.dataset.fullName || item.dataset.name || ''),
+          '截止时间：' + (item.dataset.deadline || ''),
+          '参赛打法：' + (item.dataset.strategy || ''),
+          '官方链接：' + (item.dataset.url || ''),
+        ].join('\n');
+
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(summary);
+          } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = summary;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+          }
+          const original = button.textContent;
+          button.textContent = '已复制';
+          button.classList.add('is-copied');
+          window.setTimeout(() => {
+            if (signal.aborted) return;
+            button.textContent = original || '复制参赛摘要';
+            button.classList.remove('is-copied');
+          }, 1400);
+        } catch {
+          button.textContent = '复制失败';
+          window.setTimeout(() => {
+            if (signal.aborted) return;
+            button.textContent = '复制参赛摘要';
+          }, 1400);
+        }
+      }
+
+      items.forEach(item => {
+        item.addEventListener('click', () => {
+          state.selectedId = item.dataset.id;
+          applySelect({ address: 'push', scroll: window.innerWidth < 1024 });
+        }, { signal });
       });
-      if (countEl) countEl.textContent = visible + ' items';
-      const cur = items.find(it => it.dataset.id === selectedId);
-      if (cur && cur.classList.contains('hidden')) {
-        const first = items.find(it => !it.classList.contains('hidden'));
-        if (first) { selectedId = first.dataset.id; applySelect(); }
+
+      document.querySelectorAll('.filter-cat').forEach(button => {
+        button.addEventListener('click', () => {
+          state.cat = button.dataset.fcat || '全部';
+          setChipState('.filter-cat', 'fcat', state.cat);
+          applyFilter({ address: 'replace' });
+        }, { signal });
+      });
+
+      document.querySelectorAll('.filter-tier').forEach(button => {
+        button.addEventListener('click', () => {
+          state.tier = button.dataset.ftier || '全部';
+          setChipState('.filter-tier', 'ftier', state.tier);
+          applyFilter({ address: 'replace' });
+        }, { signal });
+      });
+
+      searchEl?.addEventListener('input', () => {
+        state.search = searchEl.value;
+        applyFilter({ address: 'replace' });
+      }, { signal });
+
+      statusEl?.addEventListener('change', () => {
+        state.status = statusEl.value;
+        applyFilter({ address: 'replace' });
+      }, { signal });
+
+      sortEl?.addEventListener('change', () => {
+        state.sort = sortEl.value;
+        applyFilter({ address: 'replace' });
+      }, { signal });
+
+      document.querySelectorAll('[data-jump]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.selectedId = button.dataset.jump;
+          applySelect({ address: 'push', scroll: true });
+        }, { signal });
+      });
+
+      document.querySelectorAll('[data-copy-summary]').forEach(button => {
+        button.addEventListener('click', () => copySummary(button.dataset.copySummary, button), { signal });
+      });
+
+      window.addEventListener('hashchange', () => {
+        const id = getAddressId();
+        if (!items.some(item => item.dataset.id === id)) return;
+        state.selectedId = id;
+        applyFilter();
+      }, { signal });
+
+      applyFilter({ address: getAddressId() ? 'replace' : '' });
+      if (getAddressId()) {
+        window.setTimeout(() => {
+          if (signal.aborted) return;
+          document.querySelector('[data-detail="' + CSS.escape(state.selectedId) + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
       }
     }
 
-    items.forEach(it => it.addEventListener('click', () => {
-      selectedId = it.dataset.id;
-      applySelect();
-      if (window.innerWidth < 1024) {
-        const panel = document.querySelector('[data-detail="' + selectedId + '"]');
-        panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }));
-
-    document.querySelectorAll('.filter-cat').forEach(btn => {
-      btn.addEventListener('click', () => {
-        fCat = btn.dataset.fcat;
-        document.querySelectorAll('.filter-cat').forEach(b => {
-          b.classList.toggle('is-on', b.dataset.fcat === fCat);
-        });
-        applyFilter();
-      });
-    });
-
-    document.querySelectorAll('.filter-tier').forEach(btn => {
-      btn.addEventListener('click', () => {
-        fTier = btn.dataset.ftier;
-        document.querySelectorAll('.filter-tier').forEach(b => {
-          b.classList.toggle('is-on', b.dataset.ftier === fTier);
-        });
-        applyFilter();
-      });
-    });
-
-    document.querySelectorAll('[data-jump]').forEach(b => {
-      b.addEventListener('click', () => {
-        selectedId = b.dataset.jump;
-        applySelect();
-        document.querySelector('[data-detail="' + selectedId + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    applySelect();
+    document.addEventListener('astro:page-load', initCompetitionRadar);
+    initCompetitionRadar();
   })();
 </script>
