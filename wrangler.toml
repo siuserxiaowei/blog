@@ -1,0 +1,7 @@
+name = "siuserxiaowei-blog"
+compatibility_date = "2026-05-06"
+pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "ARTICLE_LIKES_KV"
+id = "88c85058b64143fcb80e7e84ff02608d"
