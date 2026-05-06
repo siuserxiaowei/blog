@@ -1,5 +1,43 @@
 export const RADAR_UPDATED_AT = '2026-05-06';
 
+export const DAY_MS = 86400000;
+
+export const COMPETITION_TIERS = Object.freeze(['S', 'A', 'B']);
+
+export const COMPETITION_CATEGORIES = Object.freeze([
+  '政府政策',
+  '创投曝光',
+  '工程量产',
+  '渠道变现',
+  '行业活动',
+  '国际曝光',
+  '社区创意',
+]);
+
+export const REQUIRED_COMPETITION_FIELDS = Object.freeze([
+  'id',
+  'name',
+  'fullName',
+  'org',
+  'rel',
+  'loc',
+  'date',
+  'deadlineISO',
+  'tier',
+  'cat',
+  'match',
+  'suit',
+  'desc',
+  'strategy',
+  'audience',
+  'rewards',
+  'pros',
+  'cons',
+  'winning',
+  'timeline',
+  'url',
+]);
+
 export const competitions = [
   { id:'cmake', name:'创客中国', fullName:'第十一届创客中国中小企业创新创业大赛', org:'工信部网络安全产业发展中心 + 地方政府', rel:'A+', loc:'35 省级赛区 + 17 专题赛 + 1 境外赛区', date:'2026 年 3 - 11 月', deadlineISO:'2026-07-10', tier:'S', cat:'政府政策', match:9.2, suit:'很高',
     desc:'工信部网络安全产业发展中心主办，第 11 届大赛 2026-03-10 官方通知已发布，形成 35 省级赛 + 17 专题赛 + 1 境外赛 + 全国总决赛四级联动，全国总决赛落地上海杨浦。地方有真金白银配套。',
@@ -12,7 +50,7 @@ export const competitions = [
     timeline:[{event:'大赛通知发布',date:'2026-03-10',critical:false},{event:'报名截止',date:'2026-07-10',critical:true},{event:'省赛数据导入截止',date:'2026-07-20',critical:false},{event:'获奖推荐截止',date:'2026-09-10',critical:false},{event:'全国总决赛(上海杨浦)',date:'2026-11-30',critical:true}],
     url:'https://www.cnmaker.org.cn/' },
   { id:'cxcyds', name:'中国创新创业大赛', fullName:'第 15 届中国创新创业大赛(参考上届节奏)', org:'工信部火炬高技术产业开发中心', rel:'A+', loc:'全国', date:'2026 年 5 - 12 月(参考上届)', deadlineISO:'2026-09-15', tier:'S', cat:'政府政策', match:9.0, suit:'很高',
-    desc:'火炬中心主办的硬科技大赛，第 14 届（2025）已于 12 月完赛。截至 2026-05-01 第 15 届全国启动通知尚未发布，参考上届节奏：6 月下发通知、8-10 月地方赛截止、11 月行业赛、12 月全国总决赛。获奖对接地方政府资金、税收、人才政策。',
+    desc:'火炬中心主办的硬科技大赛，第 14 届（2025）已于 12 月完赛。截至 2026-05-06 尚未确认第 15 届全国启动通知，参考上届节奏：6 月下发通知、8-10 月地方赛截止、11 月行业赛、12 月全国总决赛。获奖对接地方政府资金、税收、人才政策。',
     strategy:'突出「硬科技壁垒+研发投入+知识产权」，财务数据对得上科技型中小企业入库标准。',
     audience:'已注册公司、有研发投入和专利的硬科技团队',
     rewards:['行业/专业赛典型：一等 5 万(1 名)/二等 3 万(2)/三等 2 万(3)/优秀 1 万','地方赛奖金差异大，广东/常州赛区一等 10-15 万','地方政策包','火炬中心信用背书'],
@@ -313,22 +351,170 @@ export const competitions = [
     url:'https://www.36kr.com/' },
 ];
 
+export function parseCompetitionDate(value) {
+  if (typeof value !== 'string' || value.trim() === '') return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function daysUntil(iso, today = new Date(RADAR_UPDATED_AT)) {
+  const date = parseCompetitionDate(iso);
+  if (!date || Number.isNaN(today.getTime())) return null;
+  return Math.ceil((date.getTime() - today.getTime()) / DAY_MS);
+}
+
 export function statusOf(iso, today = new Date(RADAR_UPDATED_AT)) {
-  const d = new Date(iso);
-  const days = Math.ceil((d.getTime() - today.getTime()) / 86400000);
+  const days = daysUntil(iso, today);
+  if (days === null) return { kind: 'unknown', days, label: '日期待确认' };
   if (days < 0) return { kind: 'expired', days, label: '已截止' };
   if (days <= 14) return { kind: 'urgent', days, label: `${days} 天后截止` };
   if (days <= 60) return { kind: 'ongoing', days, label: `${days} 天后截止` };
   return { kind: 'upcoming', days, label: `${days} 天后` };
 }
 
-export function enrichCompetitions(source = competitions, today = new Date(RADAR_UPDATED_AT)) {
-  return source.map((competition) => ({
+export function getCompetitionPriority(competition, today = new Date(RADAR_UPDATED_AT)) {
+  const status = statusOf(competition.deadlineISO, today);
+  const tierScore = { S: 40, A: 26, B: 14 }[competition.tier] ?? 0;
+  const statusScore = { urgent: 35, ongoing: 22, upcoming: 10, expired: -24, unknown: 0 }[status.kind] ?? 0;
+  const matchScore = Number.isFinite(competition.match) ? competition.match * 2 : 0;
+  const criticalTimelineScore = (competition.timeline ?? []).some((item) => item.critical && statusOf(item.date, today).kind === 'urgent') ? 8 : 0;
+  return Math.max(0, Math.round(tierScore + statusScore + matchScore + criticalTimelineScore));
+}
+
+export function getCompetitionBucket(competition, today = new Date(RADAR_UPDATED_AT)) {
+  const status = statusOf(competition.deadlineISO, today);
+  const priority = getCompetitionPriority(competition, today);
+  if (status.kind === 'expired') return '已截止';
+  if (status.kind === 'unknown') return '待确认';
+  if (status.kind === 'urgent') return priority >= 78 ? '立即行动' : '临近截止';
+  if (priority >= 78) return '重点准备';
+  if (competition.tier === 'S' || priority >= 60) return '持续跟进';
+  return '机会观察';
+}
+
+export function enrichCompetition(competition, today = new Date(RADAR_UPDATED_AT)) {
+  const status = statusOf(competition.deadlineISO, today);
+  const priority = getCompetitionPriority(competition, today);
+  return {
     ...competition,
-    status: statusOf(competition.deadlineISO, today),
-  }));
+    status,
+    priority,
+    bucket: getCompetitionBucket(competition, today),
+  };
+}
+
+export function enrichCompetitions(source = competitions, today = new Date(RADAR_UPDATED_AT)) {
+  return source.map((competition) => enrichCompetition(competition, today));
+}
+
+export function sortCompetitionsByPriority(source = competitions, today = new Date(RADAR_UPDATED_AT)) {
+  return enrichCompetitions(source, today).sort((a, b) => {
+    if (b.priority !== a.priority) return b.priority - a.priority;
+    return (a.status.days ?? Number.POSITIVE_INFINITY) - (b.status.days ?? Number.POSITIVE_INFINITY);
+  });
+}
+
+export function filterCompetitions(source = competitions, filters = {}, today = new Date(RADAR_UPDATED_AT)) {
+  const {
+    cat,
+    tier,
+    status,
+    bucket,
+    minMatch = 0,
+    includeExpired = true,
+  } = filters;
+
+  return enrichCompetitions(source, today).filter((competition) => {
+    if (cat && cat !== '全部' && competition.cat !== cat) return false;
+    if (tier && tier !== '全部' && competition.tier !== tier) return false;
+    if (status && status !== '全部' && competition.status.kind !== status) return false;
+    if (bucket && bucket !== '全部' && competition.bucket !== bucket) return false;
+    if (!includeExpired && competition.status.kind === 'expired') return false;
+    return Number(competition.match) >= minMatch;
+  });
 }
 
 export function getCompetitionCategories(source = competitions) {
   return [...new Set(source.map((competition) => competition.cat))];
+}
+
+export function getCompetitionStats(source = competitions, today = new Date(RADAR_UPDATED_AT)) {
+  const enriched = enrichCompetitions(source, today);
+  return {
+    total: enriched.length,
+    byStatus: countBy(enriched, (competition) => competition.status.kind),
+    byTier: countBy(enriched, (competition) => competition.tier),
+    byCategory: countBy(enriched, (competition) => competition.cat),
+    byBucket: countBy(enriched, (competition) => competition.bucket),
+    urgentCount: enriched.filter((competition) => competition.status.kind === 'urgent').length,
+    expiredCount: enriched.filter((competition) => competition.status.kind === 'expired').length,
+    topPriority: sortCompetitionsByPriority(source, today).slice(0, 5),
+  };
+}
+
+export function validateCompetitions(source = competitions) {
+  const errors = [];
+  const seenIds = new Map();
+
+  source.forEach((competition, index) => {
+    const label = competition?.id ? `competition:${competition.id}` : `competition[${index}]`;
+
+    REQUIRED_COMPETITION_FIELDS.forEach((field) => {
+      if (!hasRequiredValue(competition?.[field])) {
+        errors.push({ id: competition?.id, index, field, message: `${label} is missing required field "${field}"` });
+      }
+    });
+
+    if (competition?.id) {
+      if (seenIds.has(competition.id)) {
+        errors.push({ id: competition.id, index, field: 'id', message: `${label} duplicates id from index ${seenIds.get(competition.id)}` });
+      } else {
+        seenIds.set(competition.id, index);
+      }
+    }
+
+    if (!parseCompetitionDate(competition?.deadlineISO)) {
+      errors.push({ id: competition?.id, index, field: 'deadlineISO', message: `${label} has an invalid deadlineISO` });
+    }
+
+    if (!COMPETITION_TIERS.includes(competition?.tier)) {
+      errors.push({ id: competition?.id, index, field: 'tier', message: `${label} has unsupported tier "${competition?.tier}"` });
+    }
+
+    if (!COMPETITION_CATEGORIES.includes(competition?.cat)) {
+      errors.push({ id: competition?.id, index, field: 'cat', message: `${label} has unsupported category "${competition?.cat}"` });
+    }
+
+    if (!Array.isArray(competition?.timeline)) {
+      errors.push({ id: competition?.id, index, field: 'timeline', message: `${label} timeline must be an array` });
+      return;
+    }
+
+    competition.timeline.forEach((item, timelineIndex) => {
+      if (!hasRequiredValue(item?.event)) {
+        errors.push({ id: competition?.id, index, field: `timeline[${timelineIndex}].event`, message: `${label} timeline item is missing event` });
+      }
+      if (!parseCompetitionDate(item?.date)) {
+        errors.push({ id: competition?.id, index, field: `timeline[${timelineIndex}].date`, message: `${label} timeline item "${item?.event ?? timelineIndex}" has an invalid date` });
+      }
+    });
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+function countBy(items, getKey) {
+  return items.reduce((counts, item) => {
+    const key = getKey(item) ?? 'unknown';
+    counts[key] = (counts[key] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function hasRequiredValue(value) {
+  if (Array.isArray(value)) return value.length > 0;
+  return value !== undefined && value !== null && value !== '';
 }
