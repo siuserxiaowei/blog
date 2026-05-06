@@ -1,0 +1,597 @@
+---
+import Newsletter from './Newsletter.astro';
+
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props;
+---
+
+<section class="article-engagement" data-article-engagement data-slug={slug} data-title={title}>
+  <div class="article-end-card" id="article-end-reaction">
+    <div class="article-end-copy">
+      <p class="section-kicker">After Reading</p>
+      <h2>读到这里，留一点反馈。</h2>
+      <p>
+        这篇如果帮你形成了一个判断，可以顺手点个赞；如果有具体想法，直接跳到评论区写一句。
+      </p>
+    </div>
+
+    <div class="article-end-actions">
+      <button class="big-like-btn" type="button" data-like-button data-like-size="large" aria-pressed="false">
+        <span class="like-heart" aria-hidden="true">♥</span>
+        <span class="like-label">有启发</span>
+        <strong data-like-count>0</strong>
+      </button>
+      <a class="comment-jump" href="#comments">去评论</a>
+    </div>
+  </div>
+
+  <div class="article-newsletter">
+    <Newsletter compact />
+  </div>
+
+  <div class="quote-note" data-quote-note hidden>
+    <div>
+      <p>准备引用</p>
+      <blockquote data-quote-text></blockquote>
+    </div>
+    <button type="button" data-copy-quote>复制引用</button>
+  </div>
+
+  <div class="floating-reader-actions" data-floating-actions aria-label="文章快捷操作">
+    <button class="floating-action like" type="button" data-like-button aria-label="点赞" aria-pressed="false">
+      <span aria-hidden="true">♥</span>
+      <strong data-like-count>0</strong>
+    </button>
+    <a class="floating-action" href="#comments" aria-label="评论">评</a>
+    <button class="floating-action" type="button" data-scroll-top aria-label="回到顶部">↑</button>
+  </div>
+
+  <button class="quote-popover" type="button" data-quote-popover hidden>复制引用并去评论</button>
+</section>
+
+<style>
+  .article-engagement {
+    margin-top: 4rem;
+  }
+
+  .article-end-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.35rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-end-copy h2 {
+    margin-top: 0.45rem;
+    color: var(--text);
+    font-size: clamp(1.55rem, 3vw, 2.15rem);
+    line-height: 1.12;
+  }
+
+  .article-end-copy p:last-child {
+    max-width: 34rem;
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .article-end-actions {
+    display: grid;
+    gap: 0.65rem;
+    justify-items: stretch;
+    min-width: 10rem;
+  }
+
+  .big-like-btn,
+  .comment-jump,
+  .quote-note button,
+  .quote-popover,
+  .floating-action {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+
+  .big-like-btn {
+    min-height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0 1rem;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .big-like-btn strong {
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .like-heart {
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .comment-jump {
+    min-height: 2.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    color: var(--text-secondary);
+  }
+
+  .big-like-btn:hover,
+  .comment-jump:hover,
+  .quote-note button:hover,
+  .quote-popover:hover,
+  .floating-action:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-strong);
+    color: var(--color-accent);
+  }
+
+  .big-like-btn.is-pulsing .like-heart,
+  .floating-action.like.is-pulsing span {
+    animation: like-pop 0.32s ease;
+  }
+
+  @keyframes like-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.36); }
+    100% { transform: scale(1); }
+  }
+
+  .article-newsletter {
+    margin-top: 1.5rem;
+  }
+
+  .quote-note {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .quote-note[hidden] {
+    display: none;
+  }
+
+  .quote-note > div {
+    min-width: 0;
+  }
+
+  .quote-note p {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .quote-note blockquote {
+    margin: 0.45rem 0 0;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .quote-note button {
+    min-height: 2.4rem;
+    padding: 0 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .floating-reader-actions {
+    position: fixed;
+    right: max(1.25rem, calc((100vw - var(--container-max)) / 2));
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    z-index: 48;
+    display: flex;
+    gap: 0.45rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .floating-reader-actions.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .floating-reader-actions.is-muted {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .floating-action {
+    position: relative;
+    width: 2.7rem;
+    height: 2.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-card);
+  }
+
+  .floating-action.like {
+    color: var(--color-accent);
+  }
+
+  .floating-action strong {
+    position: absolute;
+    top: -0.45rem;
+    right: -0.35rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    line-height: 1;
+  }
+
+  .quote-popover {
+    position: fixed;
+    z-index: 60;
+    max-width: calc(100vw - 24px);
+    min-height: 2.3rem;
+    padding: 0 0.85rem;
+    color: var(--color-accent);
+    font-size: 0.86rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .quote-popover[hidden] {
+    display: none;
+  }
+
+  .big-like-btn.is-liked,
+  .floating-action.like.is-liked {
+    border-color: color-mix(in srgb, var(--color-accent) 58%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--surface));
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 860px) {
+    .article-end-card {
+      grid-template-columns: 1fr;
+    }
+
+    .article-end-actions {
+      min-width: 0;
+    }
+
+    .floating-reader-actions {
+      right: 1rem;
+      bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .quote-note {
+      grid-template-columns: 1fr;
+    }
+
+    .quote-note button {
+      justify-content: center;
+    }
+
+    .floating-action {
+      width: 2.55rem;
+      height: 2.55rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const initArticleEngagement = () => {
+      document.querySelectorAll('[data-article-engagement]').forEach((root) => {
+        if (root.dataset.bound) return;
+        root.dataset.bound = 'true';
+
+        const slug = root.dataset.slug || window.location.pathname;
+        const title = root.dataset.title || document.title;
+        const legacyLikeKey = `article-like:${slug}`;
+        const likeKey = `article-like-local:${slug}`;
+        const quoteKey = `article-quote:${slug}`;
+        const likedKey = `article-liked:${slug}`;
+        const likeApi = `/api/article-likes?slug=${encodeURIComponent(slug)}`;
+        const likeButtons = root.querySelectorAll('[data-like-button]');
+        const likeCounts = root.querySelectorAll('[data-like-count]');
+        const floatingActions = root.querySelector('[data-floating-actions]');
+        const endReaction = root.querySelector('#article-end-reaction');
+        const quotePopover = root.querySelector('[data-quote-popover]');
+        const quoteNote = root.querySelector('[data-quote-note]');
+        const quoteText = root.querySelector('[data-quote-text]');
+        const copyQuote = root.querySelector('[data-copy-quote]');
+        const scrollTop = root.querySelector('[data-scroll-top]');
+        const articleBody = document.querySelector('.prose');
+        const controller = new AbortController();
+        let selectedQuote = sessionStorage.getItem(quoteKey) || '';
+        let serverLikes = null;
+        let apiEnabled = null;
+        let pendingDelta = 0;
+        let flushTimer = 0;
+
+        if (!localStorage.getItem(likeKey) && localStorage.getItem(legacyLikeKey)) {
+          localStorage.setItem(likeKey, localStorage.getItem(legacyLikeKey));
+        }
+
+        const getLocalLikes = () => Number.parseInt(localStorage.getItem(likeKey) || '0', 10) || 0;
+
+        const setLocalLikes = (likes) => {
+          localStorage.setItem(likeKey, String(Math.max(0, likes)));
+        };
+
+        const currentDisplayLikes = () => {
+          if (Number.isFinite(serverLikes)) return serverLikes;
+          return getLocalLikes();
+        };
+
+        const syncLikes = () => {
+          const likes = currentDisplayLikes();
+          likeCounts.forEach((node) => {
+            node.textContent = String(likes);
+          });
+        };
+
+        const syncLiked = () => {
+          const liked = localStorage.getItem(likedKey) === '1' || getLocalLikes() > 0;
+          likeButtons.forEach((button) => {
+            button.classList.toggle('is-liked', liked);
+            button.setAttribute('aria-pressed', liked ? 'true' : 'false');
+          });
+        };
+
+        const pulse = (button) => {
+          button.classList.remove('is-pulsing');
+          window.requestAnimationFrame(() => {
+            button.classList.add('is-pulsing');
+            window.setTimeout(() => button.classList.remove('is-pulsing'), 360);
+          });
+        };
+
+        const postLikes = async (delta, keepalive = false) => {
+          if (apiEnabled === false || delta <= 0) return false;
+          try {
+            const response = await fetch('/api/article-likes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug, delta }),
+              keepalive
+            });
+            if (response.status === 501 || response.status === 404) {
+              apiEnabled = false;
+              return false;
+            }
+            if (!response.ok) return false;
+            const data = await response.json();
+            if (Number.isFinite(data.likes)) {
+              serverLikes = data.likes;
+              apiEnabled = true;
+              syncLikes();
+            }
+            return true;
+          } catch {
+            return false;
+          }
+        };
+
+        const flushLikes = async (keepalive = false) => {
+          if (!pendingDelta) return;
+          const delta = pendingDelta;
+          pendingDelta = 0;
+          const synced = await postLikes(delta, keepalive);
+          if (!synced && apiEnabled !== false) {
+            pendingDelta += delta;
+          }
+        };
+
+        const scheduleFlush = () => {
+          window.clearTimeout(flushTimer);
+          flushTimer = window.setTimeout(() => flushLikes(), 450);
+        };
+
+        const loadServerLikes = async () => {
+          try {
+            const response = await fetch(likeApi);
+            if (response.status === 501 || response.status === 404) {
+              apiEnabled = false;
+              return;
+            }
+            if (!response.ok) return;
+            const data = await response.json();
+            if (Number.isFinite(data.likes)) {
+              serverLikes = data.likes;
+              apiEnabled = true;
+              syncLikes();
+            }
+          } catch {
+            apiEnabled = null;
+          }
+        };
+
+        const addLike = (button) => {
+          const next = getLocalLikes() + 1;
+          setLocalLikes(next);
+          localStorage.setItem(likedKey, '1');
+          if (Number.isFinite(serverLikes)) serverLikes += 1;
+          pendingDelta += 1;
+          syncLikes();
+          syncLiked();
+          pulse(button);
+          scheduleFlush();
+        };
+
+        const renderQuote = () => {
+          if (quoteNote && quoteText && selectedQuote) {
+            quoteText.textContent = selectedQuote;
+            quoteNote.hidden = false;
+          }
+
+          const commentNote = document.getElementById('comment-quote-note');
+          const commentText = document.getElementById('comment-quote-text');
+          const commentCopy = document.getElementById('comment-quote-copy');
+          if (commentNote && commentText && selectedQuote) {
+            commentText.textContent = selectedQuote;
+            commentNote.dataset.quoteMarkdown = quoteMarkdown();
+            commentNote.hidden = false;
+          }
+          if (commentNote && commentCopy && !commentCopy.dataset.bound) {
+            commentCopy.dataset.bound = 'true';
+            commentCopy.addEventListener('click', async () => {
+              const markdown = commentNote.dataset.quoteMarkdown || quoteMarkdown();
+              try {
+                await navigator.clipboard.writeText(markdown);
+                commentCopy.textContent = '已复制';
+              } catch {
+                commentCopy.textContent = '复制失败';
+              } finally {
+                window.setTimeout(() => {
+                  commentCopy.textContent = '再复制一次';
+                }, 1600);
+              }
+            }, { signal: controller.signal });
+          }
+        };
+
+        const quoteMarkdown = () => {
+          const body = selectedQuote
+            .split('\n')
+            .map((line) => `> ${line}`)
+            .join('\n');
+          return `${body}\n\n来自《${title}》：${window.location.href}`;
+        };
+
+        likeButtons.forEach((button) => {
+          button.addEventListener('click', () => addLike(button), { signal: controller.signal });
+        });
+
+        scrollTop?.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, { signal: controller.signal });
+
+        copyQuote?.addEventListener('click', async () => {
+          if (!selectedQuote) return;
+          try {
+            await navigator.clipboard.writeText(quoteMarkdown());
+            copyQuote.textContent = '已复制';
+          } catch {
+            copyQuote.textContent = '复制失败';
+          } finally {
+            window.setTimeout(() => {
+              copyQuote.textContent = '复制引用';
+            }, 1600);
+          }
+        }, { signal: controller.signal });
+
+        quotePopover?.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+        }, { signal: controller.signal });
+
+        quotePopover?.addEventListener('click', () => {
+          if (!selectedQuote) return;
+          sessionStorage.setItem(quoteKey, selectedQuote);
+          renderQuote();
+          quotePopover.hidden = true;
+          navigator.clipboard?.writeText(quoteMarkdown()).catch(() => {});
+          document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, { signal: controller.signal });
+
+        document.addEventListener('selectionchange', () => {
+          if (!articleBody || !quotePopover) return;
+          const selection = window.getSelection();
+          const text = selection?.toString().trim() || '';
+          if (
+            !selection ||
+            selection.rangeCount === 0 ||
+            !text ||
+            text.length < 6 ||
+            !articleBody.contains(selection.anchorNode) ||
+            !articleBody.contains(selection.focusNode)
+          ) {
+            quotePopover.hidden = true;
+            return;
+          }
+
+          selectedQuote = text.slice(0, 240);
+          const range = selection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          quotePopover.hidden = false;
+          const popoverWidth = quotePopover.offsetWidth || 132;
+          quotePopover.style.left = `${Math.min(window.innerWidth - popoverWidth - 12, Math.max(12, rect.left + rect.width / 2 - popoverWidth / 2))}px`;
+          quotePopover.style.top = `${Math.max(72, rect.top - 44)}px`;
+        }, { signal: controller.signal });
+
+        const syncFloating = () => {
+          if (!floatingActions) return;
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const ratio = max > 0 ? window.scrollY / max : 0;
+          floatingActions.classList.toggle('is-visible', ratio > 0.1);
+        };
+
+        window.addEventListener('scroll', syncFloating, { passive: true, signal: controller.signal });
+        syncFloating();
+
+        if (floatingActions && endReaction && 'IntersectionObserver' in window) {
+          const endObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              floatingActions.classList.toggle('is-muted', entry.isIntersecting);
+            });
+          }, { threshold: 0.18 });
+          endObserver.observe(endReaction);
+          controller.signal.addEventListener('abort', () => endObserver.disconnect(), { once: true });
+        }
+
+        window.addEventListener('pagehide', () => {
+          if (!pendingDelta || apiEnabled === false) return;
+          const payload = JSON.stringify({ slug, delta: pendingDelta });
+          const sent = navigator.sendBeacon?.('/api/article-likes', new Blob([payload], { type: 'application/json' }));
+          if (sent) pendingDelta = 0;
+        }, { signal: controller.signal });
+
+        document.addEventListener('astro:before-swap', () => controller.abort(), { once: true, signal: controller.signal });
+
+        syncLikes();
+        syncLiked();
+        renderQuote();
+        loadServerLikes();
+      });
+    };
+
+    document.addEventListener('DOMContentLoaded', initArticleEngagement);
+    document.addEventListener('astro:page-load', initArticleEngagement);
+  })();
+</script>

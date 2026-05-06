@@ -102,6 +102,7 @@ const pageLinks = [
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
     color: var(--text);
   }
 
@@ -122,6 +123,7 @@ const pageLinks = [
   .brand-text {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     line-height: 1.1;
   }
 
@@ -142,7 +144,7 @@ const pageLinks = [
   }
 
   .nav-links {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 0.25rem;
   }
@@ -164,7 +166,7 @@ const pageLinks = [
   }
 
   .header-actions {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 0.5rem;
   }
@@ -276,8 +278,29 @@ const pageLinks = [
   }
 
   @media (max-width: 767px) {
+    .header-inner {
+      gap: 1rem;
+    }
+
     .brand-sub { display: none; }
     .brand-name { font-size: 1.05rem; }
+  }
+
+  @media (min-width: 768px) {
+    .header-actions {
+      display: flex;
+    }
+
+    .mobile-btn,
+    .mobile-menu {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .nav-links {
+      display: flex;
+    }
   }
 </style>
 
