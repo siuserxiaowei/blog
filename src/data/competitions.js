@@ -1,4 +1,4 @@
-export const RADAR_UPDATED_AT = '2026-05-06';
+export const RADAR_UPDATED_AT = '2026-05-07';
 
 export const DAY_MS = 86400000;
 
@@ -400,6 +400,17 @@ export const competitions = [
     winning:['融资数据 / 增长曲线','品牌叙事完整度','创始人 IP'],
     timeline:[{event:'榜单提名（参考）',date:'2026-09-30',critical:false},{event:'入围公布',date:'2026-11-15',critical:false},{event:'WISE 大会颁奖',date:'2026-12-10',critical:true}],
     url:'https://www.36kr.com/' },
+  { id:'bjaigeek', name:'AI 极客争霸赛 5.10', fullName:'北京 5.10 AI 极客争霸赛 · 造物主 vs 探险家', org:'AI.X 硬件社（北京 AI 产品智能硬件活动群 · 陈大叔）', rel:'B+', loc:'北京', date:'2026-05-10', deadlineISO:'2026-05-10', tier:'B', cat:'社区创意', match:7.6, suit:'高',
+    desc:'AI.X 硬件社陈大叔在「北京 | AI产品智能硬件活动群」4-29 推的同城黑客松：20 个创意席位、零 PPT 纯造物、真人互动 + 直播曝光、最高 5000 元奖金 + 投资人面对面，配 AI 音乐会和免费酒水。规模小但圈层密度高，适合一周内能出 demo 的硬件团队当快闪练兵。',
+    strategy:'带班宠伴学机现场跑「8 万付费教师 → AI 终端」全链路 demo。Vision 30 秒说清「花衍科技 = 一个人 + AI 智能体 + 80 万营收」属于「造物主」极，把"零 PPT"规则当杠杆—别人路演讲故事，你直接让评委摸真机。目标不是 5000 元奖金，而是把"深圳智能硬件第一人"的标签搬到北京投资人和直播间，撬下一轮种子轮。',
+    audience:'北京及周边能到场、有可演示样机的硬件 / AI Native 团队',
+    rewards:['最高 5000 元现金','北京线下投资人面对面','活动直播曝光','AI 音乐会 + 免费酒水','AI.X 硬件社人脉沉淀'],
+    pros:['时间近、操作快','圈层质量靠陈大叔背书','投资人/直播 ROI 比奖金高','非评奖压力低、纯撞人','北京硬件社群入口'],
+    cons:['席位仅 20 个','现金奖偏小','需要现场北京','信息从微信群一手扩散，详情以扫码为准'],
+    winning:['可现场操作的样机','30 秒 Vision','造物 / 探险 极的清晰定位','demo 视觉冲击力'],
+    timeline:[{event:'席位招募开启',date:'2026-04-29',critical:false},{event:'活动当天 ⚠️',date:'2026-05-10',critical:true}],
+    url:'https://mp.weixin.qq.com/s/4iUCXey2YftKf0a6Lh-T-w',
+    sources:[{title:'AI.X 硬件社 陈大叔 · 北京 5.10 AI极客争霸赛招募',date:'2026-04-29',url:'https://mp.weixin.qq.com/s/4iUCXey2YftKf0a6Lh-T-w'}] },
 ];
 
 export function parseCompetitionDate(value) {

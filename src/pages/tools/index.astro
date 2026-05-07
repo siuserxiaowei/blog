@@ -89,35 +89,41 @@ const toolById = new Map(tools.map((tool) => [tool.id, tool]));
 const categories = [...new Set(tools.map((tool) => tool.cat))];
 const liveCount = tools.filter((tool) => tool.status === 'live').length;
 
-const collections = [
-  {
-    eyebrow: 'Format & transform',
-    title: '处理一段结构化数据',
-    desc: 'JSON、YAML、CSV、Markdown 这些输入先整理干净，再继续处理。',
-    ids: ['json-formatter', 'json-yaml', 'json-csv', 'markdown-html']
-  },
-  {
-    eyebrow: 'Security & identity',
-    title: '生成凭据或做基础安全处理',
-    desc: '生成密码、Token、UUID，或者快速做哈希、HMAC、JWT 解析。',
-    ids: ['password', 'token', 'uuid', 'hash']
-  },
-  {
-    eyebrow: 'Web & frontend',
-    title: '调试浏览器和接口问题',
-    desc: 'URL、状态码、curl 转代码、颜色和渐变这些动作更适合直接在线完成。',
-    ids: ['url-parser', 'http-status', 'curl-to-fetch', 'color']
-  },
-  {
-    eyebrow: 'Learning & writing',
-    title: '做学习和内容处理相关任务',
-    desc: '英语学习导航、文本统计、差异比较、Slug 和行处理都更适合放在一处。',
-    ids: ['english-learning', 'text-stats', 'text-diff', 'line-tools']
-  }
-].map((collection) => ({
-  ...collection,
-  items: collection.ids.map((id) => toolById.get(id)).filter(Boolean) as Tool[]
-}));
+const categoryMeta: Record<string, { code: string; desc: string }> = {
+  数据格式: { code: 'DATA', desc: '结构化输入的清洗、转换、对比和格式化。' },
+  编码转换: { code: 'CODEC', desc: 'Base64、URL、Unicode、二进制等编码互转。' },
+  加密哈希: { code: 'CRYPTO', desc: '哈希、签名、Token 与基础安全校验。' },
+  生成器: { code: 'GEN', desc: '批量生成标识符、密码、二维码和占位内容。' },
+  时间日期: { code: 'TIME', desc: '时间戳、Cron、日期差值这些时间类速查。' },
+  文本处理: { code: 'TEXT', desc: '统计、对比、清洗、命名转换和 Markdown 处理。' },
+  网络工具: { code: 'NET', desc: 'URL、HTTP、MIME、UA、CIDR 和接口调试辅助。' },
+  颜色图像: { code: 'PIXEL', desc: '颜色、渐变、占位图、图片压缩与图标生成。' },
+  开发辅助: { code: 'DEV', desc: '前端、终端、键盘、权限和数学相关小工具。' },
+  学习资源: { code: 'LEARN', desc: '学习导航和内容整理类资源入口。' },
+};
+
+const featuredIds = [
+  'json-formatter',
+  'password',
+  'timestamp',
+  'regex',
+  'curl-to-fetch',
+  'color',
+  'english-learning',
+  'wx2x',
+];
+
+const featuredTools = featuredIds.map((id) => toolById.get(id)).filter(Boolean) as Tool[];
+
+const categoryGroups = categories.map((cat) => {
+  const items = tools.filter((tool) => tool.cat === cat);
+  return {
+    cat,
+    items,
+    live: items.filter((tool) => tool.status === 'live').length,
+    meta: categoryMeta[cat] || { code: cat.slice(0, 4).toUpperCase(), desc: '常用工具集合。' },
+  };
+});
 
 const getToolHref = (tool: Tool) => tool.href || `/tools/${tool.id}`;
 const getToolMark = (tool: Tool) => {
@@ -144,29 +150,22 @@ const getToolMark = (tool: Tool) => {
 >
   <Header />
 
-  <main class="tools-page pt-32 pb-24">
-    <div class="mx-auto px-6" style="max-width: var(--container-max);">
-
-      <!-- Hero -->
+  <main class="tools-page pt-28 pb-24">
+    <div class="tools-container mx-auto px-4 sm:px-6">
       <section class="tools-hero scroll-reveal">
-        <div class="tools-hero-copy">
-          <div class="tools-meta-row">
-            <span class="pill-note">Browser-first toolbox</span>
-            <span class="tools-hero-note">zero upload · no sign-in</span>
-          </div>
-
+        <div class="tools-hero-copy arsenal-panel">
+          <p class="section-kicker">Arsenal / Tool Repository</p>
           <h1 class="tools-title display-serif">
-            把高频<em>小动作</em><br/>
-            收成一个目录产品。
+            高频小动作，<br />
+            都收进这座<em>工具仓库</em>。
           </h1>
-
           <p class="tools-lede">
-            开发、写作、调试、学习里最常复发的小问题，不应该每次都重新搜索。沉淀成随手可开的浏览器工作台。
+            JSON、加密、编码、时间、网络、文本和学习资源集中陈列。像查库存一样检索，像拿工具一样打开，尽量留在浏览器本地完成。
           </p>
 
           <div class="tools-hero-stats">
             <div>
-              <span class="k">Live</span>
+              <span class="k">Live tools</span>
               <strong>{liveCount}</strong>
             </div>
             <div>
@@ -184,92 +183,131 @@ const getToolMark = (tool: Tool) => {
           </div>
         </div>
 
-        <div class="tools-search-card surface-card gradient-border">
-          <label class="tools-search-label" for="tool-search">Search</label>
+        <aside class="tools-command-panel arsenal-panel" aria-label="工具搜索和分类筛选">
+          <div class="command-head">
+            <span>Command search</span>
+            <strong>{liveCount} ready</strong>
+          </div>
+
+          <label class="tools-search-label" for="tool-search">搜索工具</label>
           <div class="tools-search-box">
-            <input id="tool-search" type="search" placeholder="JSON · 加密 · 颜色 · 时间 · 雅思..." autocomplete="off" />
+            <span class="search-mark">/</span>
+            <input id="tool-search" type="search" placeholder="JSON、Token、颜色、英语、curl..." autocomplete="off" />
             <kbd>⌘K</kbd>
           </div>
-          <div class="tools-chip-row">
-            <button class="tools-chip is-active" data-cat-filter="all" type="button">全部 · {liveCount}</button>
+
+          <div class="tools-chip-row" aria-label="按分类筛选">
+            <button class="tools-chip is-active" data-cat-filter="all" type="button" aria-pressed="true">全部 · {liveCount}</button>
             {categories.map((cat) => {
               const n = tools.filter((tool) => tool.cat === cat).length;
               return (
-                <button class="tools-chip" data-cat-filter={cat} type="button">{cat} · {n}</button>
+                <button class="tools-chip" data-cat-filter={cat} type="button" aria-pressed="false">{cat} · {n}</button>
               );
             })}
           </div>
-        </div>
+        </aside>
       </section>
 
-      <!-- By Task -->
-      <section class="collections-section scroll-reveal">
+      <section class="featured-section scroll-reveal" data-feature-section>
         <div class="section-row">
           <div>
-            <p class="section-kicker">By Task</p>
-            <h2 class="section-h2 display-serif">按要做的事找工具。</h2>
+            <p class="section-kicker">Featured Tools</p>
+            <h2 class="section-h2 display-serif">精选工具。</h2>
           </div>
+          <p class="directory-note" id="featured-count">{featuredTools.length} 个高频入口</p>
         </div>
 
-        <div class="collection-grid">
-          {collections.map((collection) => (
-            <article class="collection-card surface-card">
-              <div class="collection-head">
-                <p class="collection-kicker">{collection.eyebrow}</p>
-                <span>{collection.items.length}</span>
-              </div>
-              <h3 class="collection-title">{collection.title}</h3>
-              <p class="collection-desc">{collection.desc}</p>
-
-              <div class="collection-links">
-                {collection.items.map((tool) => (
-                  <a href={getToolHref(tool)} class="collection-link">
-                    <span class="collection-mark">{getToolMark(tool)}</span>
-                    <span class="collection-link-label">{tool.name}</span>
-                    <em>↗</em>
-                  </a>
-                ))}
-              </div>
-            </article>
-          ))}
+        <div class="featured-grid">
+          {featuredTools.map((tool, index) => {
+            const href = tool.status === 'live' ? getToolHref(tool) : '#';
+            return (
+              <a
+                href={href}
+                data-feature-card
+                data-tool-name={`${tool.name} ${tool.nameEn} ${tool.desc} ${tool.cat}`.toLowerCase()}
+                data-tool-cat={tool.cat}
+                class:list={['featured-tool-card', tool.status === 'soon' && 'is-soon']}
+                aria-disabled={tool.status === 'soon' ? 'true' : undefined}
+              >
+                <div class="featured-rank">0{index + 1}</div>
+                <div class="featured-head">
+                  <span class="tool-card-icon">{getToolMark(tool)}</span>
+                  <span class="tool-status-pill is-live">{tool.status === 'live' ? '已上线' : '排队中'}</span>
+                </div>
+                <div>
+                  <p class="tool-card-cat">{tool.cat}</p>
+                  <h3 class="featured-title">{tool.name}</h3>
+                  <p class="tool-card-desc">{tool.desc}</p>
+                </div>
+                <div class="tool-card-foot">
+                  <span>{tool.nameEn}</span>
+                  <em>OPEN</em>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </section>
 
-      <!-- All tools · flat grid -->
       <section class="tools-directory scroll-reveal">
         <div class="section-row">
           <div>
-            <p class="section-kicker">All Tools · {liveCount}</p>
+            <p class="section-kicker">All Tools</p>
             <h2 class="section-h2 display-serif">全部工具。</h2>
           </div>
           <p class="directory-note" id="directory-count">{liveCount} 项全部可用</p>
         </div>
 
         <div id="empty-state" class="tools-empty hidden">
-          <p class="empty-mark">∅</p>
-          <p>没有匹配结果。换个关键词或清除筛选。</p>
+          <p class="empty-mark">EMPTY</p>
+          <p>没有匹配结果。换个关键词或清除分类筛选。</p>
         </div>
 
-        <div class="tool-grid">
-          {tools.map((tool) => {
-            const href = tool.status === 'live' ? getToolHref(tool) : '#';
-            return (
-              <a
-                href={href}
-                data-tool-card
-                data-tool-name={`${tool.name} ${tool.nameEn} ${tool.desc} ${tool.cat}`.toLowerCase()}
-                data-tool-cat={tool.cat}
-                class:list={['tool-card-item', tool.status === 'soon' && 'is-soon']}
-              >
-                <div class="tool-card-head">
-                  <span class="tool-card-icon">{getToolMark(tool)}</span>
-                  <span class="tool-card-cat">{tool.cat}</span>
+        <div class="category-stack">
+          {categoryGroups.map((group) => (
+            <section class="category-block" data-category-group={group.cat}>
+              <div class="category-head">
+                <div class="category-title-row">
+                  <span class="category-code">{group.meta.code}</span>
+                  <div>
+                    <h3>{group.cat}</h3>
+                    <p>{group.meta.desc}</p>
+                  </div>
                 </div>
-                <h4 class="tool-card-title">{tool.name}</h4>
-                <p class="tool-card-desc">{tool.desc}</p>
-              </a>
-            );
-          })}
+                <span class="category-count">{group.live} / {group.items.length} live</span>
+              </div>
+
+              <div class="tool-grid">
+                {group.items.map((tool) => {
+                  const href = tool.status === 'live' ? getToolHref(tool) : '#';
+                  return (
+                    <a
+                      href={href}
+                      data-tool-card
+                      data-tool-name={`${tool.name} ${tool.nameEn} ${tool.desc} ${tool.cat}`.toLowerCase()}
+                      data-tool-cat={tool.cat}
+                      class:list={['tool-card-item', tool.status === 'soon' && 'is-soon']}
+                      aria-disabled={tool.status === 'soon' ? 'true' : undefined}
+                    >
+                      <div class="tool-card-head">
+                        <span class="tool-card-icon">{getToolMark(tool)}</span>
+                        <span class="tool-status-pill is-live">{tool.status === 'live' ? '已上线' : '排队中'}</span>
+                      </div>
+                      <div class="tool-card-body">
+                        <p class="tool-card-cat">{tool.cat}</p>
+                        <h4 class="tool-card-title">{tool.name}</h4>
+                        <p class="tool-card-desc">{tool.desc}</p>
+                      </div>
+                      <div class="tool-card-foot">
+                        <span>{tool.nameEn}</span>
+                        <em>OPEN</em>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       </section>
 
@@ -282,73 +320,107 @@ const getToolMark = (tool: Tool) => {
 <style>
   .tools-page {
     min-height: 100vh;
+    color: var(--text);
+    position: relative;
+    overflow-x: hidden;
+    background:
+      repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-accent-2) 10%, transparent) 0 1px, transparent 1px 96px),
+      repeating-linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 8%, transparent) 0 1px, transparent 1px 96px),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 46%, var(--bg) 100%);
   }
 
-  /* ============ Hero ============ */
+  .tools-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 34%, color-mix(in srgb, var(--color-accent-2) 8%, transparent) 100%);
+    opacity: 0.32;
+  }
+
+  .tools-container {
+    width: 100%;
+    max-width: min(1240px, 100%);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tools-page .section-kicker,
+  .tools-page h1,
+  .tools-page h2,
+  .tools-page h3,
+  .tools-page h4,
+  .tools-page p,
+  .tools-page span,
+  .tools-page strong,
+  .tools-page button,
+  .tools-page input,
+  .tools-page kbd,
+  .tools-page em {
+    letter-spacing: 0;
+  }
+
   .tools-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr);
-    gap: 3rem;
-    align-items: start;
-    margin-bottom: 5rem;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 1rem;
+    align-items: stretch;
+    margin-bottom: 2.4rem;
   }
 
-  .tools-meta-row {
+  .arsenal-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 24px 70px -48px rgba(0, 0, 0, 0.75);
+  }
+
+  .tools-hero-copy {
     display: flex;
-    align-items: center;
+    min-height: 25rem;
+    flex-direction: column;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.8rem;
-  }
-
-  .tools-hero-note {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    padding: 2rem;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 42%),
+      var(--surface);
   }
 
   .tools-title {
-    font-size: clamp(2.2rem, 4.6vw, 3.8rem);
-    line-height: 1.15;
-    letter-spacing: -0.005em;
+    max-width: 45rem;
+    margin-top: 1.8rem;
+    font-size: 3.45rem;
+    line-height: 1.08;
+    letter-spacing: 0;
     text-wrap: balance;
   }
 
   .tools-title em {
     color: var(--color-accent);
-    font-style: italic;
-  }
-
-  .tools-lede {
-    max-width: 34rem;
-    margin-top: 1.6rem;
-    color: var(--text-secondary);
-    font-size: clamp(0.98rem, 1.25vw, 1.08rem);
-    line-height: 1.8;
+    font-style: normal;
   }
 
   .tools-hero-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.6rem;
-    margin-top: 2rem;
+    gap: 0.55rem;
+    margin-top: 2.1rem;
   }
 
   .tools-hero-stats > div {
-    padding: 0.95rem 0.9rem;
-    border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    min-width: 0;
+    min-height: 5rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--surface) 55%, transparent);
+    background: rgba(255, 255, 255, 0.025);
   }
 
   .tools-hero-stats .k {
     display: block;
     color: var(--text-secondary);
     font-family: var(--font-mono);
-    font-size: 0.64rem;
-    letter-spacing: 0.18em;
+    font-size: 0.68rem;
     text-transform: uppercase;
   }
 
@@ -359,49 +431,92 @@ const getToolMark = (tool: Tool) => {
     font-family: var(--font-heading);
     font-size: 1.1rem;
     font-weight: 600;
+    word-break: break-word;
   }
 
-  /* ============ Search card ============ */
-  .tools-search-card {
+  .tools-lede {
+    max-width: 42rem;
+    margin-top: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+    text-wrap: pretty;
+  }
+
+  .tools-command-panel {
     display: grid;
+    align-content: start;
     gap: 1rem;
-    padding: 1.4rem;
-    border-radius: var(--radius-xl);
+    min-height: 25rem;
+    padding: 1.15rem;
+    position: sticky;
+    top: 5.25rem;
+  }
+
+  .command-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+  }
+
+  .command-head strong {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
   }
 
   .tools-search-label {
     display: block;
     color: var(--text-secondary);
     font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
+    font-size: 0.74rem;
     text-transform: uppercase;
   }
 
   .tools-search-box {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.75rem;
-    height: 3.2rem;
+    gap: 0.8rem;
+    min-height: 4rem;
     padding: 0 1rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 65%, transparent);
-    transition: border-color 0.2s ease;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
+    background: var(--surface-inset);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .tools-search-box:focus-within {
-    border-color: color-mix(in srgb, var(--color-accent) 50%, var(--border));
+    border-color: var(--color-accent);
+    box-shadow: var(--focus-ring), inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  }
+
+  .search-mark {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
   }
 
   .tools-search-box input {
-    flex: 1;
     min-width: 0;
     border: none;
     background: transparent;
     color: var(--text);
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 1rem;
     outline: none;
   }
 
@@ -410,10 +525,10 @@ const getToolMark = (tool: Tool) => {
   }
 
   .tools-search-box kbd {
-    padding: 3px 7px;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
-    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    padding: 0.2rem 0.45rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
     color: var(--text-secondary);
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -422,18 +537,17 @@ const getToolMark = (tool: Tool) => {
   .tools-chip-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.5rem;
   }
 
   .tools-chip {
-    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    background: color-mix(in srgb, var(--surface) 45%, transparent);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.025);
     color: var(--text-secondary);
-    border-radius: 999px;
-    padding: 0.42rem 0.78rem;
+    border-radius: var(--radius-md);
+    padding: 0.52rem 0.72rem;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.04em;
+    font-size: 0.74rem;
     cursor: pointer;
     transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
   }
@@ -444,12 +558,11 @@ const getToolMark = (tool: Tool) => {
   }
 
   .tools-chip.is-active {
-    color: #1a130b;
+    color: var(--color-accent-ink);
     background: var(--color-accent);
     border-color: var(--color-accent);
   }
 
-  /* ============ Sections ============ */
   .section-row {
     display: flex;
     align-items: flex-end;
@@ -460,204 +573,241 @@ const getToolMark = (tool: Tool) => {
 
   .section-h2 {
     margin-top: 0.45rem;
-    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+    font-size: 2rem;
     line-height: 1.2;
-    letter-spacing: -0.005em;
+    letter-spacing: 0;
     text-wrap: balance;
   }
 
-  .collections-section {
-    margin-top: 5.5rem;
+  .featured-section {
+    margin-top: 3rem;
   }
 
   .tools-directory {
-    margin-top: 6rem;
+    margin-top: 4rem;
   }
 
   .directory-note {
     color: var(--text-secondary);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
+    font-size: 0.74rem;
     text-transform: uppercase;
   }
 
-  /* ============ Collections (By Task) ============ */
-  .collection-grid {
+  .featured-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
   }
 
-  .collection-card {
+  .featured-tool-card {
     display: grid;
-    gap: 1.2rem;
-    padding: 1.8rem;
-    border-radius: var(--radius-xl);
+    grid-template-rows: auto auto 1fr auto;
+    gap: 1rem;
+    min-width: 0;
+    min-height: 15rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 52%),
+      var(--surface-card);
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
   }
 
-  .collection-head {
+  .featured-tool-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    color: var(--text);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 60%),
+      var(--surface-hover);
+  }
+
+  .featured-rank {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+  }
+
+  .featured-head,
+  .tool-card-head,
+  .tool-card-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .collection-kicker {
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  .collection-head span {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-  }
-
-  .collection-title {
-    font-size: 1.35rem;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-  }
-
-  .collection-desc {
-    color: var(--text-secondary);
-    font-size: 0.92rem;
-    line-height: 1.7;
-  }
-
-  .collection-links {
-    display: grid;
-    gap: 0.35rem;
-    margin-top: 0.2rem;
-  }
-
-  .collection-link {
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
-    align-items: center;
     gap: 0.75rem;
-    padding: 0.55rem 0.65rem;
-    border-radius: var(--radius-md);
-    transition: background 0.18s ease;
+    min-width: 0;
   }
 
-  .collection-link:hover {
-    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  .featured-title {
+    margin-top: 0.35rem;
+    color: var(--text);
+    font-size: 1.2rem;
+    line-height: 1.25;
+    letter-spacing: 0;
+    word-break: break-word;
   }
 
-  .collection-link:hover em {
+  .featured-tool-card:hover .featured-title,
+  .tool-card-item:hover .tool-card-title {
     color: var(--color-accent);
-    transform: translateX(2px);
   }
 
-  .collection-mark {
-    width: 2.25rem;
-    height: 2.25rem;
+  .category-stack {
     display: grid;
+    gap: 1.9rem;
+  }
+
+  .category-block {
+    border-top: 1px solid var(--border);
+    padding-top: 1.2rem;
+  }
+
+  .category-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .category-title-row {
+    display: grid;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: start;
+    min-width: 0;
+  }
+
+  .category-code {
+    display: inline-grid;
+    min-height: 2.25rem;
     place-items: center;
-    border-radius: 10px;
-    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
     color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.66rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.76rem;
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   }
 
-  .collection-link-label {
+  .category-head h3 {
     color: var(--text);
-    font-size: 0.95rem;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.35rem;
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+
+  .category-head p {
+    max-width: 42rem;
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .category-count {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 
-  .collection-link em {
-    color: var(--text-secondary);
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    transition: color 0.18s ease, transform 0.18s ease;
-  }
-
-  /* ============ Flat tool grid ============ */
   .tool-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
   }
 
   .tool-card-item {
-    display: block;
-    padding: 1.35rem 1.4rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.9rem;
+    min-width: 0;
+    min-height: 12.25rem;
+    padding: 0.95rem;
     border-radius: var(--radius-md);
-    border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
-    background: color-mix(in srgb, var(--surface) 45%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.22s cubic-bezier(.2,.7,.2,1), border-color 0.22s ease, background 0.22s ease;
+    border: 1px solid var(--border);
+    background: var(--surface-card);
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
   }
 
   .tool-card-item:hover {
     transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--color-accent) 38%, var(--border));
-    background: color-mix(in srgb, var(--color-accent) 4%, var(--surface));
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+    color: var(--text);
   }
 
-  .tool-card-item.is-soon {
-    opacity: 0.45;
+  .tool-card-item.is-soon,
+  .featured-tool-card.is-soon {
+    opacity: 0.48;
     pointer-events: none;
   }
 
-  .tool-card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    margin-bottom: 0.75rem;
-  }
-
   .tool-card-icon {
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 2.35rem;
+    height: 2.35rem;
     display: grid;
     place-items: center;
-    border-radius: 8px;
-    border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
-    background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+    flex: 0 0 auto;
+    border-radius: var(--radius-md);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 28%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
     color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.64rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .tool-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: max-content;
+    padding: 0.18rem 0.45rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(52, 181, 164, 0.35);
+    background: rgba(52, 181, 164, 0.10);
+    color: #8ee5d5;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+  }
+
+  .tool-status-pill::before {
+    content: "";
+    width: 0.36rem;
+    height: 0.36rem;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  .tool-card-body {
+    min-width: 0;
   }
 
   .tool-card-cat {
     color: var(--text-secondary);
     font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.18em;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    opacity: 0.65;
+    opacity: 0.78;
   }
 
   .tool-card-title {
-    margin-bottom: 0.35rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.4rem;
     color: var(--text);
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.25;
-    letter-spacing: -0.005em;
-  }
-
-  .tool-card-item:hover .tool-card-title {
-    color: var(--color-accent);
+    letter-spacing: 0;
+    word-break: break-word;
   }
 
   .tool-card-desc {
@@ -668,41 +818,101 @@ const getToolMark = (tool: Tool) => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
   }
 
-  /* ============ Empty state ============ */
+  .tool-card-foot {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+  }
+
+  .tool-card-foot span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tool-card-foot em {
+    flex: 0 0 auto;
+    color: var(--color-accent);
+    font-style: normal;
+  }
+
   .tools-empty {
-    padding: 3rem 1rem;
+    margin-bottom: 1.25rem;
+    padding: 2rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.025);
     text-align: center;
     color: var(--text-secondary);
   }
 
   .tools-empty .empty-mark {
-    font-family: var(--font-serif);
-    font-size: 3.5rem;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
     line-height: 1;
-    opacity: 0.4;
+    opacity: 0.75;
     margin-bottom: 0.6rem;
   }
 
-  /* ============ Responsive ============ */
-  @media (max-width: 1120px) {
-    .tools-hero {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
+  .featured-tool-card.hidden,
+  .tool-card-item.hidden,
+  .category-block.hidden,
+  .tools-empty.hidden,
+  .featured-section.hidden {
+    display: none !important;
+  }
 
+  @media (max-width: 1180px) {
+    .featured-grid,
     .tool-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 980px) {
+    .tools-hero {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .tools-command-panel {
+      position: relative;
+      top: auto;
+      min-height: auto;
+    }
+
+    .featured-grid,
+    .tool-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .tools-page {
+      padding-top: 5.25rem;
+    }
+
+    .tools-hero-copy {
+      min-height: auto;
+      padding: 1.15rem;
+    }
+
+    .tools-title {
+      margin-top: 1.4rem;
+      font-size: 2.25rem;
+      line-height: 1.16;
+    }
+
     .tools-hero-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .collection-grid,
+    .featured-grid,
     .tool-grid {
       grid-template-columns: 1fr;
     }
@@ -711,44 +921,127 @@ const getToolMark = (tool: Tool) => {
       flex-direction: column;
       align-items: flex-start;
     }
+
+    .section-h2 {
+      font-size: 1.6rem;
+    }
+
+    .tools-chip-row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0.1rem;
+      scrollbar-width: none;
+    }
+
+    .tools-chip-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tools-chip {
+      flex: 0 0 auto;
+    }
+
+    .category-head {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .category-title-row {
+      grid-template-columns: 3.8rem minmax(0, 1fr);
+    }
+
+    .category-count {
+      white-space: normal;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .tools-container {
+      max-width: calc(100vw - 0.75rem);
+    }
+
+    .tools-search-box {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .tools-search-box kbd {
+      display: none;
+    }
+
+    .tools-hero-stats {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <script is:inline>
   (() => {
     const search = document.getElementById('tool-search');
-    const cards = Array.from(document.querySelectorAll('[data-tool-card]'));
+    const directoryCards = Array.from(document.querySelectorAll('[data-tool-card]'));
+    const featureCards = Array.from(document.querySelectorAll('[data-feature-card]'));
+    const groups = Array.from(document.querySelectorAll('[data-category-group]'));
     const chips = Array.from(document.querySelectorAll('[data-cat-filter]'));
     const empty = document.getElementById('empty-state');
-    const count = document.getElementById('directory-count');
+    const directoryCount = document.getElementById('directory-count');
+    const featuredCount = document.getElementById('featured-count');
+    const featuredSection = document.querySelector('[data-feature-section]');
     const revealElements = document.querySelectorAll('.scroll-reveal');
     let activeCategory = 'all';
 
+    const matchesFilters = (card, query) => {
+      const matchesQuery = !query || (card.dataset.toolName || '').includes(query);
+      const matchesCategory = activeCategory === 'all' || card.dataset.toolCat === activeCategory;
+      return matchesQuery && matchesCategory;
+    };
+
     const syncDirectory = () => {
       const query = (search?.value || '').trim().toLowerCase();
-      let visibleCount = 0;
+      let visibleDirectoryCount = 0;
+      let visibleFeaturedCount = 0;
 
-      cards.forEach((card) => {
-        const matchesQuery = !query || (card.dataset.toolName || '').includes(query);
-        const matchesCategory = activeCategory === 'all' || card.dataset.toolCat === activeCategory;
-        const visible = matchesQuery && matchesCategory;
+      directoryCards.forEach((card) => {
+        const visible = matchesFilters(card, query);
         card.classList.toggle('hidden', !visible);
-        if (visible) visibleCount += 1;
+        if (visible) visibleDirectoryCount += 1;
       });
 
-      if (count) {
-        count.textContent = activeCategory === 'all' && !query
-          ? `${visibleCount} 项全部可用`
-          : `${visibleCount} 项匹配`;
+      featureCards.forEach((card) => {
+        const visible = matchesFilters(card, query);
+        card.classList.toggle('hidden', !visible);
+        if (visible) visibleFeaturedCount += 1;
+      });
+
+      groups.forEach((group) => {
+        const visibleInGroup = directoryCards.some((card) => (
+          card.dataset.toolCat === group.getAttribute('data-category-group') &&
+          !card.classList.contains('hidden')
+        ));
+        group.classList.toggle('hidden', !visibleInGroup);
+      });
+
+      if (directoryCount) {
+        directoryCount.textContent = activeCategory === 'all' && !query
+          ? `${visibleDirectoryCount} 项全部可用`
+          : `${visibleDirectoryCount} 项匹配`;
       }
-      empty?.classList.toggle('hidden', visibleCount > 0);
+
+      if (featuredCount) {
+        featuredCount.textContent = activeCategory === 'all' && !query
+          ? `${visibleFeaturedCount} 个高频入口`
+          : `${visibleFeaturedCount} 个精选匹配`;
+      }
+
+      featuredSection?.classList.toggle('hidden', visibleFeaturedCount === 0);
+      empty?.classList.toggle('hidden', visibleDirectoryCount > 0);
     };
 
     chips.forEach((chip) => {
       chip.addEventListener('click', () => {
         activeCategory = chip.getAttribute('data-cat-filter') || 'all';
         chips.forEach((item) => item.classList.remove('is-active'));
+        chips.forEach((item) => item.setAttribute('aria-pressed', 'false'));
         chip.classList.add('is-active');
+        chip.setAttribute('aria-pressed', 'true');
         syncDirectory();
       });
     });

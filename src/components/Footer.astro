@@ -3,17 +3,17 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-top">
+  <div class="footer-panel">
+    <div class="footer-main">
       <div class="footer-brand">
         <p class="footer-kicker">Open workbench</p>
-        <h2 class="footer-h2">siuser<em>小伟</em></h2>
-        <p class="footer-copy">
-          写判断、做工具、持续把工作过程公开出来。这里不是简历页，而是一个会持续更新的独立工作台。
+        <h2>siuser<span>小伟</span></h2>
+        <p>
+          写判断、做工具、公开迭代。这里是一个持续更新的个人工作台，记录技术、产品和真实问题的处理过程。
         </p>
       </div>
 
-      <div class="footer-cols">
+      <nav class="footer-cols" aria-label="页脚导航">
         <div>
           <p class="footer-label">Read</p>
           <a href="/blog">文章</a>
@@ -26,17 +26,17 @@ const year = new Date().getFullYear();
           <a href="/competitions">比赛雷达</a>
         </div>
         <div>
-          <p class="footer-label">Contact</p>
+          <p class="footer-label">Operate</p>
           <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener">GitHub</a>
+          <a href="/admin/">Admin</a>
           <a href="mailto:hi@siuserxiaowei.com">Email</a>
-          <a href="/about">关于</a>
         </div>
-      </div>
+      </nav>
     </div>
 
     <div class="footer-bottom">
       <p>&copy; {year} siuser小伟</p>
-      <p class="footer-note">All drafts live — 公开构建中</p>
+      <p>dark workbench / public build</p>
     </div>
   </div>
 </footer>
@@ -44,46 +44,52 @@ const year = new Date().getFullYear();
 <style>
   .site-footer {
     margin-top: auto;
-    border-top: 1px solid var(--border);
-    padding: 3.5rem 1.5rem 2rem;
+    padding: 3rem 1rem 1.25rem;
   }
 
-  .footer-inner {
-    max-width: var(--container-max);
+  .footer-panel {
+    max-width: var(--container-wide);
     margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--footer-bg) 86%, white 4%), var(--footer-bg));
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
   }
 
-  .footer-top {
+  .footer-main {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
-    gap: 3rem;
-    padding-bottom: 2.5rem;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.85fr);
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .footer-kicker,
+  .footer-label,
+  .footer-bottom {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
   }
 
   .footer-kicker {
+    margin-bottom: 0.75rem;
     color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    margin-bottom: 0.8rem;
+    font-weight: 600;
   }
 
-  .footer-h2 {
-    font-family: var(--font-heading);
-    font-size: clamp(1.75rem, 3vw, 2.35rem);
-    line-height: 1.1;
-    margin-bottom: 0.9rem;
-    letter-spacing: -0.015em;
+  .footer-brand h2 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    line-height: 1.05;
   }
 
-  .footer-h2 em {
-    font-style: italic;
+  .footer-brand h2 span {
     color: var(--color-accent);
   }
 
-  .footer-copy {
-    max-width: 30rem;
+  .footer-brand p:last-child {
+    max-width: 32rem;
     color: var(--text-secondary);
     line-height: 1.75;
   }
@@ -91,29 +97,28 @@ const year = new Date().getFullYear();
   .footer-cols {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2rem;
-    align-content: start;
+    gap: 1rem;
   }
 
   .footer-cols > div {
+    min-height: 10rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
   }
 
   .footer-label {
+    margin-bottom: 0.25rem;
     color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    margin-bottom: 0.35rem;
   }
 
   .footer-cols a {
-    color: var(--text);
+    color: var(--text-secondary);
     font-size: 0.92rem;
-    transition: color 0.15s ease;
   }
 
   .footer-cols a:hover {
@@ -122,35 +127,30 @@ const year = new Date().getFullYear();
 
   .footer-bottom {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-top: 1.5rem;
+    padding: 1rem 2rem;
     border-top: 1px solid var(--border);
     color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
   }
 
-  .footer-note {
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 780px) {
-    .footer-top {
+  @media (max-width: 820px) {
+    .footer-main {
       grid-template-columns: 1fr;
-      gap: 2.2rem;
+      padding: 1.25rem;
     }
 
     .footer-cols {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    .footer-cols > div {
+      min-height: auto;
     }
 
     .footer-bottom {
       flex-direction: column;
-      align-items: flex-start;
+      padding: 1rem 1.25rem;
     }
   }
 </style>

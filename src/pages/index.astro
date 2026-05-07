@@ -10,31 +10,102 @@ const allPosts = (await getCollection('blog'))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const posts = allPosts.slice(0, 3);
+const posts = allPosts.slice(0, 4);
 const totalPosts = allPosts.length;
+const totalTags = new Set(allPosts.flatMap((post) => post.data.tags || [])).size;
 
-const lanes = [
+function formatDate(date: Date) {
+  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+}
+
+const quickEntries = [
   {
-    label: 'Write',
-    title: '把判断写成公开日志',
-    desc: '文章不是装饰，而是把真实的产品判断、实验过程和学习路径记录下来。',
-    meta: `${totalPosts} 篇已发布`,
-    href: '/blog'
+    label: 'Tools',
+    title: '工具箱',
+    desc: '格式化、编码转换、时间戳、图片处理等高频小工具。',
+    href: '/tools',
+    meta: '60+ utilities',
+    shortcut: '01',
+    keywords: ['工具', 'tool', 'utilities', 'json', 'timestamp', 'image']
   },
   {
-    label: 'Build',
-    title: '把重复问题做成工具',
-    desc: '工具页承担的是效率任务。高频动作直接固定成浏览器内可用的小产品。',
-    meta: '60+ 工具在线',
-    href: '/tools'
+    label: 'Writing',
+    title: '文章库',
+    desc: '产品判断、AI 实验、公开构建过程和学习笔记。',
+    href: '/blog',
+    meta: `${totalPosts} posts`,
+    shortcut: '02',
+    keywords: ['文章', 'blog', 'writing', 'ai', '产品', '学习']
   },
   {
-    label: 'Ship',
-    title: '让项目和比赛形成外部约束',
-    desc: '项目展示和比赛雷达不是补充页面，而是推动更新频率和判断密度的外部机制。',
-    meta: '持续公开迭代',
-    href: '/projects'
+    label: 'Projects',
+    title: '项目台账',
+    desc: '公开推进中的产品、站点和自动化项目。',
+    href: '/projects',
+    meta: '4 tracked',
+    shortcut: '03',
+    keywords: ['项目', 'project', 'voice agent', 'cms', 'monitor']
+  },
+  {
+    label: 'Radar',
+    title: '比赛雷达',
+    desc: '把值得投入的比赛、赛道和截止日期集中管理。',
+    href: '/competitions',
+    meta: 'priority matrix',
+    shortcut: '04',
+    keywords: ['比赛', 'competition', 'hackathon', 'radar']
+  },
+  {
+    label: 'RSS',
+    title: 'RSS 订阅',
+    desc: '用阅读器跟踪新文章，不依赖平台推荐流。',
+    href: '/rss.xml',
+    meta: 'feed',
+    shortcut: '05',
+    keywords: ['rss', '订阅', 'feed']
+  },
+  {
+    label: 'Contact',
+    title: '联系我',
+    desc: 'AI、自动化、内容产品、学习工具方向都可以聊。',
+    href: '#contact',
+    meta: 'email / github',
+    shortcut: '06',
+    keywords: ['联系', 'contact', 'github', 'email']
   }
+];
+
+const featuredProjects = [
+  {
+    title: 'AI 语音机器人',
+    desc: '把多轮对话、话术流程和企业外呼场景做成可落地的语音交互系统。',
+    href: '/projects',
+    status: 'Active',
+    signal: 'Voice Agent',
+    tags: ['AI', 'LLM', 'SaaS']
+  },
+  {
+    title: '个人网站工作台',
+    desc: 'Astro 内容站、工具箱、比赛雷达和项目台账组合成一个公开工作台。',
+    href: '/projects',
+    status: 'Active',
+    signal: 'This site',
+    tags: ['Astro', 'Content', 'Tools']
+  },
+  {
+    title: 'Admin CMS',
+    desc: '通过 GitHub API 管理 Markdown 内容，给静态站补上轻量后台。',
+    href: '/projects',
+    status: 'Active',
+    signal: 'Content Ops',
+    tags: ['SPA', 'GitHub API', 'Markdown']
+  }
+];
+
+const metrics = [
+  { label: 'Published', value: totalPosts, unit: 'posts' },
+  { label: 'Topics', value: totalTags, unit: 'tags' },
+  { label: 'Toolbox', value: '60+', unit: 'tools' }
 ];
 ---
 
@@ -42,68 +113,142 @@ const lanes = [
   <Header />
 
   <main class="flex-1">
-
-    <!-- ===== Hero ===== -->
-    <section id="home" class="container hero-section">
-      <div class="hero-inner">
-        <p class="animate-fade-in stagger-1 section-kicker">Independent Workbench · 2026</p>
-
-        <h1 class="animate-fade-in stagger-2 hero-title display-serif">
-          这里不是个人<em>简历</em>，<br />
-          而是一个持续<em>运行</em>的工作台。
-        </h1>
-
-        <p class="animate-fade-in stagger-3 hero-lede">
-          我把 AI、自动化、产品工程和学习系统相关的工作公开发布出来。<br class="hide-mobile" />
-          一部分写成文章，一部分做成工具，一部分继续推进成项目。
-        </p>
-
-        <div class="animate-fade-in stagger-4 hero-actions">
-          <a href="#blog" class="btn-primary">看最新文章 →</a>
-          <a href="/tools" class="btn-ghost">进入工具箱</a>
+    <section id="home" class="container command-section">
+      <div class="command-head animate-fade-in stagger-1">
+        <div>
+          <p class="section-kicker">Workbench Index</p>
+          <h1>
+            <span>先找到入口，</span>
+            <span>再继续深入。</span>
+          </h1>
         </div>
+        <p class="command-copy">
+          这里把文章、工具、项目和比赛雷达整理成可检索的工作台。你可以直接搜索关键词，也可以从快捷入口开始。
+        </p>
       </div>
 
-      <div class="divider-accent hero-divider"></div>
+      <div class="command-grid">
+        <div class="search-column animate-fade-in stagger-2">
+          <form id="home-search-form" class="search-panel" action="/blog" method="get">
+            <label for="home-search-input">搜索工作台</label>
+            <div class="search-row">
+              <input
+                id="home-search-input"
+                name="q"
+                type="search"
+                autocomplete="off"
+                placeholder="试试：AI、工具、项目、比赛..."
+                aria-describedby="home-search-help"
+              />
+              <button id="home-search-submit" type="submit">搜索</button>
+            </div>
+            <p id="home-search-help">
+              输入时会先筛选本页入口，按回车进入文章库继续检索。
+            </p>
+          </form>
+
+          <div class="metrics-strip" aria-label="站点概览">
+            {metrics.map((metric) => (
+              <div class="metric-cell">
+                <span>{metric.label}</span>
+                <strong>{metric.value}</strong>
+                <em>{metric.unit}</em>
+              </div>
+            ))}
+          </div>
+
+          <div class="quick-grid" id="home-search-results">
+            {quickEntries.map((entry) => (
+              <a
+                href={entry.href}
+                class="quick-card home-searchable"
+                data-home-search={`${entry.title} ${entry.desc} ${entry.label} ${entry.meta} ${entry.keywords.join(' ')}`}
+              >
+                <div class="quick-card-top">
+                  <span>{entry.shortcut}</span>
+                  <em>{entry.label}</em>
+                </div>
+                <h2>{entry.title}</h2>
+                <p>{entry.desc}</p>
+                <div class="quick-card-foot">
+                  <span>{entry.meta}</span>
+                  <span aria-hidden="true">→</span>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <p id="home-search-empty" class="search-empty hidden">没有匹配入口。可以按回车去文章库继续搜。</p>
+        </div>
+
+        <aside class="update-panel animate-fade-in stagger-3" aria-label="最近更新">
+          <div class="panel-head">
+            <p class="section-kicker">Recent Updates</p>
+            <span id="home-search-count">{quickEntries.length + posts.length + featuredProjects.length} items</span>
+          </div>
+
+          <div class="update-list">
+            {posts.map((post) => (
+              <a
+                href={`/blog/${post.id}`}
+                class="update-item home-searchable"
+                data-home-search={`${post.data.title} ${post.data.description} ${(post.data.tags || []).join(' ')}`}
+              >
+                <time>{formatDate(post.data.date)}</time>
+                <div>
+                  <h2>{post.data.title}</h2>
+                  <p>{post.data.tags?.slice(0, 3).join(' / ') || 'Writing'}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <a href="/blog" class="panel-link">查看全部文章 <span aria-hidden="true">→</span></a>
+        </aside>
+      </div>
     </section>
 
-    <!-- ===== Operating model ===== -->
-    <section id="about" class="container model-section">
-      <div class="model-head">
-        <p class="section-kicker">Operating Model</p>
-        <h2 class="display-serif model-heading">
-          三件事撑起这个站：<em>写</em>、<em>做</em>、<em>交付</em>。
-        </h2>
+    <section class="container featured-section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Pinned Projects</p>
+          <h2>重点项目卡</h2>
+        </div>
+        <a href="/projects">项目台账 <span aria-hidden="true">→</span></a>
       </div>
 
-      <div class="lanes">
-        {lanes.map((lane, i) => (
-          <a href={lane.href} class="lane scroll-reveal">
-            <div class="lane-head">
-              <span class="lane-index">{String(i + 1).padStart(2, '0')}</span>
-              <span class="lane-label">{lane.label}</span>
+      <div class="project-grid">
+        {featuredProjects.map((project) => (
+          <a
+            href={project.href}
+            class="project-card home-searchable scroll-reveal"
+            data-home-search={`${project.title} ${project.desc} ${project.signal} ${project.tags.join(' ')}`}
+          >
+            <div class="project-card-top">
+              <span>{project.status}</span>
+              <em>{project.signal}</em>
             </div>
-            <h3 class="lane-title display-serif">{lane.title}</h3>
-            <p class="lane-desc">{lane.desc}</p>
-            <div class="lane-foot">
-              <span>{lane.meta}</span>
-              <span class="lane-arrow">→</span>
+            <h3>{project.title}</h3>
+            <p>{project.desc}</p>
+            <div class="project-tags">
+              {project.tags.map((tag) => <span>{tag}</span>)}
             </div>
           </a>
         ))}
       </div>
     </section>
 
-    <!-- ===== Writing ===== -->
-    <section id="blog" class="container blog-section">
-      <div class="blog-head">
-        <p class="section-kicker">Writing</p>
-        <h2 class="display-serif model-heading">最近写下来的判断和实验。</h2>
-        <a href="/blog" class="blog-head-link">全部文章 →</a>
+    <section id="blog" class="container writing-section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Latest Writing</p>
+          <h2>最近写下来的判断和实验</h2>
+        </div>
+        <a href="/blog">文章库 <span aria-hidden="true">→</span></a>
       </div>
 
       <div class="blog-list">
-        {posts.map((post) => (
+        {posts.slice(0, 3).map((post) => (
           <BlogCard
             title={post.data.title}
             description={post.data.description}
@@ -116,17 +261,13 @@ const lanes = [
       </div>
     </section>
 
-    <!-- ===== Contact ===== -->
     <section id="contact" class="container contact-section">
-      <div class="contact-inner">
-        <div>
+      <div class="contact-grid">
+        <div class="contact-copy-block">
           <p class="section-kicker">Contact</p>
-          <h2 class="display-serif model-heading contact-h2">
-            做类似方向的，<em>直接找我</em>。
-          </h2>
-          <p class="contact-copy">
-            AI、自动化、内容产品、学习工具这些方向都可以聊。这里希望结识一起做东西的人，<br class="hide-mobile" />
-            而不只是交换名片。
+          <h2>需要一起做点东西，可以直接找我。</h2>
+          <p>
+            AI、自动化、内容产品、学习工具这些方向都可以聊。这个站点会优先展示正在推进的东西，而不是只放一份静态介绍。
           </p>
         </div>
 
@@ -152,9 +293,7 @@ const lanes = [
         </ul>
       </div>
 
-      <div class="newsletter-slot">
-        <Newsletter />
-      </div>
+      <Newsletter />
     </section>
   </main>
 
@@ -163,283 +302,421 @@ const lanes = [
 
 <style>
   .container {
+    width: 100%;
     max-width: var(--container-max);
     margin: 0 auto;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
 
-  .hide-mobile { display: inline; }
-  @media (max-width: 780px) { .hide-mobile { display: none; } }
-
-  /* ===== Buttons ===== */
-  .btn-primary,
-  .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    height: 2.75rem;
-    padding: 0 1.2rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.92rem;
-    font-weight: 500;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  .hidden {
+    display: none !important;
   }
 
-  .btn-primary {
-    background: var(--color-accent);
-    color: var(--color-accent-ink);
-    border: 1px solid var(--color-accent);
+  .command-section {
+    overflow-x: clip;
+    padding-top: 6.5rem;
+    padding-bottom: 3.5rem;
   }
 
-  .btn-primary:hover {
-    background: var(--color-accent-hover);
-    border-color: var(--color-accent-hover);
-    color: var(--color-accent-ink);
-  }
-
-  .btn-ghost {
-    border: 1px solid var(--border-strong);
-    background: transparent;
-    color: var(--text);
-  }
-
-  .btn-ghost:hover {
-    border-color: var(--text);
-    color: var(--text);
-  }
-
-  /* ===== Hero ===== */
-  .hero-section {
-    padding-top: 7rem;
-    padding-bottom: 4rem;
-  }
-
-  .hero-inner {
-    max-width: 54rem;
-  }
-
-  .hero-title {
-    margin-top: 1.5rem;
-    font-size: clamp(2.6rem, 6vw, 4.8rem);
-    line-height: 1.02;
-    letter-spacing: -0.015em;
-  }
-
-  .hero-title em {
-    color: var(--color-accent);
-    font-style: italic;
-  }
-
-  .hero-lede {
-    max-width: 42rem;
-    margin-top: 1.75rem;
-    color: var(--text-secondary);
-    font-size: clamp(1rem, 1.3vw, 1.15rem);
-    line-height: 1.85;
-  }
-
-  .hero-actions {
-    margin-top: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-  }
-
-  .hero-divider {
-    margin-top: 4.5rem;
-  }
-
-  @media (max-width: 780px) {
-    .hero-section { padding-top: 5rem; padding-bottom: 3rem; }
-    .hero-title { font-size: clamp(2.2rem, 9vw, 3.2rem); }
-  }
-
-  /* ===== Sections ===== */
-  .model-section,
-  .blog-section,
-  .contact-section {
-    padding-top: 6rem;
-    padding-bottom: 4rem;
-  }
-
-  .model-head,
-  .blog-head {
-    max-width: 48rem;
-    margin-bottom: 3rem;
-  }
-
-  .model-heading {
-    margin-top: 0.8rem;
-    font-size: clamp(2rem, 4.2vw, 3.2rem);
-    line-height: 1.08;
-    letter-spacing: -0.015em;
-  }
-
-  .model-heading em {
-    color: var(--color-accent);
-    font-style: italic;
-  }
-
-  /* ===== Lanes (Operating Model) ===== */
-  .lanes {
+  .command-head {
     display: grid;
-    grid-template-columns: 1fr;
-    border-top: 1px solid var(--border);
-  }
-
-  .lane {
-    display: grid;
-    grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.62fr);
     gap: 2rem;
-    align-items: start;
-    padding: 2.2rem 0;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-    transition: background 0.15s ease;
+    align-items: end;
+    margin-bottom: 1.2rem;
   }
 
-  .lane:hover {
-    background: color-mix(in srgb, var(--surface) 60%, transparent);
-    color: var(--text);
+  .command-head h1 {
+    max-width: 34rem;
+    margin-top: 0.55rem;
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.012em;
+    overflow-wrap: anywhere;
   }
 
-  .lane-head {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  .command-head h1 span {
+    display: block;
   }
 
-  .lane-index {
-    font-family: var(--font-heading);
-    font-size: 2.6rem;
-    line-height: 1;
-    color: var(--color-accent);
-    letter-spacing: -0.02em;
-  }
-
-  .lane-label {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .lane-title {
-    font-size: clamp(1.45rem, 2.4vw, 2rem);
-    line-height: 1.15;
-    margin-bottom: 0.6rem;
-  }
-
-  .lane:hover .lane-title {
-    color: var(--color-accent);
-  }
-
-  .lane-desc {
+  .command-copy {
     color: var(--text-secondary);
     line-height: 1.75;
-    font-size: 0.98rem;
+    max-width: 32rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
-  .lane-foot {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-end;
-    text-align: right;
-    min-width: 8rem;
+  .command-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
+    gap: 1rem;
+    align-items: start;
   }
 
-  .lane-foot > span:first-child {
-    color: var(--text-muted);
+  .search-column {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .search-panel,
+  .update-panel,
+  .quick-card,
+  .project-card {
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .search-panel {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .search-panel label {
+    color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
-  .lane-arrow {
-    color: var(--color-accent);
-    font-size: 1.15rem;
-    transition: transform 0.2s ease;
+  .search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem;
   }
 
-  .lane:hover .lane-arrow { transform: translateX(4px); }
-
-  @media (max-width: 780px) {
-    .lane {
-      grid-template-columns: 1fr;
-      gap: 0.9rem;
-      padding: 1.7rem 0;
-    }
-    .lane-index { font-size: 2rem; }
-    .lane-foot { align-items: flex-start; text-align: left; }
+  .search-row input,
+  .search-row button {
+    height: 3rem;
+    border-radius: var(--radius-sm);
+    font: inherit;
   }
 
-  /* ===== Blog ===== */
-  .blog-head {
-    position: relative;
+  .search-row input {
+    min-width: 0;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0.95rem;
+    outline: none;
   }
 
-  .blog-head-link {
-    position: absolute;
-    right: 0;
-    bottom: 0.3rem;
-    color: var(--color-accent);
+  .search-row input:focus {
+    border-color: color-mix(in srgb, var(--color-accent) 62%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+
+  .search-row button {
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    padding: 0 1rem;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .search-panel p,
+  .search-empty {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.65;
+  }
+
+  .metrics-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .metric-cell {
+    min-height: 5.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface) 72%, var(--bg));
+    padding: 0.8rem;
+  }
+
+  .metric-cell span,
+  .metric-cell em,
+  .panel-head span,
+  .quick-card-top,
+  .project-card-top {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .blog-list {
+  .metric-cell span,
+  .metric-cell em,
+  .panel-head span {
+    color: var(--text-muted);
+  }
+
+  .metric-cell strong {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    line-height: 1;
+  }
+
+  .metric-cell em {
+    display: block;
+    margin-top: 0.35rem;
+    font-style: normal;
+  }
+
+  .quick-grid,
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .quick-card,
+  .project-card {
+    display: flex;
+    min-height: 13.2rem;
+    flex-direction: column;
+    padding: 1rem;
+    color: var(--text);
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+
+  .quick-card:hover,
+  .project-card:hover,
+  .update-item:hover {
+    border-color: var(--border-strong);
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface) 72%, var(--surface-strong));
+  }
+
+  .quick-card-top,
+  .project-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--text-muted);
+  }
+
+  .quick-card-top span,
+  .project-card-top span {
+    color: var(--color-accent);
+  }
+
+  .quick-card-top em,
+  .project-card-top em {
+    font-style: normal;
+  }
+
+  .quick-card h2,
+  .project-card h3 {
+    margin-top: 1.15rem;
+    font-size: 1.25rem;
+    line-height: 1.18;
+  }
+
+  .quick-card p,
+  .project-card p {
+    margin-top: 0.7rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .quick-card-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .quick-card-foot span:last-child {
+    color: var(--color-accent);
+  }
+
+  .update-panel {
+    position: sticky;
+    top: 5.5rem;
+    padding: 1rem;
+  }
+
+  .panel-head,
+  .section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .update-list {
+    display: grid;
+    margin-top: 0.95rem;
     border-top: 1px solid var(--border);
   }
 
-  @media (max-width: 680px) {
-    .blog-head-link {
-      position: static;
-      margin-top: 1rem;
-      display: inline-block;
-    }
+  .update-item {
+    display: grid;
+    grid-template-columns: 3.4rem minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
   }
 
-  /* ===== Contact ===== */
+  .update-item time {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .update-item h2 {
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .update-item p {
+    margin-top: 0.15rem;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .panel-link,
+  .section-head a {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .panel-link {
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-top: 1rem;
+  }
+
+  .featured-section,
+  .writing-section,
+  .contact-section {
+    padding-top: 3.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .section-head {
+    margin-bottom: 1rem;
+    min-width: 0;
+  }
+
+  .section-head h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+  }
+
+  .project-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .project-card {
+    min-height: 15rem;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  .project-tags span {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    padding: 0.18rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+
+  .blog-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
   .contact-section {
     padding-bottom: 5rem;
   }
 
-  .contact-inner {
+  .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    gap: 3rem;
-    align-items: start;
-    margin-bottom: 3rem;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .contact-h2 {
-    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-    margin-bottom: 1.3rem;
+  .contact-copy-block,
+  .contact-links {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
   }
 
-  .contact-copy {
-    max-width: 40rem;
+  .contact-copy-block {
+    padding: 1rem;
+  }
+
+  .contact-copy-block h2 {
+    max-width: 34rem;
+    margin-top: 0.45rem;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+  }
+
+  .contact-copy-block p:last-child {
+    max-width: 42rem;
+    margin-top: 0.75rem;
     color: var(--text-secondary);
-    line-height: 1.85;
+    line-height: 1.75;
   }
 
   .contact-links {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: 0;
-    border-top: 1px solid var(--border);
+    overflow: hidden;
   }
 
-  .contact-links li {
-    border-bottom: 1px solid var(--border);
+  .contact-links li + li {
+    border-top: 1px solid var(--border);
   }
 
   .contact-links a {
@@ -447,40 +724,127 @@ const lanes = [
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1rem 0.25rem;
+    min-height: 4.2rem;
+    padding: 0.8rem 1rem;
     color: var(--text);
-    transition: color 0.15s ease, padding 0.15s ease;
   }
 
   .contact-links a:hover {
-    color: var(--color-accent);
-    padding-left: 0.75rem;
+    background: color-mix(in srgb, var(--surface) 72%, var(--surface-strong));
+    color: var(--text);
   }
 
-  .contact-links a span {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
+  .contact-links span {
+    font-weight: 600;
   }
 
-  .contact-links a em {
-    font-style: normal;
+  .contact-links em {
+    overflow: hidden;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
+    font-size: 0.74rem;
+    font-style: normal;
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .newsletter-slot {
-    margin-top: 1rem;
+  .home-searchable.is-filtered {
+    display: none;
   }
 
-  @media (max-width: 860px) {
-    .contact-inner { grid-template-columns: 1fr; gap: 2rem; }
+  @media (max-width: 1040px) {
+    .command-head,
+    .command-grid,
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .update-panel {
+      position: static;
+    }
+
+    .quick-grid,
+    .project-grid,
+    .blog-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .command-section {
+      padding-top: 5rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .command-head {
+      gap: 1rem;
+    }
+
+    .command-head h1 {
+      font-size: clamp(2rem, 11vw, 2.65rem);
+      line-height: 1.08;
+    }
+
+    .search-row,
+    .metrics-strip,
+    .quick-grid,
+    .project-grid,
+    .blog-list {
+      grid-template-columns: 1fr;
+    }
+
+    .search-row input,
+    .search-row button {
+      width: 100%;
+    }
+
+    .quick-card,
+    .project-card {
+      min-height: 0;
+    }
+
+    .section-head,
+    .panel-head {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
   }
 </style>
 
 <script is:inline>
   (() => {
+    const input = document.getElementById('home-search-input');
+    const cards = Array.from(document.querySelectorAll('[data-home-search]'));
+    const count = document.getElementById('home-search-count');
+    const empty = document.getElementById('home-search-empty');
+
+    const normalize = (value) => (value || '').toLowerCase().trim();
+
+    const filterHome = () => {
+      const query = normalize(input?.value);
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const haystack = normalize(card.getAttribute('data-home-search'));
+        const match = !query || haystack.includes(query);
+        card.classList.toggle('is-filtered', !match);
+        if (match) visible += 1;
+      });
+
+      if (count) count.textContent = `${visible} items`;
+      if (empty) empty.classList.toggle('hidden', visible > 0);
+    };
+
+    input?.addEventListener('input', filterHome);
+    filterHome();
+
     const revealElements = document.querySelectorAll('.scroll-reveal');
     if (!revealElements.length) return;
 
