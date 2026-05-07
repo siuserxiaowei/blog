@@ -7,43 +7,34 @@ const isHome = currentPath === '/';
 const homeLinks = [
   { href: '#home', label: '首页' },
   { href: '#blog', label: '文章' },
-  { href: '/tools', label: '工具箱' },
   { href: '/competitions', label: '比赛雷达' },
+  { href: '/tools', label: '工具箱' },
   { href: '/about', label: '关于' },
+  { href: '#contact', label: '联系' },
 ];
 
 const pageLinks = [
   { href: '/', label: '首页' },
   { href: '/blog', label: '文章' },
-  { href: '/tools', label: '工具箱' },
   { href: '/projects', label: '项目' },
   { href: '/competitions', label: '比赛雷达' },
+  { href: '/tools', label: '工具箱' },
   { href: '/about', label: '关于' },
 ];
-
-const links = isHome ? homeLinks : pageLinks;
 ---
 
 <header id="site-header" class="site-header">
   <div class="header-inner">
-    <a href="/" class="brand" aria-label="siuser小伟 首页">
+    <a href="/" class="brand">
       <span class="brand-mark">SW</span>
-      <span class="brand-copy">
+      <span class="brand-text">
         <span class="brand-name">siuser小伟</span>
-        <span class="brand-sub">workbench / arsenal</span>
+        <span class="brand-sub">open workbench · updated in public</span>
       </span>
     </a>
 
-    <form id="site-search-form" class="header-search" role="search">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
-      </svg>
-      <input id="site-search" type="search" name="q" placeholder="搜索工具 / 文章 / 赛事" autocomplete="off" />
-      <span class="search-keys" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></span>
-    </form>
-
-    <nav class="nav-links" aria-label="主导航">
-      {links.map((link) => {
+    <nav class="nav-links hidden lg:flex">
+      {(isHome ? homeLinks : pageLinks).map((link) => {
         const active = !isHome && (currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)));
         const isSection = link.href.startsWith('#');
         return (
@@ -58,37 +49,37 @@ const links = isHome ? homeLinks : pageLinks;
       })}
     </nav>
 
-    <div class="header-actions">
+    <div class="header-actions hidden md:flex">
+      <form id="site-search-form" class="site-search" role="search" aria-label="站内搜索">
+        <input id="site-search-input" type="search" name="q" placeholder="搜索站内..." autocomplete="off" />
+        <kbd>⌘K</kbd>
+      </form>
       <LangToggle />
-      <button id="theme-toggle" class="icon-btn theme-btn" type="button" aria-label="切换主题" title="切换主题">
-        <span class="theme-glyph theme-sun">☀</span>
-        <span class="theme-glyph theme-moon">◐</span>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="切换主题" title="切换主题">
+        <span class="theme-icon theme-light">☼</span>
+        <span class="theme-icon theme-dark">◐</span>
       </button>
-      <a class="icon-btn" href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-          <path d="M12 .8a11.2 11.2 0 0 0-3.5 21.8c.6.1.8-.2.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 .1.7 2.8 3.3 2 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0C16.2 5 17.2 5.3 17.2 5.3c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2V22c0 .4.2.7.8.6A11.2 11.2 0 0 0 12 .8Z" />
-        </svg>
-      </a>
-      <a href="/admin/" class="admin-btn">Admin</a>
+      <a href="/admin/" class="cta-btn" aria-label="写文章">Publish</a>
     </div>
 
-    <button id="mobile-menu-btn" class="mobile-btn" type="button" aria-label="菜单" aria-expanded="false">
+    <button id="mobile-menu-btn" class="mobile-btn md:hidden" type="button" aria-label="菜单" aria-expanded="false">
       <span></span>
       <span></span>
     </button>
   </div>
 
-  <div id="mobile-menu" class="mobile-menu">
-    <form id="mobile-search-form" class="mobile-search" role="search">
-      <input id="mobile-site-search" type="search" name="q" placeholder="搜索工具 / 文章 / 赛事" autocomplete="off" />
-    </form>
-    <div class="mobile-links">
-      {links.map((link) => <a href={link.href} class="mobile-link" data-mobile-link>{link.label}</a>)}
-    </div>
-    <div class="mobile-actions">
-      <button id="mobile-theme-toggle" class="icon-btn" type="button" aria-label="切换主题">◐</button>
-      <a href="https://github.com/siuserxiaowei" target="_blank" rel="noopener" class="admin-btn">GitHub</a>
-      <a href="/admin/" class="admin-btn">Admin</a>
+  <div id="mobile-menu" class="mobile-menu md:hidden">
+    <div class="mobile-inner">
+      <form id="mobile-site-search-form" class="mobile-site-search" role="search" aria-label="站内搜索">
+        <input id="mobile-site-search-input" type="search" name="q" placeholder="搜索工具、文章、比赛..." autocomplete="off" />
+      </form>
+      {(isHome ? homeLinks : pageLinks).map((link) => (
+        <a href={link.href} class="mobile-link" data-mobile-link>{link.label}</a>
+      ))}
+      <div class="mobile-actions">
+        <button id="mobile-theme-toggle" class="icon-btn" type="button" aria-label="切换主题">主题</button>
+        <a href="/admin/" class="cta-btn">Publish</a>
+      </div>
     </div>
   </div>
 </header>
@@ -98,370 +89,398 @@ const links = isHome ? homeLinks : pageLinks;
     position: sticky;
     top: 0;
     z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     border-bottom: 1px solid var(--border);
-    background: var(--header-bg);
-    backdrop-filter: saturate(150%) blur(14px);
-    -webkit-backdrop-filter: saturate(150%) blur(14px);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
   }
 
   .header-inner {
-    max-width: var(--container-wide);
-    min-height: 3.75rem;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 1rem;
-    display: grid;
-    grid-template-columns: auto minmax(14rem, 24rem) 1fr auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
+    gap: 2rem;
   }
 
   .brand {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
     min-width: 0;
     color: var(--text);
   }
 
   .brand-mark {
-    width: 2rem;
-    height: 2rem;
+    width: 2.1rem;
+    height: 2.1rem;
     display: grid;
     place-items: center;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--border));
-    border-radius: var(--radius-md);
-    background: var(--surface-inset);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
     color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: 0.14em;
   }
 
-  .brand-copy {
+  .brand-text {
     display: flex;
     flex-direction: column;
-    line-height: 1.05;
+    min-width: 0;
+    line-height: 1.1;
   }
 
   .brand-name {
-    font-size: 0.98rem;
-    font-weight: 700;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
   }
 
   .brand-sub {
-    margin-top: 0.18rem;
+    margin-top: 0.2rem;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-  }
-
-  .header-search,
-  .mobile-search {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    height: 2.3rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface-inset);
-    padding: 0 0.55rem;
-    color: var(--text-muted);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-  }
-
-  .header-search:focus-within,
-  .mobile-search:focus-within {
-    border-color: color-mix(in srgb, var(--color-accent) 64%, var(--border));
-    box-shadow: var(--focus-ring);
-  }
-
-  .header-search svg {
-    width: 1rem;
-    height: 1rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-  }
-
-  .header-search input,
-  .mobile-search input {
-    width: 100%;
-    min-width: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--text);
-    font-size: 0.86rem;
-  }
-
-  .header-search input::placeholder,
-  .mobile-search input::placeholder {
-    color: var(--text-faint);
-  }
-
-  .search-keys {
-    display: inline-flex;
-    gap: 0.22rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
   }
 
   .nav-links {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.15rem;
-    min-width: 0;
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .nav-link {
     display: inline-flex;
     align-items: center;
-    min-height: 2rem;
-    padding: 0 0.62rem;
-    border-radius: var(--radius-md);
+    padding: 0.5rem 0.85rem;
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
-    font-size: 0.86rem;
-    white-space: nowrap;
+    font-size: 0.9rem;
+    transition: color 0.15s ease, background 0.15s ease;
   }
 
   .nav-link:hover,
   .nav-link.is-active {
-    background: var(--surface);
     color: var(--text);
+    background: var(--surface);
   }
 
   .header-actions {
-    display: flex;
+    display: none;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
   }
 
-  .icon-btn,
-  .admin-btn {
-    height: 2.3rem;
+  .site-search {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    min-width: 12rem;
+    padding: 0 0.55rem 0 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+  }
+
+  .site-search input,
+  .mobile-site-search input {
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+  }
+
+  .site-search input {
+    width: 8.5rem;
+    font-size: 0.84rem;
+  }
+
+  .site-search input::placeholder,
+  .mobile-site-search input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .site-search kbd {
+    flex: 0 0 auto;
+    padding: 0.1rem 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.2;
+  }
+
+  .site-search:focus-within {
+    border-color: var(--border-strong);
+  }
+
+  .icon-btn {
+    width: 2.25rem;
+    height: 2.25rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    border-radius: var(--radius-sm);
+    background: transparent;
     color: var(--text-secondary);
-    cursor: pointer;
-    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-  }
-
-  .icon-btn {
-    width: 2.3rem;
+    transition: color 0.15s ease, border-color 0.15s ease;
     position: relative;
+    cursor: pointer;
   }
 
-  .icon-btn svg {
-    width: 1.02rem;
-    height: 1.02rem;
-  }
-
-  .admin-btn {
-    padding: 0 0.75rem;
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    font-weight: 600;
-  }
-
-  .icon-btn:hover,
-  .admin-btn:hover {
-    border-color: var(--border-strong);
-    background: var(--surface-hover);
+  .icon-btn:hover {
     color: var(--text);
+    border-color: var(--border-strong);
   }
 
-  .theme-glyph {
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 2.25rem;
+    padding: 0 0.9rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.15s ease;
+  }
+
+  .cta-btn:hover {
+    background: var(--color-accent-hover);
+    color: var(--color-accent-ink);
+  }
+
+  .theme-icon {
     position: absolute;
-    line-height: 1;
-    transition: opacity 0.18s ease;
+    transition: opacity 0.2s ease;
   }
 
-  .theme-sun { opacity: 0; }
-  :root[data-theme="light"] .theme-sun { opacity: 1; }
-  :root[data-theme="light"] .theme-moon { opacity: 0; }
+  .theme-dark { opacity: 0; }
+  :root[data-theme="light"] .theme-light { opacity: 0; }
+  :root[data-theme="light"] .theme-dark { opacity: 1; }
 
   .mobile-btn {
-    display: none;
-    width: 2.3rem;
-    height: 2.3rem;
-    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    display: grid;
+    place-items: center;
   }
 
   .mobile-btn span {
     display: block;
-    width: 1rem;
+    width: 0.95rem;
     height: 1px;
     background: var(--text);
-    transition: transform 0.18s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
   }
 
-  .mobile-btn span + span {
-    margin-top: 0.34rem;
-  }
+  .mobile-btn span + span { margin-top: 0.35rem; }
 
   .mobile-menu {
-    display: none;
     max-height: 0;
     overflow: hidden;
+    transition: max-height 0.3s ease;
     border-top: 1px solid transparent;
-    padding: 0 1rem;
-    transition: max-height 0.2s ease, border-color 0.2s ease, padding-bottom 0.2s ease;
   }
 
-  .mobile-menu.is-open {
+  .mobile-menu[aria-expanded="true"],
+  .mobile-menu[style*="max-height"]:not([style*="max-height: 0"]) {
     border-top-color: var(--border);
-    padding-bottom: 1rem;
   }
 
-  .mobile-search {
-    margin-top: 1rem;
+  .mobile-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 1rem 1.5rem 1.25rem;
   }
 
-  .mobile-links {
-    display: grid;
-    gap: 0.2rem;
-    padding: 0.75rem 0;
+  .mobile-site-search {
+    display: flex;
+    align-items: center;
+    min-height: 2.6rem;
+    margin-bottom: 0.75rem;
+    padding: 0 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+  }
+
+  .mobile-site-search input {
+    width: 100%;
+    font-size: 0.92rem;
   }
 
   .mobile-link {
-    padding: 0.7rem 0;
+    display: block;
+    padding: 0.8rem 0;
+    color: var(--text);
+    font-size: 0.95rem;
     border-bottom: 1px solid var(--border);
-    color: var(--text-secondary);
   }
+
+  .mobile-link:last-of-type { border-bottom: none; }
 
   .mobile-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
   }
 
-  .mobile-actions .admin-btn {
+  .mobile-actions .icon-btn,
+  .mobile-actions .cta-btn {
     flex: 1;
   }
 
-  @media (max-width: 1120px) {
+  @media (max-width: 767px) {
     .header-inner {
-      grid-template-columns: auto minmax(12rem, 1fr) auto;
+      gap: 1rem;
     }
 
-    .nav-links {
+    .brand-sub { display: none; }
+    .brand-name { font-size: 1.05rem; }
+  }
+
+  @media (min-width: 768px) {
+    .header-actions {
+      display: flex;
+    }
+
+    .mobile-btn,
+    .mobile-menu {
       display: none;
     }
   }
 
-  @media (max-width: 760px) {
-    .header-inner {
-      min-height: 3.45rem;
-      grid-template-columns: auto 1fr auto;
+  @media (min-width: 1024px) {
+    .nav-links {
+      display: flex;
     }
 
-    .brand-sub,
-    .header-search,
-    .header-actions {
-      display: none;
-    }
-
-    .mobile-btn {
-      display: grid;
-    }
-
-    .mobile-menu {
-      display: block;
+    .site-search {
+      display: flex;
     }
   }
 </style>
 
 <script is:inline>
   (() => {
-    const pageSearchSelector = '#tool-search, #search-input, #radar-search, #resource-search';
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const themeBtn = document.getElementById('theme-toggle');
+    const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
+    const sectionLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+    const siteSearchForm = document.getElementById('site-search-form');
+    const mobileSearchForm = document.getElementById('mobile-site-search-form');
+    const siteSearchInput = document.getElementById('site-search-input');
+    const mobileSearchInput = document.getElementById('mobile-site-search-input');
 
-    const focusSearch = () => {
-      const input = document.querySelector(pageSearchSelector) || document.getElementById('site-search') || document.getElementById('mobile-site-search');
-      input?.focus();
-      input?.select?.();
-    };
+    const routeSearch = (rawQuery) => {
+      const query = (rawQuery || '').trim();
+      if (!query) return;
+      const lower = query.toLowerCase();
+      const encoded = encodeURIComponent(query);
+      const toolIntent = /工具|tool|json|yaml|csv|base64|jwt|aes|hash|token|密码|二维码|时间戳|timestamp|正则|regex|颜色|图片|curl|ai工具|chatgpt|claude|gemini|manus|grok/.test(lower);
+      const competitionIntent = /比赛|赛事|竞赛|hackathon|beyond|opc|创业|报名|截止|雷达/.test(lower);
 
-    const runSearch = (query) => {
-      const pageInput = document.querySelector(pageSearchSelector);
-      if (pageInput && query) {
-        pageInput.value = query;
-        pageInput.dispatchEvent(new Event('input', { bubbles: true }));
-        focusSearch();
-        return;
-      }
-      window.location.href = `/tools${query ? `?q=${encodeURIComponent(query)}` : ''}#tool-search`;
-    };
-
-    const bindHeader = () => {
-      const mobileBtn = document.getElementById('mobile-menu-btn');
-      const mobileMenu = document.getElementById('mobile-menu');
-      const themeBtn = document.getElementById('theme-toggle');
-      const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
-
-      document.querySelectorAll('#site-search-form, #mobile-search-form').forEach((form) => {
-        if (form.dataset.bound) return;
-        form.dataset.bound = 'true';
-        form.addEventListener('submit', (event) => {
-          event.preventDefault();
-          const input = form.querySelector('input');
-          runSearch((input?.value || '').trim());
-        });
-      });
-
-      if (themeBtn && !themeBtn.dataset.bound) {
-        themeBtn.dataset.bound = 'true';
-        themeBtn.addEventListener('click', () => window.toggleTheme?.());
-      }
-
-      if (mobileThemeBtn && !mobileThemeBtn.dataset.bound) {
-        mobileThemeBtn.dataset.bound = 'true';
-        mobileThemeBtn.addEventListener('click', () => window.toggleTheme?.());
-      }
-
-      if (mobileBtn && mobileMenu && !mobileBtn.dataset.bound) {
-        mobileBtn.dataset.bound = 'true';
-        mobileBtn.addEventListener('click', () => {
-          const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
-          mobileBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-          mobileMenu.classList.toggle('is-open', !expanded);
-          mobileMenu.style.maxHeight = expanded ? '0' : `${mobileMenu.scrollHeight + 12}px`;
-        });
-      }
-
-      document.querySelectorAll('[data-mobile-link]').forEach((link) => {
-        if (link.dataset.bound) return;
-        link.dataset.bound = 'true';
-        link.addEventListener('click', () => {
-          mobileBtn?.setAttribute('aria-expanded', 'false');
-          mobileMenu?.classList.remove('is-open');
-          if (mobileMenu) mobileMenu.style.maxHeight = '0';
-        });
-      });
-
-      const query = new URLSearchParams(window.location.search).get('q');
-      const toolsSearch = document.getElementById('tool-search');
-      if (query && toolsSearch && !toolsSearch.value) {
-        toolsSearch.value = query;
-        toolsSearch.dispatchEvent(new Event('input', { bubbles: true }));
+      if (competitionIntent) {
+        window.location.href = `/competitions?q=${encoded}`;
+      } else if (toolIntent) {
+        window.location.href = `/tools?q=${encoded}`;
+      } else {
+        window.location.href = `/blog?q=${encoded}`;
       }
     };
 
-    if (!window.__siteSearchKeysBound) {
-      window.__siteSearchKeysBound = true;
-      window.addEventListener('keydown', (event) => {
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-          event.preventDefault();
-          focusSearch();
-        }
+    const closeMenu = () => {
+      if (!mobileMenu || !mobileBtn) return;
+      mobileMenu.style.maxHeight = '0';
+      mobileBtn.setAttribute('aria-expanded', 'false');
+      const lines = mobileBtn.querySelectorAll('span');
+      if (lines.length === 2) {
+        lines[0].style.transform = 'none';
+        lines[1].style.transform = 'none';
+      }
+    };
+
+    themeBtn?.addEventListener('click', () => window.toggleTheme?.());
+    mobileThemeBtn?.addEventListener('click', () => window.toggleTheme?.());
+
+    siteSearchForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      routeSearch(siteSearchInput?.value);
+    });
+
+    mobileSearchForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      routeSearch(mobileSearchInput?.value);
+      closeMenu();
+    });
+
+    mobileBtn?.addEventListener('click', () => {
+      if (!mobileMenu || !mobileBtn) return;
+      const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
+      mobileBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      mobileMenu.style.maxHeight = expanded ? '0' : `${mobileMenu.scrollHeight + 24}px`;
+      const lines = mobileBtn.querySelectorAll('span');
+      if (lines.length === 2) {
+        lines[0].style.transform = expanded ? 'none' : 'translateY(3px) rotate(45deg)';
+        lines[1].style.transform = expanded ? 'none' : 'translateY(-3px) rotate(-45deg)';
+      }
+    });
+
+    document.querySelectorAll('[data-mobile-link]').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener('click', (event) => {
+        const targetId = anchor.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+        const target = document.querySelector(targetId);
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        closeMenu();
       });
+    });
+
+    if (sectionLinks.length > 0) {
+      const sections = Array.from(document.querySelectorAll('section[id]'));
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          sectionLinks.forEach((link) => {
+            link.classList.toggle('is-active', link.getAttribute('data-nav-link') === entry.target.id);
+          });
+        });
+      }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+
+      sections.forEach((section) => observer.observe(section));
     }
 
-    bindHeader();
-    document.addEventListener('astro:page-load', bindHeader);
+    window.addEventListener('keydown', (event) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
+      const localSearch = document.querySelector('#tool-search, #search-input, #radar-search, #resource-search');
+      event.preventDefault();
+      (localSearch || siteSearchInput || mobileSearchInput)?.focus();
+    });
+
+    document.addEventListener('astro:page-load', closeMenu);
   })();
 </script>

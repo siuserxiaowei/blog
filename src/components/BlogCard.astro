@@ -12,129 +12,119 @@ const { title, description, date, tags = [], slug, image } = Astro.props;
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 ---
 
 <a href={`/blog/${slug}`} class="blog-card">
-  {image && (
-    <div class="blog-card-media">
-      <img src={image} alt={title} loading="lazy" />
-    </div>
-  )}
-
-  <article class="blog-card-body">
+  <article>
     <div class="blog-card-meta">
       <time>{formatDate(date)}</time>
-      {tags.length > 0 && <span>{tags[0]}</span>}
+      {tags.length > 0 && (
+        <span class="blog-card-tags">
+          {tags.slice(0, 3).map((tag, i) => (
+            <span>{tag}{i < Math.min(tags.length, 3) - 1 ? ' · ' : ''}</span>
+          ))}
+        </span>
+      )}
     </div>
 
-    <h3>{title}</h3>
-    <p>{description}</p>
+    {image && (
+      <div class="blog-card-media">
+        <img src={image} alt={title} loading="lazy" />
+      </div>
+    )}
 
-    <div class="blog-card-foot">
-      <span>{tags.slice(0, 3).join(' / ') || 'Writing'}</span>
-      <em aria-hidden="true">→</em>
-    </div>
+    <h3 class="blog-card-title display-serif">{title}</h3>
+    <p class="blog-card-desc">{description}</p>
+
+    <span class="blog-card-read">阅读 <em>→</em></span>
   </article>
 </a>
 
 <style>
   .blog-card {
-    display: flex;
-    min-height: 14.5rem;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    display: block;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--border);
     color: var(--text);
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color 0.15s ease;
   }
 
   .blog-card:hover {
-    border-color: var(--border-strong);
-    background: color-mix(in srgb, var(--surface) 74%, var(--surface-strong));
     color: var(--text);
+    border-bottom-color: var(--border-strong);
+  }
+
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+
+  .blog-card-tags {
+    color: var(--text-muted);
   }
 
   .blog-card-media {
-    aspect-ratio: 2.2 / 1;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-strong);
+    margin-bottom: 1.1rem;
+    aspect-ratio: 2.35 / 1;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
   }
 
   .blog-card-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.35s ease;
+    transition: transform 0.4s ease;
   }
 
   .blog-card:hover .blog-card-media img {
-    transform: scale(1.025);
+    transform: scale(1.02);
   }
 
-  .blog-card-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding: 1rem;
+  .blog-card-title {
+    font-size: clamp(1.55rem, 2.6vw, 2.1rem);
+    line-height: 1.1;
+    margin-bottom: 0.7rem;
+    color: var(--text);
+    transition: color 0.15s ease;
   }
 
-  .blog-card-meta,
-  .blog-card-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    color: var(--text-muted);
+  .blog-card:hover .blog-card-title {
+    color: var(--color-accent);
+  }
+
+  .blog-card-desc {
+    max-width: 48rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .blog-card-read {
+    color: var(--color-accent);
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 
-  .blog-card-meta span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .blog-card h3 {
-    margin-top: 0.9rem;
-    color: var(--text);
-    font-family: var(--font-heading);
-    font-size: clamp(1.18rem, 2vw, 1.45rem);
-    line-height: 1.18;
-  }
-
-  .blog-card p {
-    margin-top: 0.65rem;
-    color: var(--text-secondary);
-    font-size: 0.92rem;
-    line-height: 1.65;
-  }
-
-  .blog-card-foot {
-    margin-top: auto;
-    padding-top: 1rem;
-  }
-
-  .blog-card-foot span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .blog-card-foot em {
-    flex-shrink: 0;
-    color: var(--color-accent);
+  .blog-card-read em {
     font-style: normal;
-    transition: transform 0.15s ease;
+    transition: transform 0.2s ease;
+    display: inline-block;
   }
 
-  .blog-card:hover .blog-card-foot em {
+  .blog-card:hover .blog-card-read em {
     transform: translateX(3px);
   }
 </style>

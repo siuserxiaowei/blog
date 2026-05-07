@@ -10,362 +10,325 @@ const enriched = enrichCompetitions(competitions, TODAY);
 const expiredCount = enriched.filter(c => c.status.kind === 'expired').length;
 const urgentCount = enriched.filter(c => c.status.kind === 'urgent').length;
 const sCount = enriched.filter(c => c.tier === 'S').length;
-const openCount = enriched.length - expiredCount;
-const urgentItems = enriched.filter(c => c.status.kind === 'urgent').sort((a, b) => a.status.days - b.status.days);
-const topRadar = enriched.slice().sort((a, b) => b.priority - a.priority || b.match - a.match).slice(0, 4);
 const categories = getCompetitionCategories(enriched);
 ---
 
 <BaseLayout title="AI 硬件赛事雷达 · siuser小伟" description="AI 硬件方案商的赛事与行业活动调研看板。">
   <Header />
 
-  <main class="competition-radar-page flex-1">
-    <section class="radar-hero">
-      <div class="radar-shell">
-        <div class="hero-grid">
-          <div class="hero-copy animate-fade-in stagger-1">
-            <div class="radar-meta-row">
-              <p class="section-kicker">Competition Radar</p>
-              <span>// {RADAR_UPDATED_AT}</span>
-              <span>{enriched.length} signals tracked</span>
-            </div>
-            <h1>AI 硬件赛事雷达</h1>
-            <p class="hero-brief">
-              面向 AI 硬件方案商和早期硬件创业团队的赛事作战台。把政府政策、创投曝光、工程量产和渠道验证压到同一屏，优先判断：能不能拿订单、能不能上量、能不能拿背书。
-            </p>
-            <div class="radar-signal-row">
-              <span><span class="dot-accent"></span>订单</span>
-              <span><span class="dot-accent2"></span>政策</span>
-              <span><span class="dot-warn"></span>资本</span>
-              <span><span class="dot-danger"></span>硬截止</span>
-            </div>
-          </div>
+  <main class="flex-1">
 
-          <div class="radar-scope animate-fade-in stagger-2" aria-hidden="true">
-            <div class="scope-axis scope-axis-x"></div>
-            <div class="scope-axis scope-axis-y"></div>
-            <div class="scope-ring scope-ring-1"></div>
-            <div class="scope-ring scope-ring-2"></div>
-            <div class="scope-ring scope-ring-3"></div>
-            <div class="scope-sweep"></div>
-            <span class="scope-blip blip-1"></span>
-            <span class="scope-blip blip-2"></span>
-            <span class="scope-blip blip-3"></span>
-            <span class="scope-blip blip-4"></span>
-            <div class="scope-readout">
-              <span>TOP PRIORITY</span>
-              <strong>{topRadar[0]?.priority ?? 0}</strong>
-            </div>
-          </div>
+    <!-- Hero -->
+    <section class="mx-auto px-6 pt-16 pb-10 md:pt-24" style="max-width: var(--container-max);">
+      <div class="animate-fade-in stagger-1 flex items-center gap-3 mb-3">
+        <p class="section-kicker">Competition Radar</p>
+        <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// {RADAR_UPDATED_AT} · {enriched.length} items tracked</span>
+      </div>
+      <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-4" style="font-family: var(--font-heading); color: var(--text);">
+        AI 硬件 <span class="text-shimmer">赛事雷达</span>
+      </h1>
+      <p class="animate-fade-in stagger-3 text-base max-w-2xl leading-relaxed" style="color: var(--text-secondary);">
+        面向 AI 硬件方案商和早期硬件创业团队的赛事与行业活动数据库。只看三件事：能不能拿订单、能不能上量、能不能拿政府 / 资本背书。
+      </p>
+      <div class="animate-fade-in stagger-3 divider-accent mt-6 mb-10"></div>
+
+      <!-- 四指标 -->
+      <div class="animate-fade-in stagger-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div class="metric-tile p-5">
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">TOTAL</div>
+          <div class="text-3xl font-semibold" style="color: var(--text); font-family: var(--font-heading);">{enriched.length}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">赛事总数</div>
         </div>
-
-        <div class="radar-metrics animate-fade-in stagger-3">
-          <div class="metric-tile">
-            <span class="metric-label">TOTAL</span>
-            <strong>{enriched.length}</strong>
-            <span>赛事总数</span>
-          </div>
-          <div class="metric-tile metric-hot">
-            <span class="metric-label">ACTIVE</span>
-            <strong>{openCount}</strong>
-            <span>仍可动作</span>
-          </div>
-          <div class="metric-tile metric-warn">
-            <span class="metric-label">URGENT</span>
-            <strong>{urgentCount}</strong>
-            <span>14 天内截止</span>
-          </div>
-          <div class="metric-tile">
-            <span class="metric-label">TIER S</span>
-            <strong>{sCount}</strong>
-            <span>S 级强推</span>
-          </div>
-          <div class="metric-tile metric-muted">
-            <span class="metric-label">EXPIRED</span>
-            <strong>{expiredCount}</strong>
-            <span>已截止</span>
-          </div>
+        <div class="metric-tile p-5">
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">TIER·S</div>
+          <div class="text-3xl font-semibold" style="color: var(--color-accent); font-family: var(--font-heading);">{sCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">S 级强推</div>
+        </div>
+        <div class="metric-tile p-5 relative overflow-hidden">
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">URGENT</div>
+          <div class="text-3xl font-semibold" style="color: var(--color-accent-2); font-family: var(--font-heading);">{urgentCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">14 天内截止</div>
+        </div>
+        <div class="metric-tile p-5">
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">EXPIRED</div>
+          <div class="text-3xl font-semibold line-through" style="color: var(--text-secondary); opacity: 0.55; font-family: var(--font-heading);">{expiredCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">已过期</div>
         </div>
       </div>
     </section>
 
-    <section class="radar-section">
-      <div class="radar-shell">
-        <div class="mission-console animate-fade-in stagger-4">
-          <div class="mission-brief">
-            <p class="section-kicker">// Priority Matrix</p>
-            <h2>5 月第一优先级：BEYOND、广东 OPC、鸿蒙、海聚英才</h2>
-            <p>
-              5-8 到 5-15 是硬截止密集窗口：BEYOND HACK DAY、广东众创杯 OPC、Founder Park × 百度快闪、北京 5.10 AI 极客争霸赛、HarmonyOS 创新赛都在同一段时间。错过 4-30 三场后，短线先保能带现场资源和渠道验证的项目；中线锁定海聚英才、创客中国、奇绩创坛和智能终端场景赛。
-            </p>
-            <div class="mission-tags">
-              <span class="pill-note"><span class="dot-danger"></span>5-8 BEYOND</span>
-              <span class="pill-note"><span class="dot-danger"></span>5-10 广东 OPC</span>
-              <span class="pill-note"><span class="dot-warn"></span>5-15 鸿蒙</span>
-              <span class="pill-note"><span class="dot-accent2"></span>5-31 海聚英才</span>
-            </div>
-          </div>
-
-          <div class="urgent-console">
-            <div class="console-title-row">
-              <p class="section-kicker">// 14 天紧急</p>
-              <span>{urgentCount} alerts</span>
-            </div>
-            {urgentCount > 0 ? (
-              <ul class="urgent-stack">
-                {urgentItems.map(c => (
-                  <li>
-                    <button data-jump={c.id} class="urgent-chip">
-                      <span class={`status-dot status-${c.status.kind}`}></span>
-                      <span class="urgent-name">{c.name}</span>
-                      <span class="urgent-meta">{c.tier} · {c.match.toFixed(1)}</span>
-                      <span class="urgent-badge">{c.status.days}d</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p class="empty-state">14 天内暂无赛事截止。</p>
-            )}
+    <!-- 核心结论 -->
+    <section class="mx-auto px-6 pb-10" style="max-width: var(--container-max);">
+      <div class="animate-fade-in glass-card gradient-border p-7 md:p-10 grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8" style="border-radius: var(--radius-xl);">
+        <div>
+          <p class="section-kicker mb-4">// Priority Matrix</p>
+          <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
+            BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> WAVES 决赛
+          </h2>
+          <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            <strong style="color: var(--color-accent);">4-30 三场刚刚截止</strong>：「星火」硬件创新大赛、WAIC OPC 先锋赛、36氪 <strong style="color: var(--color-accent);">WAVES 有智青年</strong>挑战赛（决赛 6 月）— 错过报名的盯 6 月 WAVES 决赛和下一轮。一周倒计时：<strong style="color: var(--color-accent);">BEYOND HACK（5-8）</strong>澳门极限开发 + 嘉立创百万奖池，<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15）</strong>奖池 68 万。中长线：创客中国第 11 届 7-10 截止，政策兑现最稳。
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
+            <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
+            <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
+            <span class="pill-note"><span class="dot-accent"></span>决赛 · WAVES · 6 月</span>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="radar-section radar-section-tight">
-      <div class="radar-shell">
-        <div class="control-console">
-          <div class="console-title-row">
-            <p class="section-kicker">// Control Console</p>
-            <span><span class="console-led"></span>filters online</span>
-          </div>
-          <div class="filter-rows">
-            <div class="radar-control-grid">
-              <label class="radar-field">
-                <span class="section-kicker filter-label">// 搜索</span>
-                <input id="radar-search" class="radar-input" type="search" placeholder="搜赛事、赛道、打法" autocomplete="off" />
-              </label>
-              <label class="radar-field">
-                <span class="section-kicker filter-label">// 状态</span>
-                <select id="radar-status" class="radar-select">
-                  <option value="全部">全部状态</option>
-                  <option value="urgent">紧急</option>
-                  <option value="ongoing">进行中</option>
-                  <option value="upcoming">即将开始</option>
-                  <option value="expired">已过期</option>
-                </select>
-              </label>
-              <label class="radar-field">
-                <span class="section-kicker filter-label">// 排序</span>
-                <select id="radar-sort" class="radar-select">
-                  <option value="match-desc">匹配度高优先</option>
-                  <option value="urgent-first">紧急优先</option>
-                  <option value="deadline-asc">截止近优先</option>
-                  <option value="tier-desc">等级高优先</option>
-                </select>
-              </label>
-            </div>
-            <div class="filter-row">
-              <span class="section-kicker filter-label">// 分类</span>
-              <div class="filter-group">
-                <button data-fcat="全部" class="filter-cat filter-chip is-on">全部</button>
-                {categories.map(cat => (
-                  <button data-fcat={cat} class="filter-cat filter-chip">{cat}</button>
-                ))}
-              </div>
-            </div>
-            <div class="filter-row">
-              <span class="section-kicker filter-label">// 等级</span>
-              <div class="filter-group compact">
-                <button data-ftier="全部" class="filter-tier filter-chip is-on">全部</button>
-                {['S','A','B'].map(t => (
-                  <button data-ftier={t} class="filter-tier filter-chip">{t} 级</button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="radar-section radar-section-last">
-      <div class="radar-shell">
-        <div class="radar-workbench">
-          <aside class="competition-index-panel">
-            <div class="panel-bar">
-              <span class="section-kicker">// Targets</span>
-              <span id="list-count">{enriched.length} items</span>
-            </div>
-            <div class="competition-list-stack">
-              {enriched.map(c => (
-                <button
-                  data-id={c.id}
-                  data-name={c.name}
-                  data-full-name={c.fullName}
-                  data-cat={c.cat}
-                  data-tier={c.tier}
-                  data-status={c.status.kind}
-                  data-match={c.match}
-                  data-deadline={c.deadlineISO}
-                  data-strategy={c.strategy}
-                  data-url={c.url}
-                  data-priority={c.priority}
-                  data-bucket={c.bucket}
-                  data-sources={(c.sources ?? []).map(source => `${source.title} ${source.date} ${source.url}`).join(' | ')}
-                  data-search={`${c.name} ${c.fullName} ${c.cat} ${c.tier} ${c.status.label} ${c.bucket} ${c.desc} ${c.strategy} ${c.org} ${c.loc} ${c.winning.join(' ')} ${(c.sources ?? []).map(source => source.title).join(' ')}`}
-                  class="cp-list-item"
-                >
-                  <div class="list-topline">
-                    <span class="list-code">#{c.id}</span>
-                    <span class={`tier-tag tier-${c.tier}`}>{c.tier}</span>
-                  </div>
-                  <h4>{c.name}</h4>
-                  <div class="list-meta-line">
-                    <span class={`status-dot status-${c.status.kind}`}></span>
-                    <span>{c.status.label}</span>
-                    <span class="meta-dot"></span>
-                    <span>{c.cat}</span>
-                  </div>
-                  <p>{c.desc}</p>
-                  <div class="list-footer">
-                    <span>{c.bucket}</span>
-                    <strong>{c.match.toFixed(1)}<small>/10</small></strong>
-                  </div>
-                </button>
+        <div class="border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-8" style="border-color: color-mix(in srgb, var(--border) 55%, transparent);">
+          <p class="section-kicker mb-4">// 14 天紧急</p>
+          {urgentCount > 0 ? (
+            <ul class="space-y-2.5">
+              {enriched.filter(c => c.status.kind === 'urgent').sort((a,b)=>a.status.days-b.status.days).map(c => (
+                <li>
+                  <button data-jump={c.id} class="urgent-chip group">
+                    <span class="flex-1 text-sm font-medium truncate" style="color: var(--text);">{c.name}</span>
+                    <span class="urgent-badge">{c.status.days}d</span>
+                  </button>
+                </li>
               ))}
-            </div>
-          </aside>
+            </ul>
+          ) : (
+            <p class="text-sm" style="color: var(--text-secondary);">14 天内暂无赛事截止。</p>
+          )}
+        </div>
+      </div>
+    </section>
 
-          <section class="competition-detail-stage">
-            {enriched.map((c, i) => (
-              <div data-detail={c.id} class:list={["detail-panel", i !== 0 && "hidden"]}>
-                <article class="radar-panel detail-card">
-                  <div class="detail-header">
-                    <div class="detail-title-zone">
-                      <div class="detail-tags">
-                        <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
-                        <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span>{c.status.label}</span>
-                        <span class="pill-note">信用 {c.rel}</span>
-                        <span class="pill-note">{c.bucket}</span>
-                      </div>
-                      <h2>{c.fullName}</h2>
-                      <div class="detail-meta-grid">
-                        <span><span>LOC</span>{c.loc}</span>
-                        <span><span>DATE</span>{c.date}</span>
-                        <span><span>ORG</span>{c.org}</span>
-                      </div>
+    <!-- 筛选条 -->
+    <section class="mx-auto px-6 pb-8" style="max-width: var(--container-max);">
+      <div class="filter-rows">
+        <div class="radar-control-grid">
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 搜索</span>
+            <input id="radar-search" class="radar-input" type="search" placeholder="搜赛事、赛道、打法" autocomplete="off" />
+          </label>
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 状态</span>
+            <select id="radar-status" class="radar-select">
+              <option value="全部">全部状态</option>
+              <option value="urgent">紧急</option>
+              <option value="ongoing">进行中</option>
+              <option value="upcoming">即将开始</option>
+              <option value="expired">已过期</option>
+            </select>
+          </label>
+          <label class="radar-field">
+            <span class="section-kicker filter-label">// 排序</span>
+            <select id="radar-sort" class="radar-select">
+              <option value="match-desc">匹配度高优先</option>
+              <option value="urgent-first">紧急优先</option>
+              <option value="deadline-asc">截止近优先</option>
+              <option value="tier-desc">等级高优先</option>
+            </select>
+          </label>
+        </div>
+        <div class="filter-row">
+          <span class="section-kicker filter-label">// 分类</span>
+          <div class="filter-group">
+            <button data-fcat="全部" class="filter-cat filter-chip is-on">全部</button>
+            {categories.map(cat => (
+              <button data-fcat={cat} class="filter-cat filter-chip">{cat}</button>
+            ))}
+          </div>
+        </div>
+        <div class="filter-row">
+          <span class="section-kicker filter-label">// 等级</span>
+          <div class="filter-group">
+            <button data-ftier="全部" class="filter-tier filter-chip is-on">全部</button>
+            {['S','A','B'].map(t => (
+              <button data-ftier={t} class="filter-tier filter-chip">{t} 级</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 列表 + 详情 -->
+    <section class="mx-auto px-6 pb-20" style="max-width: var(--container-max);">
+      <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8 lg:gap-12">
+        <!-- 左侧列表 -->
+        <aside>
+          <div class="flex items-center justify-between px-1 mb-3">
+            <span class="section-kicker">// 列表</span>
+            <span id="list-count" class="text-xs" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
+          </div>
+          <div class="space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
+            {enriched.map(c => (
+              <button
+                data-id={c.id}
+                data-name={c.name}
+                data-full-name={c.fullName}
+                data-cat={c.cat}
+                data-tier={c.tier}
+                data-status={c.status.kind}
+                data-match={c.match}
+                data-deadline={c.deadlineISO}
+                data-strategy={c.strategy}
+                data-url={c.url}
+                data-sources={(c.sources ?? []).map(source => `${source.title} ${source.date} ${source.url}`).join(' | ')}
+                data-search={`${c.name} ${c.fullName} ${c.cat} ${c.tier} ${c.status.label} ${c.desc} ${c.strategy} ${c.org} ${c.loc} ${c.winning.join(' ')} ${(c.sources ?? []).map(source => source.title).join(' ')}`}
+                class="cp-list-item w-full text-left p-4"
+              >
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <h4 class="text-base font-semibold leading-tight truncate" style="color: var(--text); font-family: var(--font-heading);">{c.name}</h4>
+                  <span class={`tier-tag tier-${c.tier}`}>{c.tier}</span>
+                </div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class={`status-dot status-${c.status.kind}`}></span>
+                  <span class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
+                  <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.5;">·</span>
+                  <span class="text-[11px]" style="color: var(--text-secondary);">{c.cat}</span>
+                </div>
+                <p class="text-xs leading-relaxed line-clamp-2 mb-3" style="color: var(--text-secondary);">{c.desc}</p>
+                <div class="flex items-center justify-between pt-2 text-[11px]" style="border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);">
+                  <span style="color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.08em;">MATCH</span>
+                  <span style="font-family: var(--font-heading); color: var(--color-accent); font-weight: 600; font-size: 14px;">{c.match.toFixed(1)}<span style="color: var(--text-secondary); font-size: 10px; font-weight: 400;"> / 10</span></span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <!-- 右侧详情 -->
+        <section class="space-y-8">
+          {enriched.map((c, i) => (
+            <div data-detail={c.id} class:list={["detail-panel space-y-7", i !== 0 && "hidden"]}>
+
+              <!-- 主卡 -->
+              <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
+                  <div class="flex-1 min-w-0 space-y-3">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
+                      <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span>{c.status.label}</span>
+                      <span class="pill-note">信用 {c.rel}</span>
+                      <span class="pill-note">{c.cat}</span>
                     </div>
-
-                    <div class="match-console">
-                      <span>MATCH</span>
-                      <strong>{c.match.toFixed(1)}</strong>
-                      <small>{c.suit} · priority {c.priority}</small>
+                    <h2 class="text-2xl md:text-3xl leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.022em;">{c.fullName}</h2>
+                    <div class="flex flex-wrap gap-x-6 gap-y-1.5 text-sm" style="color: var(--text-secondary);">
+                      <span class="flex items-center gap-1.5"><span class="opacity-50">◎</span>{c.loc}</span>
+                      <span class="flex items-center gap-1.5"><span class="opacity-50">◷</span>{c.date}</span>
+                      <span class="flex items-center gap-1.5"><span class="opacity-50">◆</span>{c.org}</span>
                     </div>
                   </div>
 
-                  <div class="timeline-block">
-                    <div class="block-heading">
-                      <p class="section-kicker">// Timeline</p>
-                      <span>deadline {c.deadlineISO}</span>
-                    </div>
-                    <div class="timeline-strip" style={`--timeline-count: ${c.timeline.length};`}>
+                  <div class="metric-tile px-5 py-4 flex flex-col items-center justify-center min-w-[120px]">
+                    <span class="text-[10px] uppercase tracking-[0.2em]" style="color: var(--text-secondary); font-family: var(--font-mono);">Match</span>
+                    <span class="text-5xl font-semibold leading-none mt-1" style="color: var(--color-accent); font-family: var(--font-heading);">{c.match.toFixed(1)}</span>
+                    <span class="text-[10px] mt-1" style="color: var(--text-secondary);">/ 10</span>
+                    <span class="text-[11px] mt-2 px-2 py-0.5 rounded-full" style="color: var(--color-accent-2); background: color-mix(in srgb, var(--color-accent-2) 12%, transparent);">{c.suit}</span>
+                  </div>
+                </div>
+
+                <!-- 时间轴 -->
+                <div class="mb-10">
+                  <p class="section-kicker mb-5">// 关键时间节点</p>
+                  <div class="relative pt-2">
+                    <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
+                    <div class="relative grid gap-2" style={`grid-template-columns: repeat(${c.timeline.length}, minmax(0, 1fr));`}>
                       {c.timeline.map(n => {
                         const past = new Date(n.date) < TODAY;
                         const dotClass = past ? 'past' : n.critical ? 'critical' : 'normal';
                         return (
-                          <div class="timeline-node">
+                          <div class="flex flex-col items-center text-center min-w-0 px-1">
                             <div class={`timeline-dot ${dotClass}`}></div>
-                            <p>{n.event}</p>
-                            <small>{n.date}</small>
+                            <p class="mt-3 mb-1 text-[11px] font-medium leading-tight" style={`color: ${n.critical && !past ? 'var(--text)' : 'var(--text-secondary)'}; max-width: 100%;`}>{n.event}</p>
+                            <small class="text-[10px]" style="color: var(--text-secondary); opacity: 0.6; font-family: var(--font-mono);">{n.date}</small>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-
-                  <div class="intel-grid">
-                    <section class="intel-block">
-                      <p class="section-kicker">// 赛事定位</p>
-                      <p>{c.desc}</p>
-                    </section>
-                    <section class="intel-block intel-action">
-                      <p class="section-kicker">// 参赛打法</p>
-                      <p>{c.strategy}</p>
-                    </section>
-                  </div>
-
-                  <div class="chip-section-grid">
-                    <section>
-                      <p class="section-kicker">// 核心奖励 / 资源</p>
-                      <div class="chip-cloud">
-                        {c.rewards.map(r => (
-                          <span class="reward-chip">{r}</span>
-                        ))}
-                      </div>
-                    </section>
-                    <section>
-                      <p class="section-kicker">// 必胜卖点</p>
-                      <div class="chip-cloud">
-                        {c.winning.map(w => (
-                          <span class="winning-chip">{w}</span>
-                        ))}
-                      </div>
-                    </section>
-                  </div>
-                </article>
-
-                <div class="pros-cons-grid">
-                  <section class="radar-panel signal-list positive">
-                    <p class="section-kicker">// + 优势</p>
-                    <ul>
-                      {c.pros.map(p => (
-                        <li><span></span>{p}</li>
-                      ))}
-                    </ul>
-                  </section>
-                  <section class="radar-panel signal-list negative">
-                    <p class="section-kicker">// ! 难点 / 风险</p>
-                    <ul>
-                      {c.cons.map(p => (
-                        <li><span></span>{p}</li>
-                      ))}
-                    </ul>
-                  </section>
                 </div>
 
-                <div class="radar-panel action-console">
-                  <div class="audience-block">
-                    <p class="section-kicker">// 适合谁</p>
-                    <p>{c.audience}</p>
-                    {c.sources?.length ? (
-                      <div class="source-links">
-                        <span class="section-kicker source-label">// 参考来源</span>
-                        {c.sources.map(source => (
-                          <a href={source.url} target="_blank" rel="noopener" class="source-link">
-                            <span>{source.title}</span>
-                            <small>{source.date}</small>
-                          </a>
-                        ))}
-                      </div>
-                    ) : null}
+                <!-- 定位 / 打法 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div>
+                    <p class="section-kicker mb-3">// 赛事定位</p>
+                    <p class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text-secondary); background: color-mix(in srgb, var(--surface) 55%, transparent); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">{c.desc}</p>
                   </div>
-                  <div class="detail-actions">
-                    <button type="button" data-copy-summary={c.id} class="summary-button">
-                      复制参赛摘要
-                    </button>
-                    <a href={c.url} target="_blank" rel="noopener" class="cta-button">
-                      访问官方报名页 <span aria-hidden="true">↗</span>
-                    </a>
+                  <div>
+                    <p class="section-kicker mb-3">// 参赛打法</p>
+                    <p class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text); background: color-mix(in srgb, var(--color-accent) 7%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);">{c.strategy}</p>
+                  </div>
+                </div>
+
+                <!-- 奖励 / 卖点 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+                  <div>
+                    <p class="section-kicker mb-3">// 核心奖励 / 资源</p>
+                    <div class="flex flex-wrap gap-1.5">
+                      {c.rewards.map(r => (
+                        <span class="reward-chip">{r}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p class="section-kicker mb-3">// 必胜卖点</p>
+                    <div class="flex flex-wrap gap-1.5">
+                      {c.winning.map(w => (
+                        <span class="winning-chip">{w}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </section>
-        </div>
 
-        <div class="radar-footnote">
-          DATA UPDATED · {RADAR_UPDATED_AT} · {enriched.length} ENTRIES TRACKED · 带「参考上届」标签的届次尚未官方公告，请以主办方通知为准
-        </div>
+              <!-- 优势 / 难点 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
+                  <p class="section-kicker mb-3" style="color: var(--color-accent-2);">// + 优势</p>
+                  <ul class="space-y-2">
+                    {c.pros.map(p => (
+                      <li class="flex gap-2.5 text-sm leading-relaxed" style="color: var(--text-secondary);"><span style="color: var(--color-accent-2); margin-top: 2px;">●</span><span>{p}</span></li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
+                  <p class="section-kicker mb-3" style="color: var(--color-accent);">// ! 难点 / 风险</p>
+                  <ul class="space-y-2">
+                    {c.cons.map(p => (
+                      <li class="flex gap-2.5 text-sm leading-relaxed" style="color: var(--text-secondary);"><span style="color: var(--color-accent); margin-top: 2px;">●</span><span>{p}</span></li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 受众 + CTA -->
+              <div class="glass-card p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6" style="border-radius: var(--radius-lg);">
+                <div class="flex-1 min-w-0">
+                  <p class="section-kicker mb-2">// 适合谁</p>
+                  <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">{c.audience}</p>
+                  {c.sources?.length ? (
+                    <div class="source-links">
+                      <span class="section-kicker source-label">// 参考来源</span>
+                      {c.sources.map(source => (
+                        <a href={source.url} target="_blank" rel="noopener" class="source-link">
+                          <span>{source.title}</span>
+                          <small>{source.date}</small>
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                <div class="detail-actions">
+                  <button type="button" data-copy-summary={c.id} class="summary-button">
+                    复制参赛摘要
+                  </button>
+                  <a href={c.url} target="_blank" rel="noopener" class="cta-button">
+                    访问官方报名页 <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <div class="text-center text-[11px] pt-12 mt-12 border-t" style="color: var(--text-secondary); border-color: color-mix(in srgb, var(--border) 50%, transparent); font-family: var(--font-mono); letter-spacing: 0.05em;">
+        DATA UPDATED · {RADAR_UPDATED_AT} · {enriched.length} ENTRIES TRACKED · 带「参考上届」标签的届次尚未官方公告，请以主办方通知为准
       </div>
     </section>
   </main>
@@ -754,772 +717,6 @@ const categories = getCompetitionCategories(enriched);
       justify-content: space-between;
     }
   }
-
-  /* ============ 2026 radar density pass ============ */
-  html:has(.competition-radar-page) {
-    --bg: #06100d;
-    --surface: #0c1713;
-    --surface-strong: #12231d;
-    --surface-card: #0f1c18;
-    --surface-2: #13241f;
-    --border: rgba(130, 174, 151, 0.22);
-    --border-strong: rgba(89, 242, 174, 0.44);
-    --text: #edfff7;
-    --text-secondary: #a8beb4;
-    --text-muted: #71877c;
-    --color-accent: #49f2ae;
-    --color-accent-2: #f2c766;
-    --color-accent-dark: #1fa874;
-    --color-accent-ink: #04120d;
-  }
-
-  body:has(.competition-radar-page) {
-    background: #06100d;
-  }
-
-  .competition-radar-page {
-    --radar-panel: rgba(11, 24, 20, 0.88);
-    --radar-panel-strong: rgba(15, 34, 28, 0.94);
-    --radar-line: rgba(111, 242, 181, 0.22);
-    --radar-cyan: #79d9ff;
-    --radar-red: #ff6d61;
-    position: relative;
-    overflow: hidden;
-    min-height: 100vh;
-    background:
-      linear-gradient(rgba(73, 242, 174, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(73, 242, 174, 0.04) 1px, transparent 1px),
-      linear-gradient(180deg, #07120f 0%, #091814 52%, #050907 100%);
-    background-size: 42px 42px, 42px 42px, auto;
-    color: var(--text);
-  }
-
-  .competition-radar-page::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 7px);
-    opacity: 0.18;
-  }
-
-  .radar-shell {
-    position: relative;
-    z-index: 1;
-    max-width: 1240px;
-    margin: 0 auto;
-    padding-inline: 1.5rem;
-  }
-
-  .radar-hero {
-    padding: 4.5rem 0 1.5rem;
-  }
-
-  .radar-section {
-    padding: 1.1rem 0;
-  }
-
-  .radar-section-tight {
-    padding-top: 0.5rem;
-  }
-
-  .radar-section-last {
-    padding-bottom: 5rem;
-  }
-
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.58fr);
-    gap: 2rem;
-    align-items: center;
-  }
-
-  .radar-meta-row,
-  .console-title-row,
-  .panel-bar,
-  .block-heading,
-  .list-topline,
-  .list-meta-line,
-  .list-footer,
-  .radar-signal-row {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    min-width: 0;
-  }
-
-  .radar-meta-row span,
-  .console-title-row span,
-  .panel-bar span,
-  .block-heading span,
-  .list-code,
-  .metric-label,
-  .radar-footnote {
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .hero-copy h1 {
-    margin: 0.7rem 0 0.85rem;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: clamp(2.45rem, 6vw, 5.1rem);
-    font-weight: 700;
-    letter-spacing: 0;
-    line-height: 0.98;
-  }
-
-  .hero-brief {
-    max-width: 760px;
-    color: var(--text-secondary);
-    font-size: 0.98rem;
-    line-height: 1.85;
-  }
-
-  .radar-signal-row {
-    flex-wrap: wrap;
-    margin-top: 1.25rem;
-  }
-
-  .radar-signal-row span,
-  .pill-note {
-    min-width: 0;
-    border-color: var(--radar-line);
-    background: rgba(8, 20, 16, 0.78);
-    color: var(--text-secondary);
-  }
-
-  .radar-scope {
-    position: relative;
-    aspect-ratio: 1;
-    max-width: 320px;
-    justify-self: end;
-    border: 1px solid var(--radar-line);
-    border-radius: 999px;
-    background:
-      radial-gradient(circle, transparent 0 22%, rgba(73, 242, 174, 0.06) 22.5% 23%, transparent 23.5% 47%, rgba(73, 242, 174, 0.08) 47.5% 48%, transparent 48.5%),
-      rgba(7, 18, 15, 0.82);
-    box-shadow: inset 0 0 48px rgba(73, 242, 174, 0.09), 0 18px 60px -36px rgba(73, 242, 174, 0.5);
-    overflow: hidden;
-  }
-
-  .scope-axis,
-  .scope-ring,
-  .scope-sweep,
-  .scope-blip {
-    position: absolute;
-  }
-
-  .scope-axis {
-    background: rgba(73, 242, 174, 0.16);
-  }
-  .scope-axis-x { left: 8%; right: 8%; top: 50%; height: 1px; }
-  .scope-axis-y { top: 8%; bottom: 8%; left: 50%; width: 1px; }
-  .scope-ring { inset: 11%; border: 1px solid rgba(73, 242, 174, 0.18); border-radius: 999px; }
-  .scope-ring-2 { inset: 27%; }
-  .scope-ring-3 { inset: 43%; }
-  .scope-sweep {
-    inset: 0;
-    background: conic-gradient(from 15deg, rgba(73, 242, 174, 0.26), transparent 42deg);
-    animation: radar-spin 5s linear infinite;
-  }
-  .scope-blip {
-    width: 7px;
-    height: 7px;
-    border-radius: 999px;
-    background: var(--color-accent);
-    box-shadow: 0 0 16px var(--color-accent);
-  }
-  .blip-1 { left: 63%; top: 28%; }
-  .blip-2 { left: 35%; top: 62%; background: var(--color-accent-2); box-shadow: 0 0 16px var(--color-accent-2); }
-  .blip-3 { left: 72%; top: 69%; background: var(--radar-cyan); box-shadow: 0 0 16px var(--radar-cyan); }
-  .blip-4 { left: 24%; top: 36%; background: var(--radar-red); box-shadow: 0 0 16px var(--radar-red); }
-  .scope-readout {
-    position: absolute;
-    left: 50%;
-    bottom: 13%;
-    transform: translateX(-50%);
-    display: grid;
-    place-items: center;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
-  }
-  .scope-readout strong {
-    color: var(--color-accent);
-    font-size: 1.75rem;
-    line-height: 1;
-  }
-
-  @keyframes radar-spin {
-    to { transform: rotate(1turn); }
-  }
-
-  .radar-metrics {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.7rem;
-    margin-top: 2rem;
-  }
-
-  .metric-tile,
-  .radar-panel,
-  .mission-console,
-  .control-console,
-  .competition-index-panel {
-    border: 1px solid var(--radar-line);
-    border-radius: 8px;
-    background: linear-gradient(180deg, var(--radar-panel-strong), var(--radar-panel));
-    box-shadow: 0 24px 70px -54px rgba(73, 242, 174, 0.45);
-  }
-
-  .metric-tile {
-    padding: 0.95rem;
-  }
-  .metric-tile strong {
-    display: block;
-    margin: 0.15rem 0;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 1.9rem;
-    line-height: 1;
-  }
-  .metric-tile span:last-child {
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-  }
-  .metric-hot strong { color: var(--color-accent); }
-  .metric-warn strong { color: var(--color-accent-2); }
-  .metric-muted { opacity: 0.62; }
-
-  .mission-console {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr);
-    gap: 1.2rem;
-    padding: 1.15rem;
-  }
-
-  .mission-brief h2 {
-    margin: 0.55rem 0 0.7rem;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: clamp(1.25rem, 2.5vw, 2rem);
-    line-height: 1.25;
-    letter-spacing: 0;
-  }
-  .mission-brief p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.8;
-  }
-  .mission-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .console-title-row,
-  .block-heading,
-  .panel-bar {
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-
-  .urgent-stack {
-    display: grid;
-    gap: 0.45rem;
-  }
-
-  .urgent-chip {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
-    gap: 0.5rem;
-    align-items: center;
-    width: 100%;
-    padding: 0.56rem 0.65rem;
-    border-radius: 6px;
-    border: 1px solid rgba(242, 199, 102, 0.28);
-    background: rgba(242, 199, 102, 0.08);
-    color: var(--text);
-    text-align: left;
-  }
-  .urgent-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.82rem;
-  }
-  .urgent-meta,
-  .urgent-badge {
-    color: var(--color-accent-2);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    white-space: nowrap;
-  }
-  .urgent-badge {
-    padding: 0.12rem 0.45rem;
-    border-radius: 999px;
-    background: var(--color-accent-2);
-    color: #130e04;
-    font-weight: 700;
-  }
-
-  .control-console {
-    position: sticky;
-    top: 4.25rem;
-    z-index: 10;
-    padding: 1rem;
-  }
-  .console-led {
-    display: inline-block;
-    width: 0.45rem;
-    height: 0.45rem;
-    margin-right: 0.35rem;
-    border-radius: 999px;
-    background: var(--color-accent);
-    box-shadow: 0 0 12px var(--color-accent);
-  }
-  .filter-rows {
-    gap: 0.65rem;
-  }
-  .radar-control-grid {
-    grid-template-columns: minmax(220px, 1.25fr) minmax(150px, 0.6fr) minmax(170px, 0.7fr);
-    gap: 0.65rem;
-  }
-  .radar-input,
-  .radar-select {
-    min-height: 38px;
-    border-radius: 6px;
-    border-color: var(--radar-line);
-    background: rgba(4, 14, 11, 0.82);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-  }
-  .radar-input:focus,
-  .radar-select:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(73, 242, 174, 0.12);
-  }
-  .filter-row {
-    grid-template-columns: 5rem minmax(0, 1fr);
-    gap: 0.75rem;
-  }
-  .filter-group {
-    gap: 0.38rem;
-  }
-  .filter-chip {
-    padding: 0.32rem 0.62rem;
-    border-radius: 6px;
-    border-color: var(--radar-line);
-    background: rgba(8, 20, 16, 0.7);
-    color: var(--text-secondary);
-    font-size: 0.7rem;
-  }
-  .filter-chip.is-on {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: var(--color-accent-ink);
-  }
-
-  .radar-workbench {
-    display: grid;
-    grid-template-columns: minmax(300px, 0.38fr) minmax(0, 1fr);
-    gap: 1rem;
-    align-items: start;
-  }
-  .competition-index-panel {
-    position: sticky;
-    top: 11.7rem;
-    padding: 0.85rem;
-    max-height: calc(100vh - 12.5rem);
-    overflow: hidden;
-  }
-  .competition-list-stack {
-    display: grid;
-    gap: 0.5rem;
-    max-height: calc(100vh - 16rem);
-    overflow-y: auto;
-    padding-right: 0.25rem;
-  }
-  .cp-list-item {
-    width: 100%;
-    padding: 0.72rem;
-    border-radius: 7px;
-    border: 1px solid rgba(130, 174, 151, 0.18);
-    background: rgba(7, 18, 15, 0.68);
-    text-align: left;
-    color: var(--text);
-  }
-  .cp-list-item:hover,
-  .cp-list-item.is-active {
-    border-color: var(--color-accent);
-    background: rgba(73, 242, 174, 0.09);
-    transform: none;
-  }
-  .cp-list-item[data-status="expired"] {
-    opacity: 0.5;
-  }
-  .cp-list-item h4 {
-    margin: 0.35rem 0 0.28rem;
-    overflow: hidden;
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 0.92rem;
-    font-weight: 700;
-    line-height: 1.25;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .cp-list-item p {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0.42rem 0 0.55rem;
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    line-height: 1.55;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  .list-meta-line,
-  .list-footer {
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-  }
-  .list-footer {
-    justify-content: space-between;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(130, 174, 151, 0.16);
-  }
-  .list-footer strong {
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-  }
-  .list-footer small {
-    color: var(--text-muted);
-  }
-
-  .detail-panel {
-    display: grid;
-    gap: 1rem;
-    min-width: 0;
-  }
-  .detail-card,
-  .signal-list,
-  .action-console {
-    padding: 1rem;
-  }
-  .detail-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 150px;
-    gap: 1rem;
-    align-items: start;
-  }
-  .detail-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-bottom: 0.65rem;
-  }
-  .detail-title-zone h2 {
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: clamp(1.3rem, 2.6vw, 2rem);
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 1.22;
-  }
-  .detail-meta-grid {
-    display: grid;
-    gap: 0.4rem;
-    margin-top: 0.8rem;
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-  }
-  .detail-meta-grid span span {
-    display: inline-block;
-    width: 3.2rem;
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-  }
-  .match-console {
-    display: grid;
-    place-items: center;
-    padding: 0.9rem 0.6rem;
-    border: 1px solid rgba(73, 242, 174, 0.28);
-    border-radius: 8px;
-    background: rgba(73, 242, 174, 0.08);
-    font-family: var(--font-mono);
-  }
-  .match-console span,
-  .match-console small {
-    color: var(--text-muted);
-    font-size: 0.64rem;
-    text-transform: uppercase;
-  }
-  .match-console strong {
-    color: var(--color-accent);
-    font-size: 2.25rem;
-    line-height: 1;
-  }
-
-  .timeline-block,
-  .intel-grid,
-  .chip-section-grid {
-    margin-top: 1.2rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(130, 174, 151, 0.16);
-  }
-  .timeline-strip {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(var(--timeline-count), minmax(118px, 1fr));
-    gap: 0.4rem;
-    overflow-x: auto;
-    padding: 0.2rem 0 0.35rem;
-  }
-  .timeline-node {
-    min-width: 0;
-    padding-top: 0.2rem;
-  }
-  .timeline-node p {
-    margin: 0.45rem 0 0.1rem;
-    color: var(--text-secondary);
-    font-size: 0.72rem;
-    line-height: 1.35;
-  }
-  .timeline-node small {
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-  }
-  .timeline-dot {
-    width: 0.62rem;
-    height: 0.62rem;
-    border: 1px solid #06100d;
-    border-radius: 999px;
-    background: var(--text-muted);
-  }
-  .timeline-dot.normal { background: var(--radar-cyan); box-shadow: 0 0 12px var(--radar-cyan); }
-  .timeline-dot.critical { background: var(--color-accent-2); box-shadow: 0 0 14px var(--color-accent-2); }
-  .timeline-dot.past { opacity: 0.42; }
-
-  .intel-grid,
-  .chip-section-grid,
-  .pros-cons-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-  .intel-block p:last-child,
-  .audience-block p:last-child {
-    color: var(--text-secondary);
-    font-size: 0.86rem;
-    line-height: 1.75;
-  }
-  .intel-action p:last-child {
-    color: var(--text);
-  }
-  .chip-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.36rem;
-    margin-top: 0.55rem;
-  }
-  .reward-chip,
-  .winning-chip {
-    border-radius: 6px;
-    padding: 0.28rem 0.52rem;
-    font-size: 0.72rem;
-    line-height: 1.45;
-  }
-  .reward-chip {
-    color: var(--color-accent-2);
-    border-color: rgba(242, 199, 102, 0.28);
-    background: rgba(242, 199, 102, 0.08);
-  }
-  .winning-chip {
-    color: var(--color-accent);
-    border-color: rgba(73, 242, 174, 0.28);
-    background: rgba(73, 242, 174, 0.08);
-  }
-  .signal-list ul {
-    display: grid;
-    gap: 0.45rem;
-    margin-top: 0.7rem;
-  }
-  .signal-list li {
-    display: grid;
-    grid-template-columns: 0.45rem minmax(0, 1fr);
-    gap: 0.55rem;
-    color: var(--text-secondary);
-    font-size: 0.82rem;
-    line-height: 1.55;
-  }
-  .signal-list li span {
-    width: 0.38rem;
-    height: 0.38rem;
-    margin-top: 0.47rem;
-    border-radius: 999px;
-    background: var(--color-accent);
-  }
-  .signal-list.negative li span {
-    background: var(--radar-red);
-  }
-  .action-console {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1rem;
-    align-items: center;
-  }
-  .detail-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.55rem;
-  }
-  .summary-button,
-  .cta-button {
-    min-height: 2.4rem;
-    border-radius: 6px;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.82rem;
-  }
-  .summary-button {
-    border: 1px solid var(--radar-line);
-    background: rgba(8, 20, 16, 0.72);
-    color: var(--text);
-  }
-  .cta-button {
-    background: var(--color-accent);
-    color: var(--color-accent-ink);
-  }
-  .source-links {
-    gap: 0.4rem;
-  }
-  .source-link {
-    border-radius: 6px;
-    border-color: var(--radar-line);
-    background: rgba(8, 20, 16, 0.7);
-  }
-  .radar-footnote {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(130, 174, 151, 0.18);
-    text-align: center;
-  }
-
-  .tier-tag {
-    border-radius: 6px;
-  }
-  .status-dot {
-    width: 0.45rem;
-    height: 0.45rem;
-  }
-  .status-dot.status-urgent { background: var(--color-accent-2); }
-  .status-dot.status-ongoing { background: var(--color-accent); }
-  .status-dot.status-upcoming { background: var(--radar-cyan); }
-  .status-dot.status-expired { background: var(--text-muted); }
-  .dot-warn,
-  .dot-danger {
-    display: inline-block;
-    width: 0.38rem;
-    height: 0.38rem;
-    margin-right: 0.18rem;
-    border-radius: 999px;
-  }
-  .dot-warn { background: var(--color-accent-2); }
-  .dot-danger { background: var(--radar-red); }
-  .meta-dot {
-    width: 0.2rem;
-    height: 0.2rem;
-    border-radius: 999px;
-    background: var(--text-muted);
-  }
-  .empty-state {
-    color: var(--text-muted);
-    font-size: 0.82rem;
-  }
-
-  @media (max-width: 1040px) {
-    .hero-grid,
-    .mission-console,
-    .radar-workbench,
-    .action-console {
-      grid-template-columns: 1fr;
-    }
-    .radar-scope {
-      justify-self: start;
-      max-width: 250px;
-    }
-    .radar-metrics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .control-console,
-    .competition-index-panel {
-      position: relative;
-      top: auto;
-      max-height: none;
-    }
-    .competition-list-stack {
-      max-height: none;
-      overflow: visible;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .radar-shell {
-      padding-inline: 1rem;
-    }
-    .radar-hero {
-      padding-top: 3rem;
-    }
-    .radar-meta-row,
-    .console-title-row,
-    .panel-bar,
-    .block-heading {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 0.28rem;
-    }
-    .radar-control-grid,
-    .filter-row,
-    .detail-header,
-    .intel-grid,
-    .chip-section-grid,
-    .pros-cons-grid {
-      grid-template-columns: 1fr;
-    }
-    .filter-group {
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      padding-bottom: 0.15rem;
-    }
-    .filter-chip {
-      flex: 0 0 auto;
-      white-space: nowrap;
-    }
-    .urgent-chip {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-    }
-    .urgent-meta {
-      display: none;
-    }
-    .detail-actions,
-    .detail-actions > * {
-      width: 100%;
-    }
-    .radar-metrics {
-      grid-template-columns: 1fr;
-    }
-  }
 </style>
 
 <script is:inline>
@@ -1557,14 +754,27 @@ const categories = getCompetitionCategories(enriched);
       const listEl = items[0]?.parentElement;
       if (!items.length || !listEl) return;
 
+      const params = new URLSearchParams(window.location.search);
+      const initialSearch = params.get('q') || '';
+      if (searchEl && initialSearch) searchEl.value = initialSearch;
+
       const state = {
         cat: '全部',
         tier: '全部',
         status: '全部',
-        search: '',
+        search: initialSearch,
         sort: sortEl?.value || 'match-desc',
         selectedId: items.some(item => item.dataset.id === getAddressId()) ? getAddressId() : items[0].dataset.id,
       };
+
+      function setSearchAddress() {
+        if (!window.history) return;
+        const url = new URL(window.location.href);
+        const query = state.search.trim();
+        if (query) url.searchParams.set('q', query);
+        else url.searchParams.delete('q');
+        window.history.replaceState({}, '', url);
+      }
 
       function visibleItems() {
         return items.filter(item => !item.classList.contains('hidden'));
@@ -1699,6 +909,7 @@ const categories = getCompetitionCategories(enriched);
 
       searchEl?.addEventListener('input', () => {
         state.search = searchEl.value;
+        setSearchAddress();
         applyFilter({ address: 'replace' });
       }, { signal });
 
