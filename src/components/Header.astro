@@ -33,7 +33,7 @@ const pageLinks = [
       </span>
     </a>
 
-    <nav class="nav-links hidden lg:flex">
+    <nav class="nav-links">
       {(isHome ? homeLinks : pageLinks).map((link) => {
         const active = !isHome && (currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)));
         const isSection = link.href.startsWith('#');
@@ -49,7 +49,7 @@ const pageLinks = [
       })}
     </nav>
 
-    <div class="header-actions hidden md:flex">
+    <div class="header-actions">
       <form id="site-search-form" class="site-search" role="search" aria-label="站内搜索">
         <input id="site-search-input" type="search" name="q" placeholder="搜索站内..." autocomplete="off" />
         <kbd>⌘K</kbd>
@@ -62,13 +62,13 @@ const pageLinks = [
       <a href="/admin/" class="cta-btn" aria-label="写文章">Publish</a>
     </div>
 
-    <button id="mobile-menu-btn" class="mobile-btn md:hidden" type="button" aria-label="菜单" aria-expanded="false">
+    <button id="mobile-menu-btn" class="mobile-btn" type="button" aria-label="菜单" aria-controls="mobile-menu" aria-expanded="false">
       <span></span>
       <span></span>
     </button>
   </div>
 
-  <div id="mobile-menu" class="mobile-menu md:hidden">
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true" inert>
     <div class="mobile-inner">
       <form id="mobile-site-search-form" class="mobile-site-search" role="search" aria-label="站内搜索">
         <input id="mobile-site-search-input" type="search" name="q" placeholder="搜索工具、文章、比赛..." autocomplete="off" />
@@ -95,20 +95,27 @@ const pageLinks = [
     -webkit-backdrop-filter: saturate(180%) blur(10px);
   }
 
+  .site-header,
+  .site-header * {
+    box-sizing: border-box;
+  }
+
   .header-inner {
-    max-width: var(--container-max);
+    width: 100%;
+    max-width: 1320px;
     margin: 0 auto;
     padding: 0.85rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
+    gap: clamp(0.75rem, 1.6vw, 1.5rem);
   }
 
   .brand {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex: 0 1 17rem;
     min-width: 0;
     color: var(--text);
   }
@@ -139,6 +146,7 @@ const pageLinks = [
     font-family: var(--font-heading);
     font-size: 1.2rem;
     letter-spacing: -0.01em;
+    white-space: nowrap;
   }
 
   .brand-sub {
@@ -148,21 +156,28 @@ const pageLinks = [
     font-size: 0.62rem;
     letter-spacing: 0.11em;
     text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav-links {
     display: none;
     align-items: center;
+    flex: 0 0 auto;
     gap: 0.25rem;
+    white-space: nowrap;
   }
 
   .nav-link {
     display: inline-flex;
     align-items: center;
+    flex: 0 0 auto;
     padding: 0.5rem 0.85rem;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     font-size: 0.9rem;
+    line-height: 1.25;
+    white-space: nowrap;
     transition: color 0.15s ease, background 0.15s ease;
   }
 
@@ -175,6 +190,7 @@ const pageLinks = [
   .header-actions {
     display: none;
     align-items: center;
+    flex: 0 0 auto;
     gap: 0.5rem;
   }
 
@@ -183,7 +199,8 @@ const pageLinks = [
     align-items: center;
     gap: 0.5rem;
     height: 2.25rem;
-    min-width: 12rem;
+    width: clamp(11rem, 15vw, 15rem);
+    min-width: 0;
     padding: 0 0.55rem 0 0.8rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -201,7 +218,8 @@ const pageLinks = [
   }
 
   .site-search input {
-    width: 8.5rem;
+    flex: 1 1 auto;
+    width: 100%;
     font-size: 0.84rem;
   }
 
@@ -299,7 +317,7 @@ const pageLinks = [
     border-top: 1px solid transparent;
   }
 
-  .mobile-menu[aria-expanded="true"],
+  .mobile-menu[aria-hidden="false"],
   .mobile-menu[style*="max-height"]:not([style*="max-height: 0"]) {
     border-top-color: var(--border);
   }
@@ -356,22 +374,34 @@ const pageLinks = [
     .brand-name { font-size: 1.05rem; }
   }
 
-  @media (min-width: 768px) {
-    .header-actions {
-      display: flex;
+  @media (max-width: 1279px) {
+    .brand {
+      flex-basis: auto;
     }
 
-    .mobile-btn,
-    .mobile-menu {
+    .brand-sub {
       display: none;
     }
   }
 
+  @media (min-width: 768px) {
+    .header-actions {
+      display: flex;
+    }
+  }
+
   @media (min-width: 1024px) {
+    .mobile-btn,
+    .mobile-menu {
+      display: none;
+    }
+
     .nav-links {
       display: flex;
     }
+  }
 
+  @media (min-width: 1180px) {
     .site-search {
       display: flex;
     }
@@ -411,10 +441,50 @@ const pageLinks = [
       if (!mobileMenu || !mobileBtn) return;
       mobileMenu.style.maxHeight = '0';
       mobileBtn.setAttribute('aria-expanded', 'false');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      mobileMenu.setAttribute('inert', '');
       const lines = mobileBtn.querySelectorAll('span');
       if (lines.length === 2) {
         lines[0].style.transform = 'none';
         lines[1].style.transform = 'none';
+      }
+    };
+
+    const openMenu = () => {
+      if (!mobileMenu || !mobileBtn) return;
+      mobileBtn.setAttribute('aria-expanded', 'true');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      mobileMenu.removeAttribute('inert');
+      mobileMenu.style.maxHeight = `${mobileMenu.scrollHeight + 24}px`;
+      const lines = mobileBtn.querySelectorAll('span');
+      if (lines.length === 2) {
+        lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+        lines[1].style.transform = 'translateY(-3px) rotate(-45deg)';
+      }
+    };
+
+    const isVisible = (element) => {
+      if (!element) return false;
+      const style = window.getComputedStyle(element);
+      return style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
+    };
+
+    const focusBestSearch = () => {
+      const localSearch = Array.from(document.querySelectorAll('#tool-search, #search-input, #radar-search, #resource-search'))
+        .find((element) => isVisible(element));
+      if (localSearch) {
+        localSearch.focus();
+        return;
+      }
+
+      if (isVisible(siteSearchInput)) {
+        siteSearchInput.focus();
+        return;
+      }
+
+      if (mobileSearchInput && isVisible(mobileBtn)) {
+        openMenu();
+        window.requestAnimationFrame(() => mobileSearchInput.focus());
       }
     };
 
@@ -435,13 +505,8 @@ const pageLinks = [
     mobileBtn?.addEventListener('click', () => {
       if (!mobileMenu || !mobileBtn) return;
       const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
-      mobileBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-      mobileMenu.style.maxHeight = expanded ? '0' : `${mobileMenu.scrollHeight + 24}px`;
-      const lines = mobileBtn.querySelectorAll('span');
-      if (lines.length === 2) {
-        lines[0].style.transform = expanded ? 'none' : 'translateY(3px) rotate(45deg)';
-        lines[1].style.transform = expanded ? 'none' : 'translateY(-3px) rotate(-45deg)';
-      }
+      if (expanded) closeMenu();
+      else openMenu();
     });
 
     document.querySelectorAll('[data-mobile-link]').forEach((link) => {
@@ -476,9 +541,8 @@ const pageLinks = [
 
     window.addEventListener('keydown', (event) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
-      const localSearch = document.querySelector('#tool-search, #search-input, #radar-search, #resource-search');
       event.preventDefault();
-      (localSearch || siteSearchInput || mobileSearchInput)?.focus();
+      focusBestSearch();
     });
 
     document.addEventListener('astro:page-load', closeMenu);
