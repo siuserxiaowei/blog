@@ -6,18 +6,18 @@ const isHome = currentPath === '/';
 
 const homeLinks = [
   { href: '#home', label: '首页' },
+  { href: '#services', label: '服务' },
+  { href: '#method', label: '方法' },
+  { href: '#proof', label: '公开工作台' },
   { href: '#blog', label: '文章' },
-  { href: '/competitions', label: '比赛雷达' },
-  { href: '/tools', label: '工具箱' },
-  { href: '/about', label: '关于' },
   { href: '#contact', label: '联系' },
 ];
 
 const pageLinks = [
   { href: '/', label: '首页' },
+  { href: '/services', label: '服务' },
+  { href: '/workflows', label: '工作流' },
   { href: '/blog', label: '文章' },
-  { href: '/projects', label: '项目' },
-  { href: '/competitions', label: '比赛雷达' },
   { href: '/tools', label: '工具箱' },
   { href: '/about', label: '关于' },
 ];
@@ -71,7 +71,7 @@ const pageLinks = [
   <div id="mobile-menu" class="mobile-menu" aria-hidden="true" inert>
     <div class="mobile-inner">
       <form id="mobile-site-search-form" class="mobile-site-search" role="search" aria-label="站内搜索">
-        <input id="mobile-site-search-input" type="search" name="q" placeholder="搜索工具、文章、比赛..." autocomplete="off" />
+        <input id="mobile-site-search-input" type="search" name="q" placeholder="搜索服务、工具、文章..." autocomplete="off" />
       </form>
       {(isHome ? homeLinks : pageLinks).map((link) => (
         <a href={link.href} class="mobile-link" data-mobile-link>{link.label}</a>
@@ -427,8 +427,20 @@ const pageLinks = [
       const encoded = encodeURIComponent(query);
       const toolIntent = /工具|tool|json|yaml|csv|base64|jwt|aes|hash|token|密码|二维码|时间戳|timestamp|正则|regex|颜色|图片|curl|ai工具|chatgpt|claude|gemini|manus|grok/.test(lower);
       const competitionIntent = /比赛|赛事|竞赛|hackathon|beyond|opc|创业|报名|截止|雷达/.test(lower);
+      const voiceIntent = /语音|外呼|回访|客服|电话|通话|voice/.test(lower);
+      const automationIntent = /自动化|工作流|表格|审批|提醒|流转|n8n|流程/.test(lower);
+      const contentIntent = /内容系统|内容生产|选题|分发|知识库|知识系统|公众号|短视频/.test(lower);
+      const serviceIntent = /服务|合作|业务|方案|agent|看板|内部工具/.test(lower);
 
-      if (competitionIntent) {
+      if (voiceIntent) {
+        window.location.href = '/services#voice-agent';
+      } else if (automationIntent) {
+        window.location.href = '/services#automation-workflow';
+      } else if (contentIntent) {
+        window.location.href = '/services#content-system';
+      } else if (serviceIntent) {
+        window.location.href = '/services';
+      } else if (competitionIntent) {
         window.location.href = `/competitions?q=${encoded}`;
       } else if (toolIntent) {
         window.location.href = `/tools?q=${encoded}`;

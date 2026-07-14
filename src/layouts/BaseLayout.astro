@@ -11,8 +11,8 @@ interface Props {
 }
 
 const {
-  title = 'siuser小伟 - 思考、创造、记录',
-  description = '一个关于技术、思考与创造的个人空间',
+  title = 'siuser小伟 · AI 业务系统公开工作台',
+  description = '把重复沟通、流程转运和内容生产，拆成可上线、可复盘的 AI 业务系统。',
   showProgress = false,
   ogImage = '',
   ogType = 'website'
@@ -53,7 +53,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       '@type': 'WebSite',
       name: 'siuser小伟',
       url: 'https://siuserxiaowei.com',
-      description: '关于技术、思考与创造的个人博客',
+      description: '把重复沟通、流程转运和内容生产，拆成可上线、可复盘的 AI 业务系统。',
       author: {
         '@type': 'Person',
         name: 'siuser小伟',
@@ -73,6 +73,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
   <script is:inline>
     (() => {
+      document.documentElement.classList.add('has-js');
       const saved = localStorage.getItem('theme');
       document.documentElement.setAttribute('data-theme', saved || 'light');
     })();
@@ -114,6 +115,36 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           detail: document.documentElement.getAttribute('data-theme') || 'dark'
         })
       );
+    })();
+  </script>
+
+  <script is:inline>
+    (() => {
+      if (window.__siuserScrollRevealReady) return;
+      window.__siuserScrollRevealReady = true;
+
+      const reveal = () => {
+        const elements = Array.from(document.querySelectorAll('.scroll-reveal:not(.revealed)'));
+        if (!elements.length) return;
+
+        if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          elements.forEach((element) => element.classList.add('revealed'));
+          return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.14, rootMargin: '0px 0px -40px 0px' });
+
+        elements.forEach((element) => observer.observe(element));
+      };
+
+      document.addEventListener('astro:page-load', reveal);
+      reveal();
     })();
   </script>
 
