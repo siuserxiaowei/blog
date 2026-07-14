@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BlogCard from '../components/BlogCard.astro';
-import RunSheet from '../components/RunSheet.astro';
 import { getCollection } from 'astro:content';
 
 const allPosts = (await getCollection('blog'))
@@ -16,78 +15,78 @@ const totalPosts = allPosts.length;
 const problems = [
   {
     index: '01',
-    title: '重复沟通',
-    copy: '咨询、通知、回访和初筛靠人一通通完成；话术、记录和后续动作很难稳定。',
-    tag: '客户沟通'
+    title: '写下判断',
+    copy: '把产品、技术和学习里的真实判断写成公开日志，让想法经得起回看和修正。',
+    tag: 'Writing'
   },
   {
     index: '02',
-    title: '信息转运',
-    copy: '表格、消息、资料与状态在不同人之间反复复制、催办、汇总，流程越跑越依赖记忆。',
-    tag: '流程协作'
+    title: '做成工具',
+    copy: '把反复出现的小问题固定成浏览器里就能用的工具，少记、少搜、少绕路。',
+    tag: 'Building'
   },
   {
     index: '03',
-    title: '内容再生产',
-    copy: '选题、素材、初稿和分发每次从头开始，专家经验无法沉淀成可复用的生产系统。',
-    tag: '内容与知识'
+    title: '持续推进',
+    copy: '把项目放到公开环境里持续迭代，用外部反馈和真实使用倒逼自己把事情做完。',
+    tag: 'Shipping'
   }
 ];
 
 const methodSteps = [
   {
     index: '01',
-    title: '业务诊断',
-    copy: '先看真实动作、输入输出、人工成本和成功标准，不为了上 AI 而上 AI。',
-    detail: '场景 / 样本 / 负责人'
+    title: '从真实问题开始',
+    copy: '不从“该用什么模型”开始，先从一个确实卡住自己的高频动作开始。',
+    detail: '问题 / 场景 / 约束'
   },
   {
     index: '02',
-    title: '最小闭环',
-    copy: '用一条最小流程验证数据、话术、触发条件和异常分支，而不是先铺一个大系统。',
-    detail: 'AI 接管 / 人工兜底'
+    title: '先做能用的版本',
+    copy: '把复杂问题拆小，快速做出一个能亲自使用、能暴露问题的最小版本。',
+    detail: '原型 / 使用 / 反馈'
   },
   {
     index: '03',
-    title: '上线交接',
-    copy: '把日志、通知、权限、回滚和使用说明补齐，让流程真正能被团队接住。',
-    detail: '运行 / 通知 / 交接'
+    title: '把过程公开出来',
+    copy: '把关键判断、工具和项目进展放出来，让作品本身成为能被查看的说明。',
+    detail: '记录 / 工具 / 项目'
   },
   {
     index: '04',
-    title: '运行复盘',
-    copy: '根据真实运行数据调话术、调节点、调规则，把一次性交付变成持续变好的系统。',
-    detail: '数据 / 异常 / 迭代'
+    title: '根据使用继续迭代',
+    copy: '保留不确定性，根据真实使用、外部反馈和新的问题持续调整方向。',
+    detail: '复盘 / 修正 / 继续'
   }
 ];
 
 const systems = [
   {
     index: '01',
-    label: 'Customer communication',
-    title: '客户沟通系统',
-    subtitle: 'AI 语音机器人 / 外呼与回访',
-    copy: '让标准化电话沟通完成触达、记录、分级和回传；人工把时间留给高意向和异常情况。',
-    deliverable: '话术流程 · 多轮对话 · 线索回传 · 人工接管',
-    href: '/services#voice-agent'
+    label: 'Voice agent',
+    title: 'AI 语音机器人',
+    subtitle: '多轮对话 / 企业外呼',
+    copy: '围绕真实电话沟通场景，持续探索大模型语音交互、话术设计与可用产品形态。',
+    deliverable: '语音交互 · 对话设计 · 真实场景',
+    href: '/projects'
   },
   {
     index: '02',
-    label: 'Process operations',
-    title: '流程协作系统',
-    subtitle: '企业自动化工作流',
-    copy: '把表格、表单、消息、资料与 API 接成可追踪的流程，关键状态自动到达该处理的人。',
-    deliverable: '流程梳理 · 自动化节点 · 异常提醒 · 运行日志',
-    href: '/services#automation-workflow'
+    label: 'Content workbench',
+    title: '内容工作台',
+    subtitle: '写作 / 工具 / 公开构建',
+    copy: '把文章、工具、项目和持续形成的判断组织成一个会自己生长的个人工作台。',
+    deliverable: '内容系统 · 轻量工具 · 公开记录',
+    href: '/projects'
   },
   {
     index: '03',
-    label: 'Content & knowledge',
-    title: '内容与知识系统',
-    subtitle: '内容生产 / 分发 / 归档',
-    copy: '把选题、素材、脚本、改写、发布清单和知识沉淀连成一套长期可运行的内容系统。',
-    deliverable: '选题库 · 模板 · 多平台改写 · 知识归档',
-    href: '/services#content-system'
+    label: 'Automation experiments',
+    title: '自动化实验',
+    subtitle: '监控 / 代理 / 小系统',
+    copy: '把重复动作连接成小而清晰的自动化流程，优先解决自己真的会反复遇到的问题。',
+    deliverable: '自动化代理 · 使用监控 · 迭代实验',
+    href: '/projects'
   }
 ];
 
@@ -115,21 +114,18 @@ const proofs = [
   }
 ];
 
-const runSheetFields = [
-  { label: '场景', value: '续费前的客户回访' },
-  { label: '重复动作', value: '触达 · 确认 · 记录' },
-  { label: 'AI 接管', value: '外呼 · 归类 · 回填' },
-  { label: '人工兜底', value: '异常 / 高意向跟进' },
-  { label: '成功标准', value: '记录完整，可被复盘' }
+const nowItems = [
+  { index: '01', title: 'AI 语音机器人', copy: '多轮对话与企业外呼', href: '/projects' },
+  { index: '02', title: '内容工作台', copy: '写作、工具、公开构建', href: '/projects' },
+  { index: '03', title: '自动化实验', copy: '把重复动作连成流程', href: '/projects' }
 ];
 
-const emailSubject = '%E6%83%B3%E6%8B%86%E4%B8%80%E6%9D%A1%E9%87%8D%E5%A4%8D%E6%B5%81%E7%A8%8B';
-const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
+const contactHref = 'mailto:hi@siuserxiaowei.com';
 ---
 
 <BaseLayout
-  title="siuser小伟 · 让 AI 在业务里跑起来"
-  description="siuser小伟把重复沟通、流程转运和内容生产，拆成有人机分工、可上线、可复盘的 AI 业务系统。"
+  title="siuser小伟 · 独立工作台"
+  description="持续记录并公开构建 AI、自动化、产品工程与学习系统。"
 >
   <Header />
 
@@ -137,45 +133,59 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
     <section id="home" class="container hero-section">
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="animate-fade-in stagger-1 section-kicker">AI BUSINESS SYSTEMS · PUBLIC WORKBENCH</p>
+          <p class="animate-fade-in stagger-1 section-kicker">SIUSER 小伟 · AI / AUTOMATION / BUILD IN PUBLIC</p>
 
           <h1 class="animate-fade-in stagger-2 hero-title display-serif">
-            让 AI 在<em>业务里</em>跑起来，<br />
-            而不只停在演示里。
+            把有用的 AI，<br />
+            做成<em>能被真正使用</em>的东西。
           </h1>
 
           <p class="animate-fade-in stagger-3 hero-lede">
-            我把重复沟通、流程转运和内容生产，拆成有人机分工、可上线、可复盘的业务工作流。
-            先跑通一条真实流程，再把它做成团队接得住的系统。
+            这是我的公开工作台：记录 AI、自动化、产品工程和学习系统。
+            一部分写成文章，一部分做成工具，一部分继续推进到上线。
           </p>
 
           <div class="animate-fade-in stagger-4 hero-actions">
-            <a href={contactHref} class="btn-primary">带着一条重复流程来聊 <span>→</span></a>
-            <a href="#method" class="btn-ghost">看我怎么拆 <span>↓</span></a>
+            <a href="/projects" class="btn-primary">看正在构建的项目 <span>→</span></a>
+            <a href="/blog" class="btn-ghost">读最近文章 <span>→</span></a>
           </div>
 
           <p class="hero-note animate-fade-in stagger-5">
-            <span>不是卖魔法</span>
+            <span>写下判断</span>
             <i></i>
-            <span>是先跑通一条真实流程</span>
+            <span>做成工具</span>
+            <i></i>
+            <span>持续推进</span>
           </p>
         </div>
 
-        <div class="hero-ticket animate-fade-in stagger-3">
-          <RunSheet
-            title="客户回访 / 每日任务"
-            summary="一张“流程运行单”示意：先把任务的边界、分工和成功标准写清楚。"
-            fields={runSheetFields}
-            status="示意运行中"
-          />
-        </div>
+        <aside class="now-rail animate-fade-in stagger-3" aria-label="正在构建的方向">
+          <div class="now-head">
+            <span>NOW</span>
+            <span>2026</span>
+          </div>
+          <ol class="now-list">
+            {nowItems.map((item) => (
+              <li>
+                <a href={item.href}>
+                  <span class="now-index">{item.index}</span>
+                  <span class="now-copy">
+                    <strong>{item.title}</strong>
+                    <small>{item.copy}</small>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+          <a href="/projects" class="now-link">查看项目台账 <span>↗</span></a>
+        </aside>
       </div>
     </section>
 
-    <section id="problems" class="container section-block problem-section">
+    <section id="work" class="container section-block problem-section">
       <div class="section-heading narrow-heading">
-        <p class="section-kicker">START WITH THE FRICTION</p>
-        <h2 class="display-serif section-title">不是所有事情都该 AI 化。<br />先看<strong>哪一段重复，正在拖慢业务。</strong></h2>
+        <p class="section-kicker">HOW THIS SITE GROWS</p>
+        <h2 class="display-serif section-title">不是把个人经历摆出来。<br />是把<strong>正在做的事情持续放出来。</strong></h2>
       </div>
 
       <div class="problem-grid">
@@ -195,10 +205,10 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
     <section id="method" class="container section-block method-section">
       <div class="section-heading method-heading">
         <div>
-          <p class="section-kicker">FROM FIELD TO SYSTEM</p>
-          <h2 class="display-serif section-title">把一个问题，走成一条<br /><em>能持续运行</em>的流程。</h2>
+          <p class="section-kicker">BUILD LOOP</p>
+          <h2 class="display-serif section-title">把一个模糊想法，推进成<br /><em>能持续使用</em>的东西。</h2>
         </div>
-        <p>核心不是“接上模型”这一刻，而是把 AI 做什么、人保留什么、异常怎么处理和怎样验收都提前写进系统。</p>
+        <p>我更在意从问题到使用的完整闭环：先做出来，再让真实反馈决定下一步，而不是把概念包装得很完整。</p>
       </div>
 
       <ol class="method-list">
@@ -215,13 +225,13 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
       </ol>
     </section>
 
-    <section id="services" class="container section-block systems-section">
+    <section id="projects" class="container section-block systems-section">
       <div class="section-heading systems-heading">
         <div>
-          <p class="section-kicker">SYSTEM PATHS</p>
-          <h2 class="display-serif section-title">三条常见的<br />业务系统路径。</h2>
+          <p class="section-kicker">CURRENT DIRECTIONS</p>
+          <h2 class="display-serif section-title">现在持续推进的<br />三个方向。</h2>
         </div>
-        <p>内部工具与数据看板是承载层：它们服务于一条已经跑通的沟通、协作或内容流程，而不是为了多做一个页面。</p>
+        <p>它们不是包装用的能力标签，而是我正在反复做、反复使用、也会继续公开记录的长期主题。</p>
       </div>
 
       <div class="systems-list">
@@ -233,7 +243,7 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
               <h3 class="display-serif">{system.title}</h3>
               <p class="system-subtitle">{system.subtitle}</p>
               <p class="system-copy">{system.copy}</p>
-              <p class="system-deliverable"><span>交付结构</span>{system.deliverable}</p>
+              <p class="system-deliverable"><span>关注点</span>{system.deliverable}</p>
             </div>
             <span class="system-arrow" aria-hidden="true">→</span>
           </a>
@@ -241,15 +251,15 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
       </div>
 
       <div class="systems-action">
-        <a href="/services" class="text-link">看完整交付方向 <span>→</span></a>
-        <a href="/workflows" class="text-link muted">看工作流拆解 <span>→</span></a>
+        <a href="/projects" class="text-link">查看项目台账 <span>→</span></a>
+        <a href="/tools" class="text-link muted">进入工具箱 <span>→</span></a>
       </div>
     </section>
 
     <section id="proof" class="container section-block proof-section">
       <div class="section-heading proof-heading">
-        <p class="section-kicker">PUBLIC EVIDENCE</p>
-        <h2 class="display-serif section-title">公开工作台不是分散的入口，<br />而是持续工作的<strong>证据层。</strong></h2>
+        <p class="section-kicker">PUBLIC WORKBENCH</p>
+        <h2 class="display-serif section-title">公开的东西不是装饰，<br />而是我持续工作的<strong>痕迹。</strong></h2>
       </div>
 
       <div class="proof-grid">
@@ -293,16 +303,16 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
     <section id="contact" class="container section-block contact-section">
       <div class="contact-card">
         <div class="contact-copy">
-          <p class="section-kicker">START WITH ONE FLOW</p>
-          <h2 class="display-serif section-title">带着一条正在重复的流程来，<br /><em>我们先判断它值不值得做。</em></h2>
-          <p>不需要先写一份大需求。把现有的话术、表格、消息记录、流程描述或你希望改善的一个指标带来，就能从最小闭环开始聊。</p>
+          <p class="section-kicker">CONTACT</p>
+          <h2 class="display-serif section-title">做类似方向的，<br /><em>直接找我。</em></h2>
+          <p>AI、自动化、内容产品、学习工具这些方向都可以聊。希望结识一起做东西的人，而不只是交换名片。</p>
         </div>
         <div class="contact-action">
-          <a href={contactHref} class="btn-primary contact-primary">发邮件拆流程 <span>→</span></a>
+          <a href={contactHref} class="btn-primary contact-primary">发邮件联系我 <span>→</span></a>
           <ul aria-label="开始沟通前可以准备的材料">
-            <li><span>01</span>一段真实流程或原始材料</li>
-            <li><span>02</span>谁负责、谁使用、哪里最卡</li>
-            <li><span>03</span>跑通后如何判断有价值</li>
+            <li><span>01</span>正在做或想做的一件事</li>
+            <li><span>02</span>一个确实卡住你的问题</li>
+            <li><span>03</span>你希望一起推进的方向</li>
           </ul>
         </div>
       </div>
@@ -321,25 +331,25 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
   }
 
   .hero-section {
-    padding-top: clamp(4.75rem, 9vw, 8rem);
-    padding-bottom: clamp(3.5rem, 7vw, 6.5rem);
+    padding-top: clamp(5.5rem, 10vw, 8.5rem);
+    padding-bottom: clamp(3.75rem, 7vw, 6.5rem);
   }
 
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.14fr) minmax(19rem, 0.86fr);
-    gap: clamp(2.5rem, 6vw, 6rem);
-    align-items: center;
+    grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 0.62fr);
+    gap: clamp(3rem, 8vw, 9rem);
+    align-items: end;
   }
 
   .hero-copy {
-    max-width: 42rem;
+    max-width: 47rem;
   }
 
   .hero-title {
     margin-top: 1.15rem;
-    font-size: clamp(2.65rem, 5.8vw, 5.15rem);
-    line-height: 1.03;
+    font-size: clamp(2.8rem, 6.4vw, 5.75rem);
+    line-height: 1.01;
     letter-spacing: -0.03em;
     text-wrap: balance;
   }
@@ -353,10 +363,10 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
   }
 
   .hero-lede {
-    max-width: 39rem;
+    max-width: 41rem;
     margin-top: 1.55rem;
     color: var(--text-secondary);
-    font-size: clamp(1rem, 1.35vw, 1.14rem);
+    font-size: clamp(1rem, 1.35vw, 1.16rem);
     line-height: 1.9;
     text-wrap: pretty;
   }
@@ -429,20 +439,112 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
     background: var(--color-accent);
   }
 
-  .hero-ticket {
+  .now-rail {
     position: relative;
+    max-width: 20rem;
+    padding: 0.15rem 0 0.1rem 1.3rem;
+    border-left: 1px solid var(--border-strong);
   }
 
-  .hero-ticket::after {
+  .now-rail::before {
     position: absolute;
-    z-index: -1;
-    right: -1.25rem;
-    bottom: -1.25rem;
-    width: 56%;
-    height: 45%;
-    border-right: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
+    top: 0;
+    left: -1px;
+    width: 3px;
+    height: 2.1rem;
+    background: var(--color-accent);
     content: '';
+  }
+
+  .now-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .now-head span:first-child {
+    color: var(--color-accent);
+  }
+
+  .now-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .now-list li {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .now-list a {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0.7rem;
+    padding: 0.85rem 0;
+    color: var(--text);
+    transition: color 0.16s ease, padding 0.16s ease;
+  }
+
+  .now-list a:hover {
+    padding-left: 0.25rem;
+    color: var(--color-accent);
+  }
+
+  .now-index {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+  }
+
+  .now-copy {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .now-copy strong {
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .now-copy small {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .now-link {
+    display: inline-flex;
+    gap: 0.42rem;
+    margin-top: 1rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: border-color 0.16s ease, color 0.16s ease;
+  }
+
+  .now-link span {
+    color: var(--color-accent);
+  }
+
+  .now-link:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
 
   .section-block {
@@ -851,8 +953,43 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
       grid-template-columns: 1fr;
     }
 
-    .hero-ticket {
-      max-width: 34rem;
+    .hero-grid {
+      gap: 2.5rem;
+    }
+
+    .now-rail {
+      width: 100%;
+      max-width: none;
+      padding: 1.1rem 0 0;
+      border-top: 1px solid var(--border-strong);
+      border-left: 0;
+    }
+
+    .now-rail::before {
+      top: -1px;
+      left: 0;
+      width: 2.1rem;
+      height: 3px;
+    }
+
+    .now-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .now-list li {
+      border-bottom: 0;
+      border-left: 1px solid var(--border);
+    }
+
+    .now-list li:first-child {
+      border-left: 0;
+    }
+
+    .now-list a {
+      min-height: 5.7rem;
+      grid-template-columns: 1.8rem minmax(0, 1fr);
+      padding: 0.9rem 0.75rem;
     }
 
     .method-heading > p,
@@ -927,6 +1064,21 @@ const contactHref = `mailto:hi@siuserxiaowei.com?subject=${emailSubject}`;
 
     .hero-note i {
       margin-top: 0.5rem;
+    }
+
+    .now-list {
+      grid-template-columns: 1fr;
+      border-bottom: 0;
+    }
+
+    .now-list li {
+      border-bottom: 1px solid var(--border);
+      border-left: 0;
+    }
+
+    .now-list a {
+      min-height: 0;
+      padding: 0.72rem 0;
     }
   }
 </style>
