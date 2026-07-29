@@ -10,6 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "test:data": "node --test tests/competitions-data.test.mjs",
+    "radar:check": "node scripts/competition-audit.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name=siuserxiaowei-blog --branch=main"
   },
   "dependencies": {

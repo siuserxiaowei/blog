@@ -1,3 +1,10 @@
+import {
+  getPrimaryDeadline,
+  normalizeCompetitionCollection,
+  validateCompetitionCollectionV2,
+} from './competition-schema.js';
+import { competitionV2Overrides } from './competition-v2-overrides.js';
+
 export const RADAR_UPDATED_AT = '2026-07-30';
 
 export const DAY_MS = 86400000;
@@ -70,6 +77,12 @@ function trackedCompetition({
   timeline,
   sources,
   url,
+  deadlines,
+  primaryDeadline,
+  verification,
+  recordType,
+  seriesId,
+  parentId,
 }) {
   return {
     id,
@@ -92,8 +105,14 @@ function trackedCompetition({
     cons,
     winning,
     timeline: timeline ?? [{ event: '提交截止', date: deadlineISO, critical: true }],
-    sources: sources ?? [{ title: `官方赛事页｜${name}`, date: RADAR_UPDATED_AT, url }],
+    sources: sources ?? [{ title: `赛事页面｜${name}`, date: RADAR_UPDATED_AT, url }],
     url,
+    ...(deadlines ? { deadlines } : {}),
+    ...(primaryDeadline ? { primaryDeadline } : {}),
+    ...(verification ? { verification } : {}),
+    ...(recordType ? { recordType } : {}),
+    ...(seriesId ? { seriesId } : {}),
+    ...(parentId ? { parentId } : {}),
   };
 }
 
@@ -123,7 +142,7 @@ function xfyunSkillCompetition({ id, name, fullName = name, flag, desc, strategy
   });
 }
 
-export const competitions = [
+export const competitions = normalizeCompetitionCollection([
   trackedCompetition({
     id:'amddevmaster2026', name:'AMD AI DevMaster', fullName:'AMD AI DevMaster Hackathon 2026',
     org:'AMD · PyTorch Foundation 社区', rel:'A+', loc:'全球线上 · 个人或最多 3 人团队', date:'截止 2026-08-06 23:59 北京时间',
@@ -2214,7 +2233,213 @@ export const competitions = [
     timeline:[{event:'席位招募开启',date:'2026-04-29',critical:false},{event:'活动当天 ⚠️',date:'2026-05-10',critical:true}],
     url:'https://mp.weixin.qq.com/s/4iUCXey2YftKf0a6Lh-T-w',
     sources:[{title:'AI.X 硬件社 陈大叔 · 北京 5.10 AI极客争霸赛招募',date:'2026-04-29',url:'https://mp.weixin.qq.com/s/4iUCXey2YftKf0a6Lh-T-w'}] },
-];
+  trackedCompetition({
+    id:'pazhou-super-claw-2026', name:'琶洲「超级龙虾」挑战赛', fullName:'第五届琶洲算法大赛 · AI 创新应用赛「超级龙虾」挑战赛',
+    org:'琶洲算法大赛组委会', rel:'A+', loc:'全球线上 · 最多 3 人团队', date:'作品截止 2026-08-05',
+    deadlineISO:'2026-08-05', tier:'S', cat:'AI 软件', match:9.5, suit:'很高',
+    desc:'以 OpenClaw 为核心技术载体，设智能办公、智慧生活、高效学习与创作三条平行赛道。必须提交项目 PPT 与 3—5 分钟真实本地运行视频，禁止用包装视频替代可运行作品。',
+    strategy:'用已有 Agent 工作流直接收敛成一个高频场景，重点展示记忆、心跳或多智能体编排的实际调用；先保证本地稳定运行，再做演示叙事。',
+    audience:'高校学生、企业研发团队、独立开发者、开源贡献者；每队不超过 3 人',
+    rewards:['每赛道金奖 1.8 万元','每赛道银奖 2 名 × 9000 元','每赛道铜奖 3 名 × 5000 元','每赛道优胜奖 5 名 × 1000 元'],
+    pros:['软件与 Agent 高度匹配','全球开放','个人和小队可投','奖项按赛道分配'],
+    cons:['截止很近','必须使用 OpenClaw 核心框架','需真实本地部署演示'],
+    winning:['OpenClaw 使用深度','真实痛点','本地运行稳定性','创意与完成度'],
+    timeline:[{event:'报名与作品截止',date:'2026-08-05',critical:true},{event:'线上决赛（暂定）',date:'2026-09-20',critical:false}],
+    deadlines:[{type:'submission',date:'2026-08-05',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与初赛作品截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-08-05',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与初赛作品截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'奖金为拟设置、税前；决赛日期仍为暂定。'},
+    recordType:'track', seriesId:'pazhou-ai-innovation-2026',
+    sources:[{title:'琶洲算法大赛｜超级龙虾挑战赛规则',date:'2026-07-30',url:'https://www.aicompetition-pz.com/topic_detail/33',kind:'official'}],
+    url:'https://www.aicompetition-pz.com/topic_detail/33' }),
+  trackedCompetition({
+    id:'pazhou-ai-application-2026', name:'琶洲 AI 创新应用赛', fullName:'第五届琶洲算法大赛 · AI 创新应用赛',
+    org:'琶洲算法大赛组委会', rel:'A+', loc:'全球 · 个人 / 团队 / 企业 / 院校', date:'报名截止 2026-09-15',
+    deadlineISO:'2026-09-15', tier:'S', cat:'AI 软件', match:9.3, suit:'很高',
+    desc:'面向可落地的 AI 软硬件解决方案，设 AI+软件应用与智能硬件产品两条赛道。软件方向明确覆盖 Agent、RAG、多模态、智能问答、数据分析和低代码产品；初次报名只需提交 BP。',
+    strategy:'优先投软件应用赛，围绕已有真实用户和付费数据说明痛点、技术方案、商业模式与验证结果；不要把 BP 写成纯技术功能清单。',
+    audience:'全球开发者、创业团队、科技企业、高校和科研院所',
+    rewards:['每赛道冠军 8 万元','优质项目直通投资路演','超 1000 万元专项落地扶持为政策资源上限，并非单队现金','场景订单与招聘绿色通道'],
+    pros:['软件赛道边界清晰','报名周期充足','只需先交 BP','有产业落地与场景撮合'],
+    cons:['政策扶持不等于现金奖','需要商业与验证数据','后续落地权益需另行评审'],
+    winning:['真实场景','商业价值','技术领先性','项目验证数据'],
+    timeline:[{event:'报名与 BP 截止',date:'2026-09-15',critical:true}],
+    deadlines:[{type:'submission',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与 BP 截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与 BP 截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'政策落地扶持按项目与落地条件评审，不应写成 guaranteed prize。'},
+    recordType:'competition', seriesId:'pazhou-ai-innovation-2026',
+    sources:[{title:'琶洲算法大赛｜AI 创新应用赛报名通知',date:'2026-06-17',url:'https://www.aicompetition-pz.com/event_detail/117',kind:'official'}],
+    url:'https://www.aicompetition-pz.com/event_detail/117' }),
+  trackedCompetition({
+    id:'guangzhou-super-agent-2026', name:'广州超级智能体大赛', fullName:'2026 广州超级智能体大赛',
+    org:'广州市人工智能产业发展工作专班相关单位', rel:'A', loc:'广州 · 具体参赛边界待规则页确认', date:'2026-06-18 启动 · 报名截止待公告',
+    deadlineISO:'2026-12-31', tier:'A', cat:'AI 软件', match:8.8, suit:'关注',
+    desc:'广州于 6 月 18 日启动的超级智能体赛事，面向智能体产品和真实场景应用。政府新闻已确认启动，但公开稿未完整披露统一报名截止、奖金与详细资格，应作为高价值跟踪项而不是制造假倒计时。',
+    strategy:'先准备可运行 Agent、用户数据和广州落地场景说明，等待正式规则页后再决定投入；现阶段只加入关注清单。',
+    audience:'智能体产品、场景解决方案与 AI 创业团队；最终资格以正式规则为准',
+    rewards:['产业场景与生态对接','奖金及扶持额度待正式规则确认'],
+    pros:['广州政府产业信号强','软件 Agent 高度相关','适合场景落地型团队'],
+    cons:['统一截止日未公开','奖金未公开','资格和提交物仍需复核'],
+    winning:['可运行智能体','真实场景','产业落地性','数据与安全边界'],
+    timeline:[{event:'赛事启动',date:'2026-06-18',critical:false},{event:'规则更新占位（非截止）',date:'2026-12-31',critical:false}],
+    deadlines:[{type:'registration',date:null,certainty:'unknown',timezone:'Asia/Shanghai',label:'正式报名截止待公告',primary:true}],
+    primaryDeadline:{type:'registration',date:null,certainty:'unknown',timezone:'Asia/Shanghai',label:'正式报名截止待公告'},
+    verification:{status:'partially-verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'政府来源确认启动；截止、奖金和完整资格尚缺正式规则。'},
+    sources:[{title:'广州市科技局｜广州超级智能体赛事启动报道',date:'2026-06-18',url:'https://kjj.gz.gov.cn/xwlb/yw/content/post_10865186.html',kind:'official'}],
+    url:'https://kjj.gz.gov.cn/xwlb/yw/content/post_10865186.html' }),
+  trackedCompetition({
+    id:'vacat-2026', name:'VACAT AI 视觉艺术挑战赛', fullName:'VACAT 2026 AI 视觉艺术挑战赛',
+    org:'深圳市龙岗区相关单位', rel:'A', loc:'全球线上征集 · 视频 / 图像 / 穹顶影像', date:'常规赛截止 2026-08-31 · 穹顶赛 10-20',
+    deadlineISO:'2026-08-31', tier:'A', cat:'创意 AI', match:8.4, suit:'高',
+    desc:'面向专业团队、学生、独立创作者和爱好者的 AI 视觉内容赛事，普通及专项赛道 8 月 31 日截止，穹顶影像赛道 10 月 20 日截止。',
+    strategy:'软件团队可用自研工作流制作短片参赛并反向展示工具能力；先选普通视频或图像赛，穹顶赛需额外适配沉浸式规格。',
+    audience:'全球 AI 视觉创作者、学生、独立创作者与专业团队',
+    rewards:['视频类最高 2 万元','图像类最高 1 万元','穹顶影像最高 8 万元','抖音流量与孵化资源'],
+    pros:['全球开放','个人可投','图像与视频提交门槛多档','政府来源明确'],
+    cons:['穹顶赛制作规格特殊','平台传播授权需核对','不同赛道截止不同'],
+    winning:['视觉完成度','AI 创作方法','叙事与审美','格式合规'],
+    timeline:[{event:'常规 / 专项作品截止',date:'2026-08-31',critical:true},{event:'穹顶影像截止',date:'2026-10-20',critical:false}],
+    deadlines:[{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'常规及专项赛道截止',primary:true},{type:'submission',date:'2026-10-20',certainty:'confirmed',timezone:'Asia/Shanghai',label:'穹顶影像赛道截止'}],
+    primaryDeadline:{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'常规及专项赛道截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'不同赛道奖金和截止不同，不合并成单一最高奖。'},
+    sources:[{title:'深圳市龙岗区政府｜VACAT 赛事通知',date:'2026-07-10',url:'https://www.lg.gov.cn/gkmlpt/content/12/12890/post_12890803.html',kind:'official'}],
+    url:'https://www.lg.gov.cn/gkmlpt/content/12/12890/post_12890803.html' }),
+  trackedCompetition({
+    id:'cuhkx-2026', name:'CUHK-X 多模态挑战赛', fullName:'CUHK-X Privacy-Preserving Multimodal Challenge 2026',
+    org:'香港中文大学 Open AIoT Lab · UbiComp 2026', rel:'A+', loc:'全球线上 · 最多 3 人团队', date:'截止 2026-09-15',
+    deadlineISO:'2026-09-15', tier:'A', cat:'数据算法', match:7.9, suit:'中高',
+    desc:'围绕不使用 RGB 的隐私保护多模态感知开展两条赛道，前 15 名进入复核，前 6 名在 UbiComp 上海决赛，可远程答辩。',
+    strategy:'适合已有时序、多传感器或边缘感知能力的团队；从可复现基线和隐私收益切入，不要临时重做整套硬件。',
+    audience:'全球高校、研究者和多模态感知开发者；每队最多 3 人',
+    rewards:['两赛道总奖金 $20,000','每赛道奖池 $10,000','决赛队可申请 $500 差旅补助','UbiComp 展示'],
+    pros:['全球开放','可远程决赛','隐私保护主题清晰','论文与工程双重曝光'],
+    cons:['前列团队需开源代码','Apache-2.0 要求需接受','数据仅限非商业使用'],
+    winning:['多模态性能','隐私保护','复现性','方法创新'],
+    timeline:[{event:'注册与提交截止',date:'2026-09-15',critical:true},{event:'UbiComp 决赛',date:'2026-10-11',critical:false}],
+    deadlines:[{type:'submission',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Shanghai',label:'注册与提交截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Shanghai',label:'注册与提交截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'入围代码须按规则在决赛后 30 天内以 Apache-2.0 开源。'},
+    sources:[{title:'CUHK Open AIoT Lab｜CUHK-X Challenge',date:'2026-07-30',url:'https://openaiotlab.github.io/CUHK-X-Challenge/',kind:'official'}],
+    url:'https://openaiotlab.github.io/CUHK-X-Challenge/' }),
+  trackedCompetition({
+    id:'global-digital-education-2026', name:'全球数字教育创新大赛', fullName:'2026 全球数字教育创新大赛 · AI for Teaching and Learning',
+    org:'北京大学数字化学习研究中心 DI-IDEA', rel:'A+', loc:'全球 · 教育数字化项目', date:'初赛报名截止 2026-08-31',
+    deadlineISO:'2026-08-31', tier:'S', cat:'AI 软件', match:9.2, suit:'很高',
+    desc:'面向教学与学习创新项目的全球赛事，AI for Teaching and Learning 方向覆盖智能辅导、课程与内容、评测反馈和教育管理等应用。',
+    strategy:'用真实教师用户、学习效果和可复用教学流程参赛；材料中把“AI 功能”转写为对教学行为和学习结果的可验证改善。',
+    audience:'高校、教育机构、教师团队及教育技术创新项目；具体组别资格以报名系统为准',
+    rewards:['金奖 4 项 × 3 万元','银奖 8 项 × 1 万元','铜奖 32 项 × 5000 元','另设优秀奖'],
+    pros:['教育软件高度匹配','奖金梯度明确','北京大学平台曝光','截止尚可准备'],
+    cons:['需按具体组别核对资格','教育成效证据要求高','跨境材料可能需英文'],
+    winning:['教学创新','真实学习效果','可扩展性','责任与隐私'],
+    timeline:[{event:'报名与初赛材料截止',date:'2026-08-31',critical:true}],
+    deadlines:[{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与初赛材料截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'报名与初赛材料截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'参赛资格按具体赛道和报名系统复核；奖金为全赛事对应奖项，不保证单一项目获得。'},
+    sources:[{title:'北京大学 DI-IDEA｜Competition 2026',date:'2026-07-30',url:'https://diidea.pku.edu.cn/competition2026/',kind:'official'}],
+    url:'https://diidea.pku.edu.cn/competition2026/' }),
+  trackedCompetition({
+    id:'malanshan-ai-microdrama-2026', name:'马栏山杯 AI 微短剧赛', fullName:'2026 视听中国 · 马栏山杯 AI 微短剧创智大赛',
+    org:'湖南省广播电视局 · 湖南马栏山集团 · 芒果 TV 等', rel:'A+', loc:'全球征集 · 个人或团队', date:'作品截止 2026-08-31',
+    deadlineISO:'2026-08-31', tier:'A', cat:'创意 AI', match:8.6, suit:'高',
+    desc:'面向全球征集横屏和竖屏 AI 微短剧，覆盖新国风、女性视角、创新题材和公版 IP 改编。横屏需大于 2 分钟 × 3 集，竖屏需大于 1 分钟 × 5 集。',
+    strategy:'软件团队可用一部完成度高的短剧展示全链路生成能力；优先选公版 IP 或单一创新题材，严格保存素材、模型与授权记录。',
+    audience:'全球 AI 影像团队、个人创作者和微短剧制作机构',
+    rewards:['作品奖与单项奖，现金金额未在政府方案中披露','项目创制启动资金','马栏山签约与园区机会','芒果 TV / 风芒平台运营与出海支持'],
+    pros:['政府正式方案','全球个人可投','产业发行资源强','软件创作链可复用'],
+    cons:['现金金额未披露','多集制作量较大','内容与版权审核严格'],
+    winning:['叙事完整性','AI 创作质量','版权合规','平台传播潜力'],
+    timeline:[{event:'作品征集截止',date:'2026-08-31',critical:true},{event:'评审',date:'2026-09-30',critical:false},{event:'总决赛颁奖窗口',date:'2026-11-30',critical:false}],
+    deadlines:[{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'作品征集截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-08-31',certainty:'confirmed',timezone:'Asia/Shanghai',label:'作品征集截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'政府方案未公布现金奖，不能自行补写金额。'},
+    sources:[{title:'湖南省广播电视局｜2026 马栏山杯活动方案',date:'2026-06-11',url:'https://gbdsj.hunan.gov.cn/gbdsj/xxgk/tzgg/202606/t20260611_33999282.html',kind:'official'}],
+    url:'https://aigc.mgtv.com/challenges/detail?id=15' }),
+  trackedCompetition({
+    id:'we-are-human-film-2026', name:'We Are Human AI 电影赛', fullName:'We Are Human International AI Film Competition 2026',
+    org:'We Are Human Foundation', rel:'A', loc:'全球线上 · 18+', date:'截止 2026-09-30 23:59 CEST',
+    deadlineISO:'2026-09-30', tier:'A', cat:'创意 AI', match:8.0, suit:'中高',
+    desc:'全球 AI 电影征集，接受个人或团队提交 1—10 分钟作品；作品须在 2025 年 6 月 1 日之后完成，并提交伦理创作说明，入选作品需有英文字幕。',
+    strategy:'适合把产品能力做成一部短而完整的故事片；伦理说明应如实解释 AI 的使用位置、人工决策和素材来源。',
+    audience:'全球年满 18 岁的个人与团队',
+    rewards:['入选与评审荣誉','国际展映与基金会传播','规则页未披露固定现金奖'],
+    pros:['全球开放','作品时长灵活','强调负责任 AI','适合小团队'],
+    cons:['无明确现金奖','入选作品有宣传许可','需伦理说明与字幕'],
+    winning:['人类主题','电影完成度','AI 使用透明度','伦理与版权'],
+    timeline:[{event:'作品提交截止',date:'2026-09-30',critical:true}],
+    deadlines:[{type:'submission',date:'2026-09-30',certainty:'confirmed',timezone:'Europe/Paris',label:'作品提交截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-09-30',certainty:'confirmed',timezone:'Europe/Paris',label:'作品提交截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'入选作品授予 24 个月非独占宣传许可；固定现金奖未披露。'},
+    sources:[{title:'We Are Human Foundation｜Rules & Terms',date:'2026-07-30',url:'https://wearehuman.foundation/en/rules-terms/',kind:'official'}],
+    url:'https://wearehuman.foundation/en/rules-terms/' }),
+  trackedCompetition({
+    id:'world-usability-design-2026', name:'世界可用性设计挑战', fullName:'World Usability Design Challenge 2026 · Designing a Sustainable Future with Ethical AI',
+    org:'World Usability Initiative · HCI International', rel:'A+', loc:'全球线上 · 产品 / 服务设计', date:'截止 2026-09-18',
+    deadlineISO:'2026-09-18', tier:'A', cat:'AI 软件', match:8.7, suit:'高',
+    desc:'征集围绕可持续未来与伦理 AI 的用户中心设计案例。必须有可交互原型、代表性用户测试，以及研究洞察如何改变设计决策的证据；报告最长 1 万词。',
+    strategy:'不要只交产品介绍。把用户研究、原型测试、发现、设计改动和结果串成证据链，尤其说明伦理框架如何落进功能与流程。',
+    audience:'全球 UX、产品、研究与 AI 应用团队',
+    rewards:['金奖 $1,250','银奖 $1,000','铜奖 $750','获奖者获邀并免注册费参加 HCII 2027 专场'],
+    pros:['软件产品可直接参赛','评审标准透明','现金与国际会议曝光','伦理 AI 主题明确'],
+    cons:['需真实用户研究','报告量较大','不是纯 Demo 黑客松'],
+    winning:['用户研究质量','UX 评估质量','研究到设计的证据链','伦理框架'],
+    timeline:[{event:'报告与原型截止',date:'2026-09-18',critical:true},{event:'获奖公布',date:'2026-11-12',critical:false}],
+    deadlines:[{type:'submission',date:'2026-09-18',certainty:'confirmed',timezone:'UTC',label:'报告与原型截止',primary:true}],
+    primaryDeadline:{type:'submission',date:'2026-09-18',certainty:'confirmed',timezone:'UTC',label:'报告与原型截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'官网未标具体时刻；按日历日提醒，并在提交前复核表单时区。'},
+    sources:[{title:'World Usability Day｜Design Challenge 2026',date:'2026-07-30',url:'https://worldusabilityday.org/design-challenge/',kind:'official'}],
+    url:'https://worldusabilityday.org/design-challenge/' }),
+  trackedCompetition({
+    id:'ifcomp-2026', name:'IFComp 互动小说赛', fullName:'The 32nd Annual Interactive Fiction Competition 2026',
+    org:'Interactive Fiction Technology Foundation', rel:'A+', loc:'全球线上 · 免费 · 每人最多 3 部', date:'参赛意向 2026-08-01 · 成品 08-28',
+    deadlineISO:'2026-08-01', tier:'A', cat:'游戏创作', match:8.5, suit:'高',
+    desc:'历史悠久的文字驱动数字游戏与互动叙事比赛。2026 已开放参赛，必须先在 8 月 1 日前登记参赛意向，再于 8 月 28 日前上传完整作品。',
+    strategy:'先用最低信息登记 intent 锁定资格，再完善 Twine、Web 或其他可运行作品；优先保证完成度、可访问性和完整 walkthrough。',
+    audience:'全球互动小说、文字游戏和数字叙事作者；免费，最多提交 3 部作品',
+    rewards:['The Colossal Fund 现金奖池按当年捐赠形成，金额非固定','社区 Prize Pool 实物与服务奖','Rising Star 等荣誉'],
+    pros:['全球免费','个人可投','Web 软件作品适配','社区历史与长尾传播强'],
+    cons:['8 月 1 日 intent 很近','需在 8 月 28 日交完整作品','现金奖池不固定'],
+    winning:['叙事与交互','作品完成度','可玩性','无障碍与提示'],
+    timeline:[{event:'参赛意向截止',date:'2026-08-01',critical:true},{event:'最终作品截止',date:'2026-08-28',critical:true},{event:'公众评审截止',date:'2026-10-19',critical:false}],
+    deadlines:[{type:'intent',date:'2026-08-01',certainty:'confirmed',timezone:'America/New_York',label:'参赛意向截止',primary:true},{type:'submission',date:'2026-08-28',certainty:'confirmed',timezone:'America/New_York',label:'最终作品截止'}],
+    primaryDeadline:{type:'intent',date:'2026-08-01',certainty:'confirmed',timezone:'America/New_York',label:'参赛意向截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'所有截止均为美国东部时间 23:59；奖池由捐赠形成，不写固定总额。'},
+    sources:[{title:'IFComp｜2026 Author Handbook',date:'2026-07-30',url:'https://ifcomp.org/about/how_to_enter',kind:'official'}],
+    url:'https://ifcomp.org/about/how_to_enter' }),
+  trackedCompetition({
+    id:'unu-ai-sdgs-2026', name:'UNU AI for SDGs 青年创新赛', fullName:'AI for SDGs · Global Youth AI Future Innovation Competition 2026',
+    org:'UNU Global AI Network · UNU Macau · Venture Cup China', rel:'A+', loc:'全球申请 · 澳门线下决赛', date:'申请截止 2026-09-15',
+    deadlineISO:'2026-09-15', tier:'S', cat:'创业路演', match:9.4, suit:'很高',
+    desc:'2026 主题为 AI × 教育，覆盖 AI for Education、AI for Social Innovation 与面向欠发达国家的教育 AI。全球公司、团队或个人均可申请，但项目必须达到 TRL 6 及以上。',
+    strategy:'非常适合已有真实教师与付费数据的教育 AI 项目。申请材料用英文，重点证明真实场景验证、教育公平、AI 素养和可规模化落地。',
+    audience:'全球公司、团队或个人；项目 TRL 6+；已注册企业成立不超过 10 年；全程英文',
+    rewards:['全球总决赛期间免费酒店','每队可申请最高 $1,000 差旅补助，名额有限','UNU 全球 AI 网络与跨国合作曝光','未披露固定现金奖'],
+    pros:['教育 AI 极度匹配','全球开放','联合国大学平台','真实落地项目更占优'],
+    cons:['TRL 6+ 排除纯概念','全英文材料','澳门决赛线下','差旅补助非人人获得'],
+    winning:['真实部署证据','教育与社会影响','TRL 成熟度','全球可扩展性'],
+    timeline:[{event:'开放申请截止',date:'2026-09-15',critical:true},{event:'线上评审',date:'2026-09-30',critical:false},{event:'线上半决赛',date:'2026-10-15',critical:false},{event:'澳门总决赛',date:'2026-11-26',critical:false}],
+    deadlines:[{type:'application',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Macau',label:'开放申请截止',primary:true}],
+    primaryDeadline:{type:'application',date:'2026-09-15',certainty:'confirmed',timezone:'Asia/Macau',label:'开放申请截止'},
+    verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'差旅补助数量有限且需申请；官网未列固定现金奖。'},
+    sources:[{title:'United Nations University｜2026 Call for Applications',date:'2026-07-27',url:'https://unu.edu/macau/news/ai-sdgs-global-youth-ai-future-innovation-competition-2026-call-applications',kind:'official'}],
+    url:'https://unu.edu/macau/news/ai-sdgs-global-youth-ai-future-innovation-competition-2026-call-applications' }),
+  trackedCompetition({
+    id:'industrial-internet-2026', name:'第八届工业互联网大赛', fullName:'第八届工业互联网大赛 · 主题赛与直通赛',
+    org:'工业互联网大赛组委会', rel:'A', loc:'全国 · 北京中关村 / 上海张江等', date:'主题赛报名持续至 2026 年 9 月 · 具体日待公告',
+    deadlineISO:'2026-09-30', tier:'A', cat:'AI 软件', match:8.3, suit:'关注',
+    desc:'主题赛面向全社会征集产业一线解决方案，重点覆盖工业软件创新、人工智能与制造业融合；直通赛按企业真实需求全年滚动发布。官方公开稿仅确认主题赛持续至 9 月，没有给出具体日期。',
+    strategy:'有制造业 Agent、工业数据分析或低代码方案再跟进；先准备真实客户案例与可验证指标，等具体赛题和精确截止发布后再进入冲刺。',
+    audience:'工业互联网、工业软件、制造业 AI 解决方案团队；具体组别资格以正式规程为准',
+    rewards:['全国总决赛候选资格','供需对接、专家辅导、试点验证与产业合作','投融资对接','部分获奖项目可优先申请重点实验室课题'],
+    pros:['软件和 Agent 可投','真实产业需求','全年直通赛机会','转化资源强'],
+    cons:['主题赛精确截止未公开','现金奖励未在当前稿披露','工业案例门槛较高'],
+    winning:['产业痛点','可验证成效','推广复制性','工业现场适配'],
+    timeline:[{event:'主题赛月份提醒（非硬截止）',date:'2026-09-30',critical:false}],
+    deadlines:[{type:'submission',date:'2026-09-30',certainty:'estimated',timezone:'Asia/Shanghai',label:'主题赛报名持续至 9 月，精确日待公告',primary:true},{type:'application',date:null,certainty:'rolling',timezone:'Asia/Shanghai',label:'直通赛全年滚动'}],
+    primaryDeadline:{type:'submission',date:'2026-09-30',certainty:'estimated',timezone:'Asia/Shanghai',label:'主题赛报名持续至 9 月，精确日待公告'},
+    verification:{status:'partially-verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'9 月 30 日仅用于月份展示，不能进入紧急排序。'},
+    sources:[{title:'上海市企业走出去综合服务平台｜第八届工业互联网大赛报名介绍',date:'2026-06-26',url:'https://segg.sh.gov.cn/pdfpt/gzdt/20260626/12ab9a6706504b3ba0fd02dd0e999899.html',kind:'official'}],
+    url:'https://segg.sh.gov.cn/pdfpt/gzdt/20260626/12ab9a6706504b3ba0fd02dd0e999899.html' }),
+], competitionV2Overrides, { updatedAt: RADAR_UPDATED_AT });
 
 export function parseCompetitionDate(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;
@@ -2231,15 +2456,34 @@ export function parseCompetitionDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function daysUntil(iso, today = new Date()) {
-  const date = parseCompetitionDate(iso);
+export function daysUntil(deadline, today = new Date()) {
+  if (deadline && typeof deadline === 'object' && deadline.certainty !== 'confirmed') return null;
+  const date = parseCompetitionDate(
+    deadline && typeof deadline === 'object' ? deadline.date : deadline,
+  );
   if (!date || Number.isNaN(today.getTime())) return null;
   return Math.ceil((date.getTime() - today.getTime()) / DAY_MS);
 }
 
-export function statusOf(iso, today = new Date()) {
-  const days = daysUntil(iso, today);
-  if (days === null) return { kind: 'unknown', days, label: '日期待确认' };
+export function statusOf(deadline, today = new Date()) {
+  const certainty = deadline && typeof deadline === 'object'
+    ? deadline.certainty
+    : 'confirmed';
+  if (certainty !== 'confirmed') {
+    const labels = {
+      estimated: '预计日期',
+      rolling: '滚动招募',
+      unknown: '日期待确认',
+    };
+    return {
+      kind: 'unknown',
+      days: null,
+      label: labels[certainty] ?? '日期待确认',
+      certainty,
+    };
+  }
+  const days = daysUntil(deadline, today);
+  if (days === null) return { kind: 'unknown', days, label: '日期待确认', certainty: 'unknown' };
   if (days < 0) return { kind: 'expired', days, label: '已截止' };
   if (days <= 14) return { kind: 'urgent', days, label: `${days} 天后截止` };
   if (days <= 60) return { kind: 'ongoing', days, label: `${days} 天后截止` };
@@ -2247,16 +2491,20 @@ export function statusOf(iso, today = new Date()) {
 }
 
 export function getCompetitionPriority(competition, today = new Date()) {
-  const status = statusOf(competition.deadlineISO, today);
+  const primaryDeadline = getPrimaryDeadline(competition);
+  const status = statusOf(primaryDeadline, today);
   const tierScore = { S: 40, A: 26, B: 14 }[competition.tier] ?? 0;
   const statusScore = { urgent: 35, ongoing: 22, upcoming: 10, expired: -24, unknown: 0 }[status.kind] ?? 0;
   const matchScore = Number.isFinite(competition.match) ? competition.match * 2 : 0;
-  const criticalTimelineScore = (competition.timeline ?? []).some((item) => item.critical && statusOf(item.date, today).kind === 'urgent') ? 8 : 0;
+  const criticalTimelineScore = primaryDeadline?.certainty === 'confirmed'
+    && (competition.timeline ?? []).some((item) => item.critical && statusOf(item.date, today).kind === 'urgent')
+    ? 8
+    : 0;
   return Math.max(0, Math.round(tierScore + statusScore + matchScore + criticalTimelineScore));
 }
 
 export function getCompetitionBucket(competition, today = new Date()) {
-  const status = statusOf(competition.deadlineISO, today);
+  const status = statusOf(getPrimaryDeadline(competition), today);
   const priority = getCompetitionPriority(competition, today);
   if (status.kind === 'expired') return '已截止';
   if (status.kind === 'unknown') return '待确认';
@@ -2267,10 +2515,16 @@ export function getCompetitionBucket(competition, today = new Date()) {
 }
 
 export function enrichCompetition(competition, today = new Date()) {
-  const status = statusOf(competition.deadlineISO, today);
+  const primaryDeadline = getPrimaryDeadline(competition);
+  const status = statusOf(primaryDeadline, today);
   const priority = getCompetitionPriority(competition, today);
   return {
     ...competition,
+    primaryDeadline,
+    verification: competition.verification,
+    recordType: competition.recordType,
+    seriesId: competition.seriesId,
+    parentId: competition.parentId,
     status,
     priority,
     bucket: getCompetitionBucket(competition, today),
@@ -2376,9 +2630,13 @@ export function validateCompetitions(source = competitions) {
     });
   });
 
+  const v2 = validateCompetitionCollectionV2(source);
+  errors.push(...v2.errors);
+
   return {
     valid: errors.length === 0,
     errors,
+    warnings: v2.warnings,
   };
 }
 
@@ -2394,3 +2652,9 @@ function hasRequiredValue(value) {
   if (Array.isArray(value)) return value.length > 0;
   return value !== undefined && value !== null && value !== '';
 }
+
+export {
+  getPrimaryDeadline,
+  normalizeCompetitionCollection,
+  validateCompetitionCollectionV2,
+} from './competition-schema.js';
