@@ -16,6 +16,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const radarURL = `/competitions/#${encodeURIComponent(competition.id)}`;
 const sources = Array.isArray(competition.sources) ? competition.sources : [];
 const timeline = Array.isArray(competition.timeline) ? competition.timeline : [];
+const verification = competition.verification && typeof competition.verification === 'object'
+  ? competition.verification
+  : {};
 
 const uncertainDatePattern = /(预计|参考|待公告|滚动|可能延期|暂定)/;
 const nonEventDatePattern = /(截止|报名|申请|提交|提案|征集|评审|公布|通知|开放|招募|入围|结果|投票)/;
@@ -48,7 +51,7 @@ const webPageNode = {
     name: 'siuser小伟',
     url: 'https://siuserxiaowei.com/',
   },
-  mainEntity: { '@id': `${canonicalURL}#event` },
+  ...(eventStartDate ? { mainEntity: { '@id': `${canonicalURL}#event` } } : {}),
 };
 
 const eventNode = {
@@ -68,7 +71,7 @@ const eventNode = {
 
 const structuredData = JSON.stringify({
   '@context': 'https://schema.org',
-  '@graph': [webPageNode, eventNode],
+  '@graph': eventStartDate ? [webPageNode, eventNode] : [webPageNode],
 }).replace(/</g, '\\u003c');
 
 const description = `${competition.fullName}：${competition.desc}`;
@@ -89,7 +92,7 @@ const description = `${competition.fullName}：${competition.desc}`;
         <div class="flex flex-wrap items-center gap-2.5 mb-5">
           <span class={`tier-tag tier-${competition.tier} tier-lg`}>{competition.tier} 级</span>
           <span class="pill-note">{competition.cat}</span>
-          <span class="pill-note">信用 {competition.rel}</span>
+          <span class="pill-note">来源等级 {competition.rel}</span>
         </div>
 
         <h1 class="detail-title">{competition.fullName}</h1>
@@ -193,9 +196,11 @@ const description = `${competition.fullName}：${competition.desc}`;
         <div class="verification-note mt-6">
           <strong>核验边界</strong>
           <p>
-            本站于 {RADAR_UPDATED_AT} 整理该记录，用于赛事发现与决策辅助，不是官方报名系统，也不承诺实时更新。
+            本站于 {verification.checkedAt ?? RADAR_UPDATED_AT} 整理该记录
+            {verification.status ? `（核验状态：${verification.status}）` : ''}，用于赛事发现与决策辅助，不是官方报名系统，也不承诺实时更新。
             截止时间、参赛资格、奖金条件和规则变更均以主办方最新公告为准。
           </p>
+          {verification.notes && <p class="mt-2">{verification.notes}</p>}
         </div>
       </section>
     </article>

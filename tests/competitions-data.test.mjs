@@ -64,7 +64,6 @@ test('rolling, unknown, and estimated dates never enter urgent countdown', () =>
     'builderx',
     'wise36kr',
     'creatorhackathonvol1',
-    'industrial-internet-2026',
   ];
   for (const id of ids) {
     const competition = byId.get(id);
@@ -75,12 +74,14 @@ test('rolling, unknown, and estimated dates never enter urgent countdown', () =>
   }
 });
 
-test('Agentic Cinema prize boundaries total $65,000', () => {
+test('Agentic Cinema prize boundaries total $60,000', () => {
   const competition = byId.get('agenticcinema2026');
-  assert.match(competition.desc, /\$65,000/);
-  assert.ok(competition.rewards.some((reward) => reward.includes('$65,000')));
+  assert.match(competition.desc, /\$60,000/);
+  assert.ok(competition.rewards.some((reward) => reward.includes('$60,000')));
   assert.ok(competition.rewards.some((reward) => reward.includes('IBM')));
   assert.ok(competition.rewards.some((reward) => reward.includes('Grafana')));
+  assert.ok(competition.rewards.some((reward) => reward.includes('Parallel')));
+  assert.ok(competition.rewards.some((reward) => reward.includes('ClickHouse')));
 });
 
 test('all twelve high-confidence research additions are present', () => {
@@ -110,7 +111,15 @@ test('new verified records retain official sources and qualification boundaries'
 
   const film = byId.get('we-are-human-film-2026');
   assert.match(film.audience, /18/);
-  assert.match(film.rewards.join(' '), /未披露固定现金奖/);
+  assert.match(film.rewards.join(' '), /€5,000/);
+
+  const guangzhou = byId.get('guangzhou-super-agent-2026');
+  assert.equal(getPrimaryDeadline(guangzhou).date, '2026-07-31');
+  assert.equal(getPrimaryDeadline(guangzhou).certainty, 'confirmed');
+
+  const industrial = byId.get('industrial-internet-2026');
+  assert.equal(getPrimaryDeadline(industrial).date, '2026-09-21');
+  assert.equal(getPrimaryDeadline(industrial).certainty, 'confirmed');
 });
 
 test('default source labels no longer assert official status', () => {

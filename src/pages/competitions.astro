@@ -41,7 +41,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
         <div class="metric-tile p-5">
           <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">TOTAL</div>
           <div class="text-3xl font-semibold" style="color: var(--text); font-family: var(--font-heading);">{enriched.length}</div>
-          <div class="mt-1 text-xs" style="color: var(--text-secondary);">赛事总数</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">机会 / 赛题记录</div>
         </div>
         <div class="metric-tile p-5">
           <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">ACTIVE</div>
@@ -183,6 +183,8 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
                 data-match={c.match}
                 data-deadline={deadline?.date ?? c.deadlineISO}
                 data-deadline-confidence={deadline?.confidence ?? 'legacy'}
+                data-deadline-type={deadline?.type ?? 'deadline'}
+                data-deadline-label={deadline?.label ?? '关键截止'}
                 data-calendar-eligible={deadline?.calendarEligible ? 'true' : 'false'}
                 data-strategy={c.strategy}
                 data-loc={c.loc}
@@ -250,7 +252,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
                 data-export-ics={enriched[0]?.id}
                 class="summary-button"
                 disabled={!deadlineInfo.get(enriched[0]?.id)?.calendarEligible}
-                title={deadlineInfo.get(enriched[0]?.id)?.calendarEligible ? '下载报名截止日历' : '日期尚未确认，暂不提供日历'}
+                title={deadlineInfo.get(enriched[0]?.id)?.calendarEligible ? '下载关键截止日历' : '日期尚未确认，暂不提供日历'}
               >加入日历</button>
             </div>
           </div>
@@ -264,7 +266,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
                     <div class="flex flex-wrap items-center gap-2.5">
                       <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
                       <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span><span data-status-label>{c.status.label}</span></span>
-                      <span class="pill-note">信用 {c.rel}</span>
+                      <span class="pill-note">来源等级 {c.rel}</span>
                       <span class="pill-note">{c.cat}</span>
                     </div>
                     <h2 class="text-2xl md:text-3xl leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.022em;">{c.fullName}</h2>
@@ -1146,6 +1148,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
       }
       const id = (item.dataset.id || 'competition').replace(/[^a-zA-Z0-9._-]/g, '-');
       const name = item.dataset.fullName || item.dataset.name || '赛事';
+      const deadlineLabel = item.dataset.deadlineLabel || '关键截止';
       const officialUrl = item.dataset.url || `${window.location.origin}/competitions/#${encodeURIComponent(id)}`;
       const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
       const lines = [
@@ -1159,7 +1162,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
         `DTSTAMP:${stamp}`,
         `DTSTART;VALUE=DATE:${compactDate(deadline)}`,
         `DTEND;VALUE=DATE:${compactDate(nextDate(deadline))}`,
-        `SUMMARY:${escapeIcsText(`报名截止｜${name}`)}`,
+        `SUMMARY:${escapeIcsText(`${deadlineLabel}｜${name}`)}`,
         `DESCRIPTION:${escapeIcsText([
           item.dataset.strategy || '',
           `赛事页面：${officialUrl}`,
@@ -1369,7 +1372,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
             detailExportEl.disabled = selectedItem.dataset.calendarEligible !== 'true';
             detailExportEl.title = detailExportEl.disabled
               ? '日期尚未确认，暂不提供日历'
-              : '下载报名截止日历';
+              : '下载关键截止日历';
           }
           syncFavorites();
         }
@@ -1484,7 +1487,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
           link.click();
           link.remove();
           window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
-          announce(`已下载 ${item.dataset.name || '赛事'} 的报名截止日历。`);
+          announce(`已下载 ${item.dataset.name || '赛事'} 的关键截止日历。`);
           const original = button.textContent;
           button.textContent = '已下载';
           window.setTimeout(() => {

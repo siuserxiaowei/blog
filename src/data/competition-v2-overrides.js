@@ -87,15 +87,16 @@ export const competitionV2Overrides = Object.freeze({
     verification: officialVerification('首个强制节点为 8 月 9 日，不应按 9 月 13 日排序。'),
   },
   agenticcinema2026: {
-    desc: '使用 Gemini、Google Cloud Agent Builder 与合作方 MCP Server 构建媒体娱乐 Agent 或多 Agent 系统。五组赞助赛道合计现金奖 $65,000；规则明确排除中国等地区，本条仅为符合资格的全球读者保留。',
+    desc: '使用 Gemini、Google Cloud Agent Builder 与合作方 MCP Server 构建媒体娱乐 Agent 或多 Agent 系统。IBM、Grafana、Parallel 与 ClickHouse 四条合作方赛道合计现金奖 $60,000；规则明确排除中国等地区，本条仅为符合资格的全球读者保留。',
     rewards: [
-      '五组赞助赛道合计 $65,000',
+      '四组合作方赛道合计 $60,000',
       'IBM：$7,500 / $4,500 / $3,000',
-      'Grafana：$7,500 / $3,000 / $2,000',
-      'Parallel、ClickHouse 与 Partner Track 5：各 $12,500',
+      'Grafana：$7,500 / $4,500 / $3,000',
+      'Parallel：$7,500 / $4,500 / $3,000',
+      'ClickHouse：$7,500 / $4,500 / $3,000',
       'Google Cloud / IBM 等合作方曝光',
     ],
-    verification: officialVerification('奖金按 Devpost Rules 的五组奖项合计，原 $15,000 是只统计 IBM 赛道的错误。'),
+    verification: officialVerification('奖金按 Devpost 当前四条合作方赛道各 $15,000 合计；中国等规则所列地区不可参赛。'),
   },
   creatorhackathonvol1: {
     deadlines: [uncertainDeadline('estimated', '以开赛日作保守提醒；独立报名截止未公开', '2026-08-01')],

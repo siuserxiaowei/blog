@@ -41,6 +41,7 @@ export function getCompetitionDeadlineInfo(competition = {}) {
   ));
 
   const rawConfidence = firstText(
+    primaryObject.certainty,
     primaryObject.confidence,
     primaryObject.status,
     typeof verificationValue === 'string' ? verificationValue : '',
@@ -55,6 +56,8 @@ export function getCompetitionDeadlineInfo(competition = {}) {
   return {
     date,
     confidence: confidence || 'unverified',
+    type: firstText(primaryObject.type, 'deadline'),
+    label: firstText(primaryObject.label, '关键截止'),
     calendarEligible: Boolean(date && CONFIRMED_STATES.has(rawConfidence)),
   };
 }
@@ -111,6 +114,7 @@ export function buildCompetitionDeadlineIcs(competition, options = {}) {
 
   const id = firstText(competition.id, 'competition').replace(/[^a-zA-Z0-9._-]/g, '-');
   const name = firstText(competition.fullName, competition.name, '赛事');
+  const deadlineLabel = firstText(deadline.label, '关键截止');
   const siteOrigin = firstText(options.siteOrigin, 'https://siuserxiaowei.com').replace(/\/$/, '');
   const detailUrl = `${siteOrigin}/competitions/#${encodeURIComponent(firstText(competition.id, id))}`;
   const officialUrl = firstText(competition.url);
@@ -131,7 +135,7 @@ export function buildCompetitionDeadlineIcs(competition, options = {}) {
     `DTSTAMP:${utcStamp(options.now)}`,
     `DTSTART;VALUE=DATE:${compactDate(deadline.date)}`,
     `DTEND;VALUE=DATE:${compactDate(addOneUtcDay(deadline.date))}`,
-    `SUMMARY:${escapeIcsText(`报名截止｜${name}`)}`,
+    `SUMMARY:${escapeIcsText(`${deadlineLabel}｜${name}`)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
     `URL:${escapeIcsText(officialUrl || detailUrl)}`,
     competition.loc ? `LOCATION:${escapeIcsText(competition.loc)}` : '',
