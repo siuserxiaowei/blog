@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 import { competitions, RADAR_UPDATED_AT, enrichCompetitions, getCompetitionCategories } from '../data/competitions.js';
+import { getCompetitionDeadlineInfo } from '../lib/competition-radar.js';
 
 const TODAY = new Date();
 const enriched = enrichCompetitions(competitions, TODAY);
@@ -13,6 +14,7 @@ const activeCount = enriched.length - expiredCount;
 const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法', '安全攻防', '游戏创作', '创意 AI', '创业路演']);
 const softwareCount = enriched.filter(c => c.status.kind !== 'expired' && softwareCategories.has(c.cat)).length;
 const categories = getCompetitionCategories(enriched);
+const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo(c)]));
 ---
 
 <BaseLayout title="AI 产品赛事雷达 · siuser小伟" description="面向 AI 软件、Agent、独立开发与轻硬件团队的赛事和行业活动看板。">
@@ -127,21 +129,34 @@ const categories = getCompetitionCategories(enriched);
         <div class="filter-row">
           <span class="section-kicker filter-label">// 分类</span>
           <div class="filter-group">
-            <button data-fcat="全部" class="filter-cat filter-chip is-on">全部</button>
+            <button type="button" data-fcat="全部" class="filter-cat filter-chip is-on" aria-pressed="true">全部</button>
             {categories.map(cat => (
-              <button data-fcat={cat} class="filter-cat filter-chip">{cat}</button>
+              <button type="button" data-fcat={cat} class="filter-cat filter-chip" aria-pressed="false">{cat}</button>
             ))}
           </div>
         </div>
         <div class="filter-row">
           <span class="section-kicker filter-label">// 等级</span>
           <div class="filter-group">
-            <button data-ftier="全部" class="filter-tier filter-chip is-on">全部</button>
+            <button type="button" data-ftier="全部" class="filter-tier filter-chip is-on" aria-pressed="true">全部</button>
             {['S','A','B'].map(t => (
-              <button data-ftier={t} class="filter-tier filter-chip">{t} 级</button>
+              <button type="button" data-ftier={t} class="filter-tier filter-chip" aria-pressed="false">{t} 级</button>
             ))}
           </div>
         </div>
+        <div class="workbench-row">
+          <div class="filter-group" aria-label="收藏筛选">
+            <button type="button" id="favorites-only" class="filter-chip workbench-toggle" aria-pressed="false">
+              <span aria-hidden="true">★</span>
+              只看收藏
+              <span id="favorite-count" class="favorite-count">0</span>
+            </button>
+            <button type="button" id="clear-favorites" class="filter-chip subtle-action">清空收藏</button>
+            <button type="button" id="clear-filters" class="filter-chip subtle-action">清除筛选</button>
+          </div>
+          <p class="workbench-note">收藏只保存在当前浏览器；筛选和当前赛事会同步到网址。</p>
+        </div>
+        <p id="radar-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></p>
       </div>
     </section>
 
@@ -152,11 +167,13 @@ const categories = getCompetitionCategories(enriched);
         <aside>
           <div class="flex items-center justify-between px-1 mb-3">
             <span class="section-kicker">// 列表</span>
-            <span id="list-count" class="text-xs" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
+            <span id="list-count" class="text-xs" aria-live="polite" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
           </div>
-          <div class="space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
-            {enriched.map(c => (
-              <button
+          <div id="competition-list" class="competition-list space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
+            {enriched.map(c => {
+              const deadline = deadlineInfo.get(c.id);
+              return (
+              <article
                 data-id={c.id}
                 data-name={c.name}
                 data-full-name={c.fullName}
@@ -164,35 +181,79 @@ const categories = getCompetitionCategories(enriched);
                 data-tier={c.tier}
                 data-status={c.status.kind}
                 data-match={c.match}
-                data-deadline={c.deadlineISO}
+                data-deadline={deadline?.date ?? c.deadlineISO}
+                data-deadline-confidence={deadline?.confidence ?? 'legacy'}
+                data-calendar-eligible={deadline?.calendarEligible ? 'true' : 'false'}
                 data-strategy={c.strategy}
+                data-loc={c.loc}
                 data-url={c.url}
                 data-sources={(c.sources ?? []).map(source => `${source.title} ${source.date} ${source.url}`).join(' | ')}
                 data-search={`${c.name} ${c.fullName} ${c.cat} ${c.tier} ${c.status.label} ${c.desc} ${c.strategy} ${c.org} ${c.loc} ${c.winning.join(' ')} ${(c.sources ?? []).map(source => source.title).join(' ')}`}
-                class="cp-list-item w-full text-left p-4"
+                class="cp-list-item relative"
               >
-                <div class="flex items-start justify-between gap-3 mb-2">
-                  <h4 class="text-base font-semibold leading-tight truncate" style="color: var(--text); font-family: var(--font-heading);">{c.name}</h4>
-                  <span class={`tier-tag tier-${c.tier}`}>{c.tier}</span>
-                </div>
-                <div class="flex items-center gap-2 mb-2">
-                  <span class={`status-dot status-${c.status.kind}`}></span>
-                  <span data-status-label class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
-                  <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.5;">·</span>
-                  <span class="text-[11px]" style="color: var(--text-secondary);">{c.cat}</span>
-                </div>
-                <p class="text-xs leading-relaxed line-clamp-2 mb-3" style="color: var(--text-secondary);">{c.desc}</p>
-                <div class="flex items-center justify-between pt-2 text-[11px]" style="border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);">
-                  <span style="color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.08em;">MATCH</span>
-                  <span style="font-family: var(--font-heading); color: var(--color-accent); font-weight: 600; font-size: 14px;">{c.match.toFixed(1)}<span style="color: var(--text-secondary); font-size: 10px; font-weight: 400;"> / 10</span></span>
-                </div>
-              </button>
-            ))}
+                <button
+                  type="button"
+                  data-select-competition
+                  class="cp-list-select w-full text-left p-4"
+                  aria-current="false"
+                  aria-label={`查看 ${c.fullName}`}
+                >
+                  <div class="flex items-start justify-between gap-3 mb-2 pr-9">
+                    <h3 class="text-base font-semibold leading-tight truncate" style="color: var(--text); font-family: var(--font-heading);">{c.name}</h3>
+                    <span class={`tier-tag tier-${c.tier}`}>{c.tier}</span>
+                  </div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class={`status-dot status-${c.status.kind}`}></span>
+                    <span data-status-label class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
+                    <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.5;">·</span>
+                    <span class="text-[11px]" style="color: var(--text-secondary);">{c.cat}</span>
+                  </div>
+                  <p class="text-xs leading-relaxed line-clamp-2 mb-3" style="color: var(--text-secondary);">{c.desc}</p>
+                  <div class="flex items-center justify-between pt-2 text-[11px]" style="border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);">
+                    <span style="color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.08em;">MATCH</span>
+                    <span style="font-family: var(--font-heading); color: var(--color-accent); font-weight: 600; font-size: 14px;">{c.match.toFixed(1)}<span style="color: var(--text-secondary); font-size: 10px; font-weight: 400;"> / 10</span></span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  data-favorite={c.id}
+                  class="favorite-button list-favorite"
+                  aria-label={`收藏 ${c.fullName}`}
+                  aria-pressed="false"
+                  title="收藏到当前浏览器"
+                ><span aria-hidden="true">☆</span></button>
+              </article>
+            )})}
+          </div>
+          <div id="competition-empty" class="empty-state hidden" role="status">
+            <p>没有符合当前条件的赛事。</p>
+            <button type="button" data-empty-reset class="summary-button">清除筛选</button>
           </div>
         </aside>
 
         <!-- 右侧详情 -->
         <section class="space-y-8">
+          <div id="detail-workbench" class="detail-workbench" aria-label="当前赛事快捷操作">
+            <span class="section-kicker">// 当前赛事</span>
+            <div class="detail-workbench-actions">
+              <button
+                type="button"
+                id="detail-favorite"
+                data-favorite={enriched[0]?.id}
+                class="summary-button favorite-detail"
+                aria-label={`收藏 ${enriched[0]?.fullName ?? '当前赛事'}`}
+                aria-pressed="false"
+              ><span aria-hidden="true">☆</span><span data-favorite-label>收藏</span></button>
+              <button
+                type="button"
+                id="detail-export-ics"
+                data-export-ics={enriched[0]?.id}
+                class="summary-button"
+                disabled={!deadlineInfo.get(enriched[0]?.id)?.calendarEligible}
+                title={deadlineInfo.get(enriched[0]?.id)?.calendarEligible ? '下载报名截止日历' : '日期尚未确认，暂不提供日历'}
+              >加入日历</button>
+            </div>
+          </div>
           {enriched.map((c, i) => (
             <div data-detail={c.id} class:list={["detail-panel space-y-7", i !== 0 && "hidden"]}>
 
@@ -225,9 +286,9 @@ const categories = getCompetitionCategories(enriched);
                 <!-- 时间轴 -->
                 <div class="mb-10">
                   <p class="section-kicker mb-5">// 关键时间节点</p>
-                  <div class="relative pt-2">
-                    <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
-                    <div class="relative grid gap-2" style={`grid-template-columns: repeat(${c.timeline.length}, minmax(0, 1fr));`}>
+                    <div class="timeline-track relative pt-2">
+                      <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
+                    <div class="timeline-grid relative grid gap-2" style={`--timeline-count: ${c.timeline.length}; grid-template-columns: repeat(${c.timeline.length}, minmax(0, 1fr));`}>
                       {c.timeline.map(n => {
                         const past = new Date(n.date) < TODAY;
                         const dotClass = past ? 'past' : n.critical ? 'critical' : 'normal';
@@ -266,7 +327,7 @@ const categories = getCompetitionCategories(enriched);
                     </div>
                   </div>
                   <div>
-                    <p class="section-kicker mb-3">// 必胜卖点</p>
+                    <p class="section-kicker mb-3">// 评审匹配点</p>
                     <div class="flex flex-wrap gap-1.5">
                       {c.winning.map(w => (
                         <span class="winning-chip">{w}</span>
@@ -318,7 +379,7 @@ const categories = getCompetitionCategories(enriched);
                     复制参赛摘要
                   </button>
                   <a href={c.url} target="_blank" rel="noopener" class="cta-button">
-                    访问官方报名页 <span aria-hidden="true">→</span>
+                    查看赛事页面 <span aria-hidden="true">→</span>
                   </a>
                 </div>
               </div>
@@ -328,7 +389,7 @@ const categories = getCompetitionCategories(enriched);
       </div>
 
       <div class="text-center text-[11px] pt-12 mt-12 border-t" style="color: var(--text-secondary); border-color: color-mix(in srgb, var(--border) 50%, transparent); font-family: var(--font-mono); letter-spacing: 0.05em;">
-        FACT CHECKED · {RADAR_UPDATED_AT} · {enriched.length} ENTRIES TRACKED · 倒计时按访问当天自动计算；带「参考 / 预计」标签的信息仍须以主办方通知为准
+        人工整理 · 更新于 {RADAR_UPDATED_AT} · {enriched.length} 条记录 · 倒计时按访问当天自动计算；匹配点为编辑判断，所有资格、日期与奖励请在提交前复核赛事页面
       </div>
     </section>
   </main>
@@ -360,7 +421,7 @@ const categories = getCompetitionCategories(enriched);
   .radar-select {
     width: 100%;
     min-width: 0;
-    min-height: 42px;
+    min-height: 44px;
     border-radius: var(--radius-md);
     color: var(--text);
     background: color-mix(in srgb, var(--surface) 62%, transparent);
@@ -405,6 +466,43 @@ const categories = getCompetitionCategories(enriched);
     min-width: 0;
   }
 
+  .workbench-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.2rem;
+  }
+
+  .workbench-note {
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.55;
+    text-align: right;
+  }
+
+  .workbench-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .favorite-count {
+    display: inline-grid;
+    min-width: 1.45rem;
+    height: 1.45rem;
+    place-items: center;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    color: inherit;
+    background: color-mix(in srgb, currentColor 12%, transparent);
+    font-size: 10px;
+  }
+
+  .subtle-action {
+    background: transparent;
+  }
+
   @media (max-width: 720px) {
     .radar-control-grid {
       grid-template-columns: 1fr;
@@ -414,13 +512,20 @@ const categories = getCompetitionCategories(enriched);
       grid-template-columns: 1fr;
       gap: 0.5rem;
     }
+
+    .workbench-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .workbench-note {
+      text-align: left;
+    }
   }
 
   /* ============ 列表项 ============ */
   .cp-list-item {
-    cursor: pointer;
     border-radius: var(--radius-lg);
-    padding-block: 1.1rem !important;
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-2) 82%, transparent));
     border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
     backdrop-filter: blur(12px);
@@ -428,6 +533,26 @@ const categories = getCompetitionCategories(enriched);
     transition: transform 0.24s cubic-bezier(.2,.7,.2,1), border-color 0.2s ease, box-shadow 0.24s ease, background 0.24s ease;
     overflow-wrap: anywhere;
   }
+
+  .cp-list-select {
+    display: block;
+    min-height: 44px;
+    border-radius: inherit;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .cp-list-select:focus-visible,
+  .favorite-button:focus-visible,
+  .filter-chip:focus-visible,
+  .summary-button:focus-visible,
+  .cta-button:focus-visible,
+  .urgent-chip:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-accent) 68%, transparent);
+    outline-offset: 3px;
+  }
+
   .cp-list-item:hover {
     transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--color-accent) 40%, var(--border));
@@ -439,8 +564,77 @@ const categories = getCompetitionCategories(enriched);
     box-shadow: 0 22px 48px -30px color-mix(in srgb, var(--color-accent) 55%, transparent);
     transform: translateY(-1px);
   }
-  .cp-list-item.is-active h4 { color: var(--color-accent) !important; }
+  .cp-list-item.is-active h3 { color: var(--color-accent) !important; }
   .cp-list-item[data-status="expired"] { opacity: 0.55; }
+
+  .favorite-button {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: var(--text-secondary);
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .favorite-button:hover,
+  .favorite-button[aria-pressed="true"] {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 54%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--surface));
+  }
+
+  .list-favorite {
+    position: absolute;
+    z-index: 2;
+    top: 0.7rem;
+    right: 0.55rem;
+  }
+
+  .empty-state {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1.4rem;
+    color: var(--text-secondary);
+    border: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 48%, transparent);
+  }
+
+  .empty-state.hidden {
+    display: none;
+  }
+
+  .detail-panel {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 920px;
+  }
+
+  .detail-workbench {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 60px;
+    padding: 0.65rem 0.8rem 0.65rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  .detail-workbench-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
 
   /* ============ 等级标签 ============ */
   .tier-tag {
@@ -547,9 +741,16 @@ const categories = getCompetitionCategories(enriched);
     transform: scale(1.2);
   }
 
+  .timeline-track {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
   /* ============ 筛选按钮 ============ */
   .filter-chip {
-    padding: 6px 14px;
+    min-height: 44px;
+    padding: 8px 14px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
@@ -595,6 +796,7 @@ const categories = getCompetitionCategories(enriched);
   /* ============ CTA ============ */
   .cta-button {
     display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px;
     padding: 12px 22px;
     border-radius: var(--radius-md);
     font-family: var(--font-heading);
@@ -668,6 +870,7 @@ const categories = getCompetitionCategories(enriched);
     align-items: center;
     justify-content: center;
     min-width: 0;
+    min-height: 44px;
     padding: 12px 18px;
     border-radius: var(--radius-md);
     font-family: var(--font-heading);
@@ -678,6 +881,12 @@ const categories = getCompetitionCategories(enriched);
     background: color-mix(in srgb, var(--surface) 58%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
     transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .summary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.46;
+    transform: none;
   }
 
   .summary-button:hover {
@@ -703,8 +912,17 @@ const categories = getCompetitionCategories(enriched);
 
   /* ============ 响应式微调 ============ */
   @media (max-width: 768px) {
-    .cp-list-item { padding: 14px; }
-    .urgent-chip { padding: 10px; }
+    .competition-list {
+      max-height: min(68vh, 780px);
+      overflow-y: auto;
+      padding-right: 0.25rem;
+      overscroll-behavior: contain;
+    }
+    .urgent-chip { min-height: 44px; padding: 10px; }
+    .timeline-grid {
+      min-width: max(420px, calc(var(--timeline-count, 4) * 104px));
+      padding-bottom: 0.5rem;
+    }
     .detail-actions {
       width: 100%;
       justify-content: stretch;
@@ -716,14 +934,44 @@ const categories = getCompetitionCategories(enriched);
       width: 100%;
       justify-content: space-between;
     }
+    .detail-workbench {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .detail-workbench-actions > * {
+      flex: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot.status-urgent {
+      animation: none;
+    }
+
+    .cp-list-item,
+    .favorite-button,
+    .filter-chip,
+    .summary-button,
+    .cta-button,
+    .urgent-chip,
+    .source-link {
+      scroll-behavior: auto;
+      transition-duration: 0.01ms !important;
+      transform: none !important;
+    }
   }
 </style>
 
 <script is:inline>
   (function () {
     const abortKey = '__competitionRadarAbort';
+    const favoriteStorageKey = 'competition-radar:favorites:v1';
+    const favoriteStorageVersion = 1;
     const tierRank = { S: 3, A: 2, B: 1 };
     const statusRank = { urgent: 0, ongoing: 1, upcoming: 2, expired: 3 };
+    const validSorts = new Set(['software-first', 'urgent-first', 'match-desc', 'deadline-asc', 'tier-desc']);
+    const validStatuses = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired']);
+    const validTiers = new Set(['全部', 'S', 'A', 'B']);
     const softwareRank = {
       'AI 软件': 0,
       '开源开发': 1,
@@ -757,7 +1005,7 @@ const categories = getCompetitionCategories(enriched);
       dot.classList.add(`status-${kind}`);
     }
 
-    function refreshStatuses(items, panels) {
+    function refreshStatuses(items, panelById) {
       const urgent = [];
       let active = 0;
       let software = 0;
@@ -768,7 +1016,7 @@ const categories = getCompetitionCategories(enriched);
         item.querySelector('[data-status-label]')?.replaceChildren(status.label);
         updateStatusDot(item.querySelector('.status-dot'), status.kind);
 
-        const panel = panels.find(entry => entry.dataset.detail === item.dataset.id);
+        const panel = panelById.get(item.dataset.id || '');
         panel?.querySelector('[data-status-label]')?.replaceChildren(status.label);
         updateStatusDot(panel?.querySelector('.status-dot'), status.kind);
 
@@ -793,13 +1041,15 @@ const categories = getCompetitionCategories(enriched);
         const button = document.createElement('button');
         const name = document.createElement('span');
         const badge = document.createElement('span');
+        button.type = 'button';
         button.dataset.jump = item.dataset.id || '';
         button.className = 'urgent-chip group';
+        button.setAttribute('aria-label', `查看 ${item.dataset.name || '赛事'}，${status.label}`);
         name.className = 'flex-1 text-sm font-medium truncate';
         name.style.color = 'var(--text)';
         name.textContent = item.dataset.name || '';
         badge.className = 'urgent-badge';
-        badge.textContent = `${status.days}d`;
+        badge.textContent = status.days === 0 ? '今天' : `${status.days}d`;
         button.append(name, badge);
         li.append(button);
         urgentList.append(li);
@@ -812,15 +1062,117 @@ const categories = getCompetitionCategories(enriched);
     function getAddressId() {
       const params = new URLSearchParams(window.location.search);
       const queryId = params.get('competition') || params.get('event');
-      const hashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
+      let hashId = '';
+      try {
+        hashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
+      } catch {
+        hashId = window.location.hash.slice(1);
+      }
       return queryId || hashId || '';
     }
 
-    function setAddressId(id, mode) {
-      if (!id || !window.history) return;
-      const url = new URL(window.location.href);
-      url.hash = encodeURIComponent(id);
-      window.history[mode === 'replace' ? 'replaceState' : 'pushState']({}, '', url);
+    function readFavoriteIds(validIds) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(favoriteStorageKey) || 'null');
+        if (
+          !parsed
+          || parsed.version !== favoriteStorageVersion
+          || !Array.isArray(parsed.ids)
+        ) {
+          if (parsed !== null) localStorage.removeItem(favoriteStorageKey);
+          return new Set();
+        }
+        return new Set(parsed.ids.filter(id => typeof id === 'string' && validIds.has(id)));
+      } catch {
+        localStorage.removeItem(favoriteStorageKey);
+        return new Set();
+      }
+    }
+
+    function writeFavoriteIds(ids) {
+      try {
+        localStorage.setItem(favoriteStorageKey, JSON.stringify({
+          version: favoriteStorageVersion,
+          ids: Array.from(ids).sort(),
+        }));
+      } catch {
+        // Private browsing or a full storage quota should not break the workbench.
+      }
+    }
+
+    function escapeIcsText(value) {
+      return String(value ?? '')
+        .replaceAll('\\', '\\\\')
+        .replace(/\r?\n/g, '\\n')
+        .replaceAll(';', '\\;')
+        .replaceAll(',', '\\,');
+    }
+
+    function foldIcsLine(line) {
+      const encoder = new TextEncoder();
+      const chunks = [];
+      let chunk = '';
+      for (const character of String(line)) {
+        const candidate = chunk + character;
+        if (chunk && encoder.encode(candidate).length > 73) {
+          chunks.push(chunk);
+          chunk = character;
+        } else {
+          chunk = candidate;
+        }
+      }
+      if (chunk || !chunks.length) chunks.push(chunk);
+      return chunks.join('\r\n ');
+    }
+
+    function compactDate(value) {
+      return value.replaceAll('-', '');
+    }
+
+    function nextDate(value) {
+      const [year, month, day] = value.split('-').map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day + 1));
+      return [
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, '0'),
+        String(date.getUTCDate()).padStart(2, '0'),
+      ].join('-');
+    }
+
+    function buildCalendar(item) {
+      const deadline = item.dataset.deadline || '';
+      if (item.dataset.calendarEligible !== 'true' || !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+        throw new Error('Deadline is not eligible for calendar export.');
+      }
+      const id = (item.dataset.id || 'competition').replace(/[^a-zA-Z0-9._-]/g, '-');
+      const name = item.dataset.fullName || item.dataset.name || '赛事';
+      const officialUrl = item.dataset.url || `${window.location.origin}/competitions/#${encodeURIComponent(id)}`;
+      const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//siuserxiaowei.com//Competition Radar//ZH-CN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:competition-${id}@siuserxiaowei.com`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;VALUE=DATE:${compactDate(deadline)}`,
+        `DTEND;VALUE=DATE:${compactDate(nextDate(deadline))}`,
+        `SUMMARY:${escapeIcsText(`报名截止｜${name}`)}`,
+        `DESCRIPTION:${escapeIcsText([
+          item.dataset.strategy || '',
+          `赛事页面：${officialUrl}`,
+          '由赛事雷达人工整理，请在提交前复核主办方最新规则。',
+        ].filter(Boolean).join('\n'))}`,
+        `URL:${escapeIcsText(officialUrl)}`,
+        item.dataset.loc ? `LOCATION:${escapeIcsText(item.dataset.loc)}` : '',
+        'STATUS:CONFIRMED',
+        'TRANSP:TRANSPARENT',
+        'END:VEVENT',
+        'END:VCALENDAR',
+      ].filter(Boolean).map(foldIcsLine);
+      return `${lines.join('\r\n')}\r\n`;
     }
 
     function initCompetitionRadar() {
@@ -831,17 +1183,28 @@ const categories = getCompetitionCategories(enriched);
 
       const items = Array.from(document.querySelectorAll('.cp-list-item[data-id]'));
       const panels = Array.from(document.querySelectorAll('[data-detail]'));
+      const itemById = new Map(items.map(item => [item.dataset.id || '', item]));
+      const panelById = new Map(panels.map(panel => [panel.dataset.detail || '', panel]));
+      const validIds = new Set(itemById.keys());
       const countEl = document.getElementById('list-count');
       const searchEl = document.getElementById('radar-search');
       const statusEl = document.getElementById('radar-status');
       const sortEl = document.getElementById('radar-sort');
+      const favoritesOnlyEl = document.getElementById('favorites-only');
+      const clearFavoritesEl = document.getElementById('clear-favorites');
+      const favoriteCountEl = document.getElementById('favorite-count');
+      const clearFiltersEl = document.getElementById('clear-filters');
+      const emptyEl = document.getElementById('competition-empty');
+      const announcerEl = document.getElementById('radar-announcer');
+      const detailWorkbenchEl = document.getElementById('detail-workbench');
+      const detailFavoriteEl = document.getElementById('detail-favorite');
+      const detailExportEl = document.getElementById('detail-export-ics');
       const listEl = items[0]?.parentElement;
       if (!items.length || !listEl) return;
-      refreshStatuses(items, panels);
+      refreshStatuses(items, panelById);
 
       const params = new URLSearchParams(window.location.search);
-      const initialSearch = params.get('q') || '';
-      if (searchEl && initialSearch) searchEl.value = initialSearch;
+      const categoryValues = new Set(['全部', ...items.map(item => item.dataset.cat || '').filter(Boolean)]);
 
       const defaultItem = items
         .filter(item => item.dataset.status !== 'expired')
@@ -851,26 +1214,114 @@ const categories = getCompetitionCategories(enriched);
           || Date.parse(a.dataset.deadline || '9999-12-31') - Date.parse(b.dataset.deadline || '9999-12-31')
         )[0] || items[0];
 
+      const initialId = getAddressId();
       const state = {
-        cat: '全部',
-        tier: '全部',
-        status: '全部',
-        search: initialSearch,
-        sort: sortEl?.value || 'software-first',
-        selectedId: items.some(item => item.dataset.id === getAddressId()) ? getAddressId() : defaultItem.dataset.id,
+        cat: categoryValues.has(params.get('cat') || '') ? params.get('cat') : '全部',
+        tier: validTiers.has(params.get('tier') || '') ? params.get('tier') : '全部',
+        status: validStatuses.has(params.get('status') || '') ? params.get('status') : '全部',
+        search: params.get('q') || '',
+        sort: validSorts.has(params.get('sort') || '') ? params.get('sort') : 'software-first',
+        favoritesOnly: params.get('saved') === '1',
+        selectedId: validIds.has(initialId) ? initialId : defaultItem.dataset.id,
       };
+      const favorites = readFavoriteIds(validIds);
 
-      function setSearchAddress() {
+      function announce(message) {
+        if (!announcerEl) return;
+        announcerEl.textContent = '';
+        window.requestAnimationFrame(() => {
+          announcerEl.textContent = message;
+        });
+      }
+
+      function writeAddress(mode = 'replace') {
         if (!window.history) return;
         const url = new URL(window.location.href);
         const query = state.search.trim();
         if (query) url.searchParams.set('q', query);
         else url.searchParams.delete('q');
-        window.history.replaceState({}, '', url);
+        if (state.cat !== '全部') url.searchParams.set('cat', state.cat);
+        else url.searchParams.delete('cat');
+        if (state.tier !== '全部') url.searchParams.set('tier', state.tier);
+        else url.searchParams.delete('tier');
+        if (state.status !== '全部') url.searchParams.set('status', state.status);
+        else url.searchParams.delete('status');
+        if (state.sort !== 'software-first') url.searchParams.set('sort', state.sort);
+        else url.searchParams.delete('sort');
+        if (state.favoritesOnly) url.searchParams.set('saved', '1');
+        else url.searchParams.delete('saved');
+        url.searchParams.delete('competition');
+        url.searchParams.delete('event');
+        url.hash = state.selectedId ? encodeURIComponent(state.selectedId) : '';
+        window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
       }
 
       function visibleItems() {
         return items.filter(item => !item.classList.contains('hidden'));
+      }
+
+      function syncControls() {
+        if (searchEl) searchEl.value = state.search;
+        if (statusEl) statusEl.value = state.status;
+        if (sortEl) sortEl.value = state.sort;
+        setChipState('.filter-cat', 'fcat', state.cat);
+        setChipState('.filter-tier', 'ftier', state.tier);
+        favoritesOnlyEl?.classList.toggle('is-on', state.favoritesOnly);
+        favoritesOnlyEl?.setAttribute('aria-pressed', state.favoritesOnly ? 'true' : 'false');
+      }
+
+      function syncFavorites() {
+        document.querySelectorAll('[data-favorite]').forEach(button => {
+          const id = button.dataset.favorite || '';
+          const isFavorite = favorites.has(id);
+          button.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+          const icon = button.querySelector('[aria-hidden="true"]');
+          if (icon) icon.textContent = isFavorite ? '★' : '☆';
+          const label = button.querySelector('[data-favorite-label]');
+          if (label) label.textContent = isFavorite ? '已收藏' : '收藏';
+          const item = itemById.get(id);
+          const name = item?.dataset.fullName || item?.dataset.name || '赛事';
+          button.setAttribute('aria-label', `${isFavorite ? '取消收藏' : '收藏'} ${name}`);
+        });
+        if (favoriteCountEl) favoriteCountEl.textContent = String(favorites.size);
+        if (clearFavoritesEl) clearFavoritesEl.disabled = favorites.size === 0;
+      }
+
+      function toggleFavorite(id) {
+        if (!validIds.has(id)) return;
+        const item = itemById.get(id);
+        if (favorites.has(id)) favorites.delete(id);
+        else favorites.add(id);
+        writeFavoriteIds(favorites);
+        syncFavorites();
+        if (state.favoritesOnly) applyFilter({ address: 'replace' });
+        announce(`${item?.dataset.name || '赛事'}${favorites.has(id) ? '已收藏' : '已取消收藏'}，当前共 ${favorites.size} 条收藏。`);
+      }
+
+      function resetFilters(options = {}) {
+        state.cat = '全部';
+        state.tier = '全部';
+        state.status = '全部';
+        state.search = '';
+        state.sort = 'software-first';
+        state.favoritesOnly = false;
+        syncControls();
+        applyFilter({ address: options.address || 'push' });
+        searchEl?.focus({ preventScroll: true });
+      }
+
+      function syncStateFromAddress() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = getAddressId();
+        state.search = urlParams.get('q') || '';
+        state.cat = categoryValues.has(urlParams.get('cat') || '') ? urlParams.get('cat') : '全部';
+        state.tier = validTiers.has(urlParams.get('tier') || '') ? urlParams.get('tier') : '全部';
+        state.status = validStatuses.has(urlParams.get('status') || '') ? urlParams.get('status') : '全部';
+        state.sort = validSorts.has(urlParams.get('sort') || '') ? urlParams.get('sort') : 'software-first';
+        state.favoritesOnly = urlParams.get('saved') === '1';
+        if (validIds.has(id)) state.selectedId = id;
+        syncControls();
+        applyFilter({ preserveAddress: true });
       }
 
       function compareItems(a, b) {
@@ -902,12 +1353,32 @@ const categories = getCompetitionCategories(enriched);
       }
 
       function applySelect(options = {}) {
-        const hasPanel = panels.some(panel => panel.dataset.detail === state.selectedId);
+        const hasPanel = panelById.has(state.selectedId);
         panels.forEach(panel => panel.classList.toggle('hidden', panel.dataset.detail !== state.selectedId || !hasPanel));
-        items.forEach(item => item.classList.toggle('is-active', item.dataset.id === state.selectedId));
-        if (hasPanel && options.address) setAddressId(state.selectedId, options.address);
+        items.forEach(item => {
+          const active = item.dataset.id === state.selectedId;
+          item.classList.toggle('is-active', active);
+          item.querySelector('[data-select-competition]')?.setAttribute('aria-current', active ? 'true' : 'false');
+        });
+        detailWorkbenchEl?.classList.toggle('hidden', !hasPanel);
+        const selectedItem = itemById.get(state.selectedId);
+        if (hasPanel && selectedItem) {
+          if (detailFavoriteEl) detailFavoriteEl.dataset.favorite = state.selectedId;
+          if (detailExportEl) {
+            detailExportEl.dataset.exportIcs = state.selectedId;
+            detailExportEl.disabled = selectedItem.dataset.calendarEligible !== 'true';
+            detailExportEl.title = detailExportEl.disabled
+              ? '日期尚未确认，暂不提供日历'
+              : '下载报名截止日历';
+          }
+          syncFavorites();
+        }
+        if (hasPanel && options.address) writeAddress(options.address);
         if (hasPanel && options.scroll) {
-          document.querySelector('[data-detail="' + CSS.escape(state.selectedId) + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          panelById.get(state.selectedId)?.scrollIntoView({
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'start',
+          });
         }
       }
 
@@ -920,37 +1391,46 @@ const categories = getCompetitionCategories(enriched);
             (state.cat === '全部' || item.dataset.cat === state.cat) &&
             (state.tier === '全部' || item.dataset.tier === state.tier) &&
             (state.status === '全部' || item.dataset.status === state.status) &&
+            (!state.favoritesOnly || favorites.has(item.dataset.id || '')) &&
             (!query || haystack.includes(query));
           item.classList.toggle('hidden', !ok);
           if (ok) visible++;
         });
         if (countEl) countEl.textContent = visible + ' items';
+        emptyEl?.classList.toggle('hidden', visible !== 0);
         applySort();
 
-        const current = items.find(item => item.dataset.id === state.selectedId);
+        const current = itemById.get(state.selectedId);
         if (!current || current.classList.contains('hidden')) {
           state.selectedId = visibleItems()[0]?.dataset.id || '';
-          applySelect({ address: state.selectedId ? 'replace' : '' });
+          const addressMode = options.preserveAddress ? 'replace' : (options.address || 'replace');
+          applySelect({ address: state.selectedId ? addressMode : '' });
+          if (!state.selectedId) writeAddress(addressMode);
+          announce(visible ? `已显示 ${visible} 条赛事。` : '没有符合当前条件的赛事。');
           return;
         }
-        applySelect(options);
+        applySelect({ address: options.preserveAddress ? '' : options.address, scroll: options.scroll });
+        announce(`已显示 ${visible} 条赛事。`);
       }
 
       function setChipState(selector, dataName, value) {
         document.querySelectorAll(selector).forEach(button => {
-          button.classList.toggle('is-on', button.dataset[dataName] === value);
+          const active = button.dataset[dataName] === value;
+          button.classList.toggle('is-on', active);
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
       }
 
       async function copySummary(id, button) {
-        const item = items.find(entry => entry.dataset.id === id) || items.find(entry => entry.dataset.id === state.selectedId);
+        const item = itemById.get(id) || itemById.get(state.selectedId);
         if (!item) return;
         const summary = [
           '赛事：' + (item.dataset.fullName || item.dataset.name || ''),
           '截止时间：' + (item.dataset.deadline || ''),
           '参赛打法：' + (item.dataset.strategy || ''),
-          '官方链接：' + (item.dataset.url || ''),
+          '赛事页面：' + (item.dataset.url || ''),
           item.dataset.sources ? '参考来源：' + item.dataset.sources : '',
+          '说明：赛事雷达人工整理，请在提交前复核赛事页面的资格、日期与奖励。',
         ].filter(Boolean).join('\n');
 
         try {
@@ -984,8 +1464,39 @@ const categories = getCompetitionCategories(enriched);
         }
       }
 
+      function downloadCalendar(id, button) {
+        const item = itemById.get(id);
+        if (!item) return;
+        try {
+          const calendar = buildCalendar(item);
+          const blob = new Blob([calendar], { type: 'text/calendar;charset=utf-8' });
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const baseName = (item.dataset.name || id || 'competition-deadline')
+            .normalize('NFKC')
+            .replace(/[\\/:*?"<>|]+/g, '-')
+            .replace(/\s+/g, '-')
+            .slice(0, 80);
+          link.href = blobUrl;
+          link.download = `${baseName || 'competition-deadline'}.ics`;
+          link.hidden = true;
+          document.body.append(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+          announce(`已下载 ${item.dataset.name || '赛事'} 的报名截止日历。`);
+          const original = button.textContent;
+          button.textContent = '已下载';
+          window.setTimeout(() => {
+            if (!signal.aborted) button.textContent = original || '加入日历';
+          }, 1400);
+        } catch {
+          announce('该赛事日期尚未确认，暂时不能导出日历。');
+        }
+      }
+
       items.forEach(item => {
-        item.addEventListener('click', () => {
+        item.querySelector('[data-select-competition]')?.addEventListener('click', () => {
           state.selectedId = item.dataset.id;
           applySelect({ address: 'push', scroll: window.innerWidth < 1024 });
         }, { signal });
@@ -995,7 +1506,7 @@ const categories = getCompetitionCategories(enriched);
         button.addEventListener('click', () => {
           state.cat = button.dataset.fcat || '全部';
           setChipState('.filter-cat', 'fcat', state.cat);
-          applyFilter({ address: 'replace' });
+          applyFilter({ address: 'push' });
         }, { signal });
       });
 
@@ -1003,24 +1514,23 @@ const categories = getCompetitionCategories(enriched);
         button.addEventListener('click', () => {
           state.tier = button.dataset.ftier || '全部';
           setChipState('.filter-tier', 'ftier', state.tier);
-          applyFilter({ address: 'replace' });
+          applyFilter({ address: 'push' });
         }, { signal });
       });
 
       searchEl?.addEventListener('input', () => {
         state.search = searchEl.value;
-        setSearchAddress();
         applyFilter({ address: 'replace' });
       }, { signal });
 
       statusEl?.addEventListener('change', () => {
         state.status = statusEl.value;
-        applyFilter({ address: 'replace' });
+        applyFilter({ address: 'push' });
       }, { signal });
 
       sortEl?.addEventListener('change', () => {
         state.sort = sortEl.value;
-        applyFilter({ address: 'replace' });
+        applyFilter({ address: 'push' });
       }, { signal });
 
       document.querySelectorAll('[data-jump]').forEach(button => {
@@ -1034,18 +1544,52 @@ const categories = getCompetitionCategories(enriched);
         button.addEventListener('click', () => copySummary(button.dataset.copySummary, button), { signal });
       });
 
-      window.addEventListener('hashchange', () => {
-        const id = getAddressId();
-        if (!items.some(item => item.dataset.id === id)) return;
-        state.selectedId = id;
-        applyFilter();
+      document.querySelectorAll('[data-export-ics]').forEach(button => {
+        button.addEventListener('click', () => downloadCalendar(button.dataset.exportIcs, button), { signal });
+      });
+
+      document.querySelectorAll('[data-favorite]').forEach(button => {
+        button.addEventListener('click', () => toggleFavorite(button.dataset.favorite || ''), { signal });
+      });
+
+      favoritesOnlyEl?.addEventListener('click', () => {
+        state.favoritesOnly = !state.favoritesOnly;
+        syncControls();
+        applyFilter({ address: 'push' });
       }, { signal });
 
-      applyFilter({ address: getAddressId() ? 'replace' : '' });
-      if (getAddressId()) {
+      clearFavoritesEl?.addEventListener('click', () => {
+        if (!favorites.size || !window.confirm(`确定清空 ${favorites.size} 条收藏吗？`)) return;
+        favorites.clear();
+        writeFavoriteIds(favorites);
+        syncFavorites();
+        applyFilter({ address: 'replace' });
+        announce('收藏已清空。');
+      }, { signal });
+
+      clearFiltersEl?.addEventListener('click', () => resetFilters({ address: 'push' }), { signal });
+      document.querySelector('[data-empty-reset]')?.addEventListener('click', () => resetFilters({ address: 'push' }), { signal });
+
+      window.addEventListener('popstate', syncStateFromAddress, { signal });
+      window.addEventListener('hashchange', syncStateFromAddress, { signal });
+      window.addEventListener('storage', event => {
+        if (event.key !== favoriteStorageKey) return;
+        favorites.clear();
+        readFavoriteIds(validIds).forEach(id => favorites.add(id));
+        syncFavorites();
+        if (state.favoritesOnly) applyFilter({ preserveAddress: true });
+      }, { signal });
+
+      syncControls();
+      syncFavorites();
+      applyFilter({ address: 'replace' });
+      if (initialId && validIds.has(initialId)) {
         window.setTimeout(() => {
           if (signal.aborted) return;
-          document.querySelector('[data-detail="' + CSS.escape(state.selectedId) + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          panelById.get(state.selectedId)?.scrollIntoView({
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'start',
+          });
         }, 80);
       }
     }
