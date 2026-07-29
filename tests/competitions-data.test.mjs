@@ -122,6 +122,15 @@ test('new verified records retain official sources and qualification boundaries'
   assert.equal(getPrimaryDeadline(industrial).certainty, 'confirmed');
 });
 
+test('dead primary action links fall back to a reachable organizer page with a warning', () => {
+  const step = byId.get('stepsoftware2026');
+  assert.equal(step.url, 'https://www.stepelectric.com/');
+  assert.equal(step.verification.linkHealth, 'dead');
+  assert.equal(getPrimaryDeadline(step).certainty, 'estimated');
+  assert.match(step.verification.notes, /404/);
+  assert.ok(step.sources.every((source) => source.url !== 'https://www.stepelectric.com/Product_detail_by/103.html'));
+});
+
 test('default source labels no longer assert official status', () => {
   const misleading = competitions.flatMap((competition) => competition.sources)
     .filter((source) => source.title.startsWith('官方赛事页｜'));

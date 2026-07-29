@@ -98,6 +98,41 @@ export const competitionV2Overrides = Object.freeze({
     ],
     verification: officialVerification('奖金按 Devpost 当前四条合作方赛道各 $15,000 合计；中国等规则所列地区不可参赛。'),
   },
+  stepsoftware2026: {
+    url: 'https://www.stepelectric.com/',
+    deadlines: [
+      {
+        type: 'submission',
+        date: '2026-09-30',
+        certainty: 'estimated',
+        timezone: 'Asia/Shanghai',
+        label: '原详情所列截止日；当前需向主办方复核',
+        primary: true,
+      },
+    ],
+    primaryDeadline: {
+      type: 'submission',
+      date: '2026-09-30',
+      certainty: 'estimated',
+      timezone: 'Asia/Shanghai',
+      label: '原详情所列截止日；当前需向主办方复核',
+    },
+    verification: {
+      status: 'partially-verified',
+      checkedAt: '2026-07-30',
+      sourceKind: 'official',
+      linkHealth: 'dead',
+      notes: '主办方原赛事详情页已返回 404；本站暂改链到主办方官网，赛前须向主办方复核报名入口和截止时间。',
+    },
+    sources: [
+      {
+        title: '上海新时达官网｜原赛事详情已下线',
+        date: '2026-07-30',
+        url: 'https://www.stepelectric.com/',
+        kind: 'official',
+      },
+    ],
+  },
   creatorhackathonvol1: {
     deadlines: [uncertainDeadline('estimated', '以开赛日作保守提醒；独立报名截止未公开', '2026-08-01')],
     primaryDeadline: uncertainDeadline('estimated', '以开赛日作保守提醒；独立报名截止未公开', '2026-08-01'),
