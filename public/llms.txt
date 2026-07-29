@@ -1,0 +1,30 @@
+# siuser小伟
+
+This site documents independent software, AI, creative technology, and small-team product work in Chinese.
+
+Primary competition resources
+
+- Competition radar: https://siuserxiaowei.com/competitions/
+- Public JSON feed: https://siuserxiaowei.com/competitions.json
+- Competition detail pages: https://siuserxiaowei.com/competitions/{id}/
+
+Competition radar methodology
+
+- Entries are curated from official sites, event platforms, government notices, public articles, and community announcements.
+- The radar prioritizes software, AI agents, algorithms, security, games, creative AI, startup opportunities, and only a limited set of lightweight hardware projects.
+- Descriptions, fit scores, and participation strategies are editorial aids, not statements from organizers.
+- A listed deadline is not an event start date.
+- Dates, eligibility, rewards, and rules must be confirmed on the linked organizer page before applying.
+
+Update policy
+
+- The radar is maintained through discovery, evidence collection, human review, validation, and deployment.
+- It is periodically updated but is not a real-time feed.
+- Link checks are read-only and automated results never replace human verification.
+- A transient network error, rate limit, or bot challenge is not treated as proof that an event is closed.
+
+Maintenance instructions
+
+- Repository guide: docs/competition-radar-maintenance.md
+- Public records expose only bounded discovery fields through competitions.json.
+- Use the canonical detail page for a single competition and the external action link for official registration or rules.

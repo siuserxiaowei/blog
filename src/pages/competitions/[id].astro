@@ -1,0 +1,434 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { competitions, RADAR_UPDATED_AT } from '../../data/competitions.js';
+
+export function getStaticPaths() {
+  return competitions.map((competition) => ({
+    params: { id: competition.id },
+    props: { competition },
+  }));
+}
+
+const { competition } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const radarURL = `/competitions/#${encodeURIComponent(competition.id)}`;
+const sources = Array.isArray(competition.sources) ? competition.sources : [];
+const timeline = Array.isArray(competition.timeline) ? competition.timeline : [];
+
+const uncertainDatePattern = /(预计|参考|待公告|滚动|可能延期|暂定)/;
+const nonEventDatePattern = /(截止|报名|申请|提交|提案|征集|评审|公布|通知|开放|招募|入围|结果|投票)/;
+const explicitEventStartPattern = /^(活动开始|比赛开始|线上比赛开始|创作期开始|开发开始|总决赛开始|黑客松与颁奖|澳门极限开发|Maker Faire Shenzhen|活动当天)/;
+const explicitEventEndPattern = /^(活动结束|比赛结束|总决赛结束)/;
+
+function findExplicitEventDate(pattern) {
+  return timeline.find((item) => {
+    if (!item?.event || !item?.date) return false;
+    if (uncertainDatePattern.test(item.event) || nonEventDatePattern.test(item.event)) return false;
+    return pattern.test(item.event);
+  })?.date;
+}
+
+const eventStartDate = findExplicitEventDate(explicitEventStartPattern);
+const eventEndDate = eventStartDate ? findExplicitEventDate(explicitEventEndPattern) : undefined;
+const sourceURLs = [...new Set(sources.map((source) => source?.url).filter(Boolean))];
+
+const webPageNode = {
+  '@type': 'WebPage',
+  '@id': canonicalURL,
+  url: canonicalURL,
+  name: competition.fullName,
+  description: competition.desc,
+  inLanguage: 'zh-CN',
+  dateModified: RADAR_UPDATED_AT,
+  isPartOf: {
+    '@type': 'WebSite',
+    '@id': 'https://siuserxiaowei.com/#website',
+    name: 'siuser小伟',
+    url: 'https://siuserxiaowei.com/',
+  },
+  mainEntity: { '@id': `${canonicalURL}#event` },
+};
+
+const eventNode = {
+  '@type': 'Event',
+  '@id': `${canonicalURL}#event`,
+  name: competition.fullName,
+  description: competition.desc,
+  url: canonicalURL,
+  organizer: {
+    '@type': 'Organization',
+    name: competition.org,
+  },
+  ...(eventStartDate ? { startDate: eventStartDate } : {}),
+  ...(eventEndDate ? { endDate: eventEndDate } : {}),
+  ...(sourceURLs.length ? { sameAs: sourceURLs } : {}),
+};
+
+const structuredData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [webPageNode, eventNode],
+}).replace(/</g, '\\u003c');
+
+const description = `${competition.fullName}：${competition.desc}`;
+---
+
+<BaseLayout title={`${competition.fullName} · 赛事雷达`} description={description}>
+  <Header />
+
+  <script type="application/ld+json" set:html={structuredData} />
+
+  <main class="flex-1">
+    <article class="competition-detail mx-auto px-6 py-14 md:py-20">
+      <nav aria-label="面包屑" class="mb-8">
+        <a class="back-link" href={radarURL}>← 返回赛事雷达</a>
+      </nav>
+
+      <header class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
+        <div class="flex flex-wrap items-center gap-2.5 mb-5">
+          <span class={`tier-tag tier-${competition.tier} tier-lg`}>{competition.tier} 级</span>
+          <span class="pill-note">{competition.cat}</span>
+          <span class="pill-note">信用 {competition.rel}</span>
+        </div>
+
+        <h1 class="detail-title">{competition.fullName}</h1>
+        <p class="detail-summary">{competition.desc}</p>
+
+        <dl class="fact-grid">
+          <div>
+            <dt>主办／组织</dt>
+            <dd>{competition.org}</dd>
+          </div>
+          <div>
+            <dt>地区与形式</dt>
+            <dd>{competition.loc}</dd>
+          </div>
+          <div>
+            <dt>日期说明</dt>
+            <dd>{competition.date}</dd>
+          </div>
+          <div>
+            <dt>适配评分</dt>
+            <dd>{competition.match.toFixed(1)} / 10 · {competition.suit}</dd>
+          </div>
+        </dl>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a class="primary-action" href={competition.url} target="_blank" rel="noopener noreferrer">
+            前往赛事／报名页面 ↗
+          </a>
+          <a class="secondary-action" href={radarURL}>在雷达中查看</a>
+        </div>
+      </header>
+
+      <div class="detail-grid mt-8">
+        <section class="glass-card detail-section">
+          <p class="section-kicker mb-3">// 资格与适用人群</p>
+          <h2>谁适合参加</h2>
+          <p>{competition.audience}</p>
+          <p class="subtle mt-3">地区、团队人数、身份与费用等硬性资格仍应以赛事规则页为准。</p>
+        </section>
+
+        <section class="glass-card detail-section">
+          <p class="section-kicker mb-3">// 参赛建议</p>
+          <h2>推荐打法</h2>
+          <p>{competition.strategy}</p>
+        </section>
+      </div>
+
+      <section class="glass-card detail-section mt-8">
+        <p class="section-kicker mb-3">// Timeline</p>
+        <h2>关键时间轴</h2>
+        <ol class="timeline-list">
+          {timeline.map((item) => (
+            <li>
+              <span class:list={['timeline-marker', item.critical && 'is-critical']}></span>
+              <div>
+                <strong>{item.event}</strong>
+                <time datetime={item.date}>{item.date}</time>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p class="subtle mt-5">
+          时间轴中的报名或提交截止仅用于参赛提醒，不会被当作活动开始日期写入结构化数据。
+        </p>
+      </section>
+
+      <div class="detail-grid mt-8">
+        <section class="glass-card detail-section">
+          <p class="section-kicker mb-3">// Rewards</p>
+          <h2>奖励与机会</h2>
+          <ul class="bullet-list">
+            {competition.rewards.map((reward) => <li>{reward}</li>)}
+          </ul>
+        </section>
+
+        <section class="glass-card detail-section">
+          <p class="section-kicker mb-3">// Evaluation</p>
+          <h2>可能的获胜重点</h2>
+          <ul class="bullet-list">
+            {competition.winning.map((item) => <li>{item}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <section class="glass-card detail-section mt-8">
+        <p class="section-kicker mb-3">// Sources</p>
+        <h2>来源与核验说明</h2>
+        {sources.length > 0 ? (
+          <ul class="source-list">
+            {sources.map((source) => (
+              <li>
+                <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>
+                <span>{source.date}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>当前记录尚未整理独立来源列表，请直接查看赛事页面并再次核对规则。</p>
+        )}
+
+        <div class="verification-note mt-6">
+          <strong>核验边界</strong>
+          <p>
+            本站于 {RADAR_UPDATED_AT} 整理该记录，用于赛事发现与决策辅助，不是官方报名系统，也不承诺实时更新。
+            截止时间、参赛资格、奖金条件和规则变更均以主办方最新公告为准。
+          </p>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .competition-detail {
+    max-width: var(--container-max);
+  }
+
+  .back-link {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    transition: color 160ms ease;
+  }
+
+  .back-link:hover,
+  .source-list a:hover {
+    color: var(--color-accent);
+  }
+
+  .detail-title {
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 4rem);
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    max-width: 20ch;
+  }
+
+  .detail-summary {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-top: 1.25rem;
+    max-width: 72ch;
+  }
+
+  .fact-grid,
+  .detail-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fact-grid {
+    border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .fact-grid dt {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+
+  .fact-grid dd {
+    color: var(--text);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .primary-action,
+  .secondary-action {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 600;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.65rem 1.1rem;
+  }
+
+  .primary-action {
+    background: var(--color-accent);
+    color: var(--background);
+  }
+
+  .secondary-action {
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .detail-section {
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .detail-section h2 {
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .detail-section p,
+  .bullet-list,
+  .source-list {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+
+  .subtle {
+    font-size: 0.78rem !important;
+    opacity: 0.75;
+  }
+
+  .timeline-list {
+    display: grid;
+    gap: 0;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    margin-top: 1.25rem;
+  }
+
+  .timeline-list li {
+    border-top: 1px solid var(--border);
+    min-width: 0;
+    padding: 1.25rem 1rem 0 0;
+    position: relative;
+  }
+
+  .timeline-marker {
+    background: var(--text-secondary);
+    border: 3px solid var(--background);
+    border-radius: 999px;
+    height: 0.8rem;
+    left: 0;
+    position: absolute;
+    top: -0.42rem;
+    width: 0.8rem;
+  }
+
+  .timeline-marker.is-critical {
+    background: var(--color-accent);
+  }
+
+  .timeline-list strong,
+  .timeline-list time {
+    display: block;
+  }
+
+  .timeline-list strong {
+    color: var(--text);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .timeline-list time {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    margin-top: 0.35rem;
+  }
+
+  .bullet-list {
+    list-style: disc;
+    padding-left: 1.15rem;
+  }
+
+  .bullet-list li + li {
+    margin-top: 0.35rem;
+  }
+
+  .source-list li {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    justify-content: space-between;
+    padding: 0.65rem 0;
+  }
+
+  .source-list li + li {
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  }
+
+  .source-list a {
+    color: var(--text);
+  }
+
+  .source-list span {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    opacity: 0.7;
+  }
+
+  .verification-note {
+    background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
+    border-radius: 0.9rem;
+    padding: 1rem;
+  }
+
+  .verification-note strong {
+    color: var(--text);
+    display: block;
+    font-size: 0.78rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .verification-note p {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 720px) {
+    .fact-grid,
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-list {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-list li {
+      border-left: 1px solid var(--border);
+      border-top: 0;
+      padding: 0 0 1.25rem 1.25rem;
+    }
+
+    .timeline-marker {
+      left: -0.42rem;
+      top: 0.15rem;
+    }
+  }
+</style>
