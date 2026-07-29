@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">创作者黑客松，两天做出一个能演示的东西</title>
+  <desc id="desc">米白色编辑风封面，黄色爆炸框、奖杯和创作者工作台组成主视觉。</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#1f1c18" flood-opacity=".12"/>
+    </filter>
+    <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#1f1c18" opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f5f0e7"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <path d="M62 91 146 66 192 101 278 57 344 91 430 50 496 94 576 66 632 102 601 163 634 210 550 224 506 273 429 244 360 285 292 245 209 274 159 226 82 239 104 178Z"
+        fill="#f4ca32" stroke="#1f1c18" stroke-width="8" stroke-linejoin="round" filter="url(#shadow)"/>
+  <text x="112" y="152" fill="#1f1c18" font-size="40" font-weight="800" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">创作者黑客松 Vol.1</text>
+  <text x="112" y="201" fill="#1f1c18" font-size="25" font-weight="600" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">8.1—8.2 · 上海 + 线上分会场</text>
+
+  <text x="70" y="375" fill="#1f1c18" font-size="62" font-weight="800" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">两天，做出一个</text>
+  <text x="70" y="455" fill="#1f1c18" font-size="76" font-weight="900" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">能演示的东西</text>
+  <rect x="70" y="500" width="570" height="64" rx="10" fill="#d94b35"/>
+  <text x="98" y="542" fill="#fff8ed" font-size="27" font-weight="700" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">0→1 创作 · 二次开发 · Token 奖励</text>
+
+  <g transform="translate(736 82)" filter="url(#shadow)">
+    <rect width="390" height="470" rx="28" fill="#fffaf0" stroke="#1f1c18" stroke-width="6"/>
+    <path d="M146 64h98v52c0 58-26 91-49 104-23-13-49-46-49-104Z" fill="#f4ca32" stroke="#1f1c18" stroke-width="6"/>
+    <path d="M146 82h-46v26c0 45 25 68 67 68M244 82h46v26c0 45-25 68-67 68" fill="none" stroke="#1f1c18" stroke-width="6" stroke-linecap="round"/>
+    <path d="M195 220v48M150 268h90M135 286h120" fill="none" stroke="#1f1c18" stroke-width="7" stroke-linecap="round"/>
+    <text x="48" y="350" fill="#1f1c18" font-size="34" font-weight="900" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">$100,000</text>
+    <text x="52" y="390" fill="#7d4d24" font-size="21" font-weight="700" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">等额 TOKEN 奖池</text>
+    <path d="M52 418h286" stroke="#1f1c18" stroke-width="3" stroke-dasharray="7 8"/>
+    <text x="52" y="452" fill="#1f1c18" font-size="18" font-weight="600" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">注意：Token 不等于现金</text>
+  </g>
+
+  <g fill="#d94b35">
+    <path d="M681 131c-11-22-43-9-33 13 6 13 33 31 33 31s27-18 33-31c10-22-22-35-33-13Z"/>
+    <path d="M1105 573c-8-16-31-7-24 9 5 10 24 23 24 23s20-13 24-23c7-16-16-25-24-9Z"/>
+  </g>
+  <g fill="#f4ca32" stroke="#1f1c18" stroke-width="3">
+    <path d="m678 44 7 17 19 1-15 12 5 18-16-10-16 10 5-18-15-12 19-1Z"/>
+    <path d="m690 520 7 17 19 1-15 12 5 18-16-10-16 10 5-18-15-12 19-1Z"/>
+  </g>
+</svg>

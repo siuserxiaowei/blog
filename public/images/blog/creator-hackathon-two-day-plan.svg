@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">两天黑客松推进路线</title>
+  <desc id="desc">从问题、核心闭环、演示到路演的四步时间规划。</desc>
+  <rect width="1200" height="520" rx="28" fill="#f5f0e7"/>
+  <text x="70" y="82" fill="#1f1c18" font-size="38" font-weight="800" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">两天里，不要做“大产品”</text>
+  <text x="70" y="124" fill="#71685d" font-size="23" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">只做一条能被看懂、能跑通、能演示的核心闭环</text>
+  <path d="M148 276h905" stroke="#c8bfb2" stroke-width="8" stroke-linecap="round"/>
+  <g font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">
+    <g transform="translate(140 276)">
+      <circle r="48" fill="#f4ca32" stroke="#1f1c18" stroke-width="6"/>
+      <text x="-22" y="12" fill="#1f1c18" font-size="32" font-weight="900">01</text>
+      <text x="-74" y="92" fill="#1f1c18" font-size="25" font-weight="800">一句话问题</text>
+      <text x="-92" y="129" fill="#71685d" font-size="19">谁，在什么场景，</text>
+      <text x="-74" y="158" fill="#71685d" font-size="19">卡在了哪里？</text>
+    </g>
+    <g transform="translate(440 276)">
+      <circle r="48" fill="#fffaf0" stroke="#1f1c18" stroke-width="6"/>
+      <text x="-22" y="12" fill="#1f1c18" font-size="32" font-weight="900">02</text>
+      <text x="-74" y="92" fill="#1f1c18" font-size="25" font-weight="800">跑通闭环</text>
+      <text x="-88" y="129" fill="#71685d" font-size="19">输入 → AI 处理</text>
+      <text x="-69" y="158" fill="#71685d" font-size="19">→ 可见结果</text>
+    </g>
+    <g transform="translate(740 276)">
+      <circle r="48" fill="#fffaf0" stroke="#1f1c18" stroke-width="6"/>
+      <text x="-22" y="12" fill="#1f1c18" font-size="32" font-weight="900">03</text>
+      <text x="-74" y="92" fill="#1f1c18" font-size="25" font-weight="800">准备演示</text>
+      <text x="-76" y="129" fill="#71685d" font-size="19">留一条稳定路径</text>
+      <text x="-68" y="158" fill="#71685d" font-size="19">再录屏备份</text>
+    </g>
+    <g transform="translate(1040 276)">
+      <circle r="48" fill="#d94b35" stroke="#1f1c18" stroke-width="6"/>
+      <text x="-22" y="12" fill="#fffaf0" font-size="32" font-weight="900">04</text>
+      <text x="-74" y="92" fill="#1f1c18" font-size="25" font-weight="800">讲清价值</text>
+      <text x="-89" y="129" fill="#71685d" font-size="19">问题 → 转折 →</text>
+      <text x="-77" y="158" fill="#71685d" font-size="19">结果 → 下一步</text>
+    </g>
+  </g>
+</svg>

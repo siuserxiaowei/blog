@@ -5,15 +5,17 @@ import Footer from '../components/Footer.astro';
 
 import { competitions, RADAR_UPDATED_AT, enrichCompetitions, getCompetitionCategories } from '../data/competitions.js';
 
-const TODAY = new Date(RADAR_UPDATED_AT);
+const TODAY = new Date();
 const enriched = enrichCompetitions(competitions, TODAY);
 const expiredCount = enriched.filter(c => c.status.kind === 'expired').length;
 const urgentCount = enriched.filter(c => c.status.kind === 'urgent').length;
-const sCount = enriched.filter(c => c.tier === 'S').length;
+const activeCount = enriched.length - expiredCount;
+const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法', '安全攻防', '游戏创作', '创意 AI', '创业路演']);
+const softwareCount = enriched.filter(c => c.status.kind !== 'expired' && softwareCategories.has(c.cat)).length;
 const categories = getCompetitionCategories(enriched);
 ---
 
-<BaseLayout title="AI 硬件赛事雷达 · siuser小伟" description="AI 硬件方案商的赛事与行业活动调研看板。">
+<BaseLayout title="AI 产品赛事雷达 · siuser小伟" description="面向 AI 软件、Agent、独立开发与轻硬件团队的赛事和行业活动看板。">
   <Header />
 
   <main class="flex-1">
@@ -25,10 +27,10 @@ const categories = getCompetitionCategories(enriched);
         <span class="text-[10px] tracking-wider" style="font-family: var(--font-mono); color: var(--text-secondary); opacity: 0.5;">// {RADAR_UPDATED_AT} · {enriched.length} items tracked</span>
       </div>
       <h1 class="animate-fade-in stagger-2 text-3xl md:text-5xl mb-4" style="font-family: var(--font-heading); color: var(--text);">
-        AI 硬件 <span class="text-shimmer">赛事雷达</span>
+        AI 产品 <span class="text-shimmer">赛事雷达</span>
       </h1>
       <p class="animate-fade-in stagger-3 text-base max-w-2xl leading-relaxed" style="color: var(--text-secondary);">
-        面向 AI 硬件方案商和早期硬件创业团队的赛事与行业活动数据库。只看三件事：能不能拿订单、能不能上量、能不能拿政府 / 资本背书。
+        面向 AI 软件、Agent、算法、安全、独立游戏、创意 AI 与小团队创业的赛事数据库。同时追踪官方站、活动平台、公众号和社群海报；硬件只保留龙虾盒子、陪伴终端等小而轻的项目。
       </p>
       <div class="animate-fade-in stagger-3 divider-accent mt-6 mb-10"></div>
 
@@ -40,19 +42,19 @@ const categories = getCompetitionCategories(enriched);
           <div class="mt-1 text-xs" style="color: var(--text-secondary);">赛事总数</div>
         </div>
         <div class="metric-tile p-5">
-          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">TIER·S</div>
-          <div class="text-3xl font-semibold" style="color: var(--color-accent); font-family: var(--font-heading);">{sCount}</div>
-          <div class="mt-1 text-xs" style="color: var(--text-secondary);">S 级强推</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">ACTIVE</div>
+          <div id="metric-active" class="text-3xl font-semibold" style="color: var(--color-accent); font-family: var(--font-heading);">{activeCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">现在可投 / 将开放</div>
         </div>
         <div class="metric-tile p-5 relative overflow-hidden">
-          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">URGENT</div>
-          <div class="text-3xl font-semibold" style="color: var(--color-accent-2); font-family: var(--font-heading);">{urgentCount}</div>
-          <div class="mt-1 text-xs" style="color: var(--text-secondary);">14 天内截止</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">SOFTWARE</div>
+          <div id="metric-software" class="text-3xl font-semibold" style="color: var(--color-accent-2); font-family: var(--font-heading);">{softwareCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">活跃软件 / 算法 / 创意</div>
         </div>
         <div class="metric-tile p-5">
-          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">EXPIRED</div>
-          <div class="text-3xl font-semibold line-through" style="color: var(--text-secondary); opacity: 0.55; font-family: var(--font-heading);">{expiredCount}</div>
-          <div class="mt-1 text-xs" style="color: var(--text-secondary);">已过期</div>
+          <div class="text-[11px] uppercase tracking-[0.18em] mb-2" style="color: var(--text-secondary); font-family: var(--font-mono);">URGENT</div>
+          <div id="metric-urgent" class="text-3xl font-semibold" style="color: var(--color-accent-2); font-family: var(--font-heading);">{urgentCount}</div>
+          <div class="mt-1 text-xs" style="color: var(--text-secondary);">14 天内截止</div>
         </div>
       </div>
     </section>
@@ -63,35 +65,32 @@ const categories = getCompetitionCategories(enriched);
         <div>
           <p class="section-kicker mb-4">// Priority Matrix</p>
           <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
-            BEYOND HACK <span style="color: var(--text-secondary); font-weight: 400;">›</span> 鸿蒙 <span style="color: var(--text-secondary); font-weight: 400;">›</span> 创客中国 <span style="color: var(--text-secondary); font-weight: 400;">›</span> WAVES 决赛
+            Shipaton <span style="color: var(--text-secondary); font-weight: 400;">›</span> 讯飞教育 AI <span style="color: var(--text-secondary); font-weight: 400;">›</span> Agent Security <span style="color: var(--text-secondary); font-weight: 400;">›</span> CCF OPC
           </h2>
           <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            <strong style="color: var(--color-accent);">4-30 三场刚刚截止</strong>：「星火」硬件创新大赛、WAIC OPC 先锋赛、36氪 <strong style="color: var(--color-accent);">WAVES 有智青年</strong>挑战赛（决赛 6 月）— 错过报名的盯 6 月 WAVES 决赛和下一轮。一周倒计时：<strong style="color: var(--color-accent);">BEYOND HACK（5-8）</strong>澳门极限开发 + 嘉立创百万奖池，<strong style="color: var(--color-accent);">HarmonyOS 极客赛道（5-15）</strong>奖池 68 万。中长线：创客中国第 11 届 7-10 截止，政策兑现最稳。
+            <strong style="color: var(--color-accent);">软件主线分成三种回报</strong>：RevenueCat Shipaton 奖励真实上架、增长与收入；讯飞教育和情感数字人适合复用现有产品；Kaggle Agent Security、ARC 与 Pokémon 更偏算法和技术影响力。中国居民被排除、仅学生或仅特定地区可报的项目不会进入默认优先队列。
           </p>
           <div class="flex flex-wrap gap-2">
-            <span class="pill-note"><span class="dot-accent"></span>资本 · BEYOND HACK · 5-8</span>
-            <span class="pill-note"><span class="dot-accent"></span>生态 · 鸿蒙 · 5-15</span>
-            <span class="pill-note"><span class="dot-accent"></span>政策 · 创客中国 · 7-10</span>
-            <span class="pill-note"><span class="dot-accent"></span>决赛 · WAVES · 6 月</span>
+            <span class="pill-note"><span class="dot-accent"></span>上架变现 · Shipaton · 9-30</span>
+            <span class="pill-note"><span class="dot-accent"></span>教育 Agent · 讯飞 · 9-25</span>
+            <span class="pill-note"><span class="dot-accent"></span>安全研究 · Kaggle · 9-01</span>
+            <span class="pill-note"><span class="dot-accent"></span>语音 Agent · CALL-E · 9-14</span>
           </div>
         </div>
 
         <div class="border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-8" style="border-color: color-mix(in srgb, var(--border) 55%, transparent);">
           <p class="section-kicker mb-4">// 14 天紧急</p>
-          {urgentCount > 0 ? (
-            <ul class="space-y-2.5">
-              {enriched.filter(c => c.status.kind === 'urgent').sort((a,b)=>a.status.days-b.status.days).map(c => (
-                <li>
-                  <button data-jump={c.id} class="urgent-chip group">
-                    <span class="flex-1 text-sm font-medium truncate" style="color: var(--text);">{c.name}</span>
-                    <span class="urgent-badge">{c.status.days}d</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="text-sm" style="color: var(--text-secondary);">14 天内暂无赛事截止。</p>
-          )}
+          <ul id="urgent-list" class:list={["space-y-2.5", urgentCount === 0 && "hidden"]}>
+            {enriched.filter(c => c.status.kind === 'urgent').sort((a,b)=>a.status.days-b.status.days).map(c => (
+              <li>
+                <button data-jump={c.id} class="urgent-chip group">
+                  <span class="flex-1 text-sm font-medium truncate" style="color: var(--text);">{c.name}</span>
+                  <span class="urgent-badge">{c.status.days}d</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p id="urgent-empty" class:list={["text-sm", urgentCount > 0 && "hidden"]} style="color: var(--text-secondary);">14 天内暂无赛事截止。</p>
         </div>
       </div>
     </section>
@@ -117,8 +116,9 @@ const categories = getCompetitionCategories(enriched);
           <label class="radar-field">
             <span class="section-kicker filter-label">// 排序</span>
             <select id="radar-sort" class="radar-select">
-              <option value="match-desc">匹配度高优先</option>
+              <option value="software-first">软件优先</option>
               <option value="urgent-first">紧急优先</option>
+              <option value="match-desc">匹配度高优先</option>
               <option value="deadline-asc">截止近优先</option>
               <option value="tier-desc">等级高优先</option>
             </select>
@@ -177,7 +177,7 @@ const categories = getCompetitionCategories(enriched);
                 </div>
                 <div class="flex items-center gap-2 mb-2">
                   <span class={`status-dot status-${c.status.kind}`}></span>
-                  <span class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
+                  <span data-status-label class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
                   <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.5;">·</span>
                   <span class="text-[11px]" style="color: var(--text-secondary);">{c.cat}</span>
                 </div>
@@ -202,7 +202,7 @@ const categories = getCompetitionCategories(enriched);
                   <div class="flex-1 min-w-0 space-y-3">
                     <div class="flex flex-wrap items-center gap-2.5">
                       <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
-                      <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span>{c.status.label}</span>
+                      <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span><span data-status-label>{c.status.label}</span></span>
                       <span class="pill-note">信用 {c.rel}</span>
                       <span class="pill-note">{c.cat}</span>
                     </div>
@@ -328,7 +328,7 @@ const categories = getCompetitionCategories(enriched);
       </div>
 
       <div class="text-center text-[11px] pt-12 mt-12 border-t" style="color: var(--text-secondary); border-color: color-mix(in srgb, var(--border) 50%, transparent); font-family: var(--font-mono); letter-spacing: 0.05em;">
-        DATA UPDATED · {RADAR_UPDATED_AT} · {enriched.length} ENTRIES TRACKED · 带「参考上届」标签的届次尚未官方公告，请以主办方通知为准
+        FACT CHECKED · {RADAR_UPDATED_AT} · {enriched.length} ENTRIES TRACKED · 倒计时按访问当天自动计算；带「参考 / 预计」标签的信息仍须以主办方通知为准
       </div>
     </section>
   </main>
@@ -724,6 +724,90 @@ const categories = getCompetitionCategories(enriched);
     const abortKey = '__competitionRadarAbort';
     const tierRank = { S: 3, A: 2, B: 1 };
     const statusRank = { urgent: 0, ongoing: 1, upcoming: 2, expired: 3 };
+    const softwareRank = {
+      'AI 软件': 0,
+      '开源开发': 1,
+      '数据算法': 2,
+      '安全攻防': 3,
+      '游戏创作': 4,
+      '创意 AI': 5,
+      '创业路演': 6,
+      '学生限定': 8,
+      '地区限定': 9,
+    };
+    const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法', '安全攻防', '游戏创作', '创意 AI', '创业路演']);
+    const dayMs = 86400000;
+
+    function statusForDeadline(value) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+      if (!match) return { kind: 'unknown', days: null, label: '日期待确认' };
+      const deadline = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const days = Math.ceil((deadline.getTime() - today.getTime()) / dayMs);
+      if (days < 0) return { kind: 'expired', days, label: '已截止' };
+      if (days <= 14) return { kind: 'urgent', days, label: days === 0 ? '今天截止' : `${days} 天后截止` };
+      if (days <= 60) return { kind: 'ongoing', days, label: `${days} 天后截止` };
+      return { kind: 'upcoming', days, label: `${days} 天后` };
+    }
+
+    function updateStatusDot(dot, kind) {
+      if (!dot) return;
+      dot.classList.remove('status-urgent', 'status-ongoing', 'status-upcoming', 'status-expired', 'status-unknown');
+      dot.classList.add(`status-${kind}`);
+    }
+
+    function refreshStatuses(items, panels) {
+      const urgent = [];
+      let active = 0;
+      let software = 0;
+
+      items.forEach(item => {
+        const status = statusForDeadline(item.dataset.deadline);
+        item.dataset.status = status.kind;
+        item.querySelector('[data-status-label]')?.replaceChildren(status.label);
+        updateStatusDot(item.querySelector('.status-dot'), status.kind);
+
+        const panel = panels.find(entry => entry.dataset.detail === item.dataset.id);
+        panel?.querySelector('[data-status-label]')?.replaceChildren(status.label);
+        updateStatusDot(panel?.querySelector('.status-dot'), status.kind);
+
+        if (status.kind === 'urgent') urgent.push({ item, status });
+        if (status.kind !== 'expired') {
+          active++;
+          if (softwareCategories.has(item.dataset.cat)) software++;
+        }
+      });
+
+      document.getElementById('metric-urgent')?.replaceChildren(String(urgent.length));
+      document.getElementById('metric-active')?.replaceChildren(String(active));
+      document.getElementById('metric-software')?.replaceChildren(String(software));
+
+      const urgentList = document.getElementById('urgent-list');
+      const urgentEmpty = document.getElementById('urgent-empty');
+      if (!urgentList) return;
+      urgentList.replaceChildren();
+
+      urgent.sort((a, b) => a.status.days - b.status.days).forEach(({ item, status }) => {
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        const name = document.createElement('span');
+        const badge = document.createElement('span');
+        button.dataset.jump = item.dataset.id || '';
+        button.className = 'urgent-chip group';
+        name.className = 'flex-1 text-sm font-medium truncate';
+        name.style.color = 'var(--text)';
+        name.textContent = item.dataset.name || '';
+        badge.className = 'urgent-badge';
+        badge.textContent = `${status.days}d`;
+        button.append(name, badge);
+        li.append(button);
+        urgentList.append(li);
+      });
+
+      urgentList.classList.toggle('hidden', urgent.length === 0);
+      urgentEmpty?.classList.toggle('hidden', urgent.length > 0);
+    }
 
     function getAddressId() {
       const params = new URLSearchParams(window.location.search);
@@ -745,7 +829,7 @@ const categories = getCompetitionCategories(enriched);
       window[abortKey] = controller;
       const { signal } = controller;
 
-      const items = Array.from(document.querySelectorAll('[data-id]'));
+      const items = Array.from(document.querySelectorAll('.cp-list-item[data-id]'));
       const panels = Array.from(document.querySelectorAll('[data-detail]'));
       const countEl = document.getElementById('list-count');
       const searchEl = document.getElementById('radar-search');
@@ -753,18 +837,27 @@ const categories = getCompetitionCategories(enriched);
       const sortEl = document.getElementById('radar-sort');
       const listEl = items[0]?.parentElement;
       if (!items.length || !listEl) return;
+      refreshStatuses(items, panels);
 
       const params = new URLSearchParams(window.location.search);
       const initialSearch = params.get('q') || '';
       if (searchEl && initialSearch) searchEl.value = initialSearch;
+
+      const defaultItem = items
+        .filter(item => item.dataset.status !== 'expired')
+        .sort((a, b) =>
+          (softwareRank[a.dataset.cat] ?? 7) - (softwareRank[b.dataset.cat] ?? 7)
+          || (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9)
+          || Date.parse(a.dataset.deadline || '9999-12-31') - Date.parse(b.dataset.deadline || '9999-12-31')
+        )[0] || items[0];
 
       const state = {
         cat: '全部',
         tier: '全部',
         status: '全部',
         search: initialSearch,
-        sort: sortEl?.value || 'match-desc',
-        selectedId: items.some(item => item.dataset.id === getAddressId()) ? getAddressId() : items[0].dataset.id,
+        sort: sortEl?.value || 'software-first',
+        selectedId: items.some(item => item.dataset.id === getAddressId()) ? getAddressId() : defaultItem.dataset.id,
       };
 
       function setSearchAddress() {
@@ -785,6 +878,13 @@ const categories = getCompetitionCategories(enriched);
         const matchB = Number(b.dataset.match || 0);
         const deadlineA = Date.parse(a.dataset.deadline || '9999-12-31');
         const deadlineB = Date.parse(b.dataset.deadline || '9999-12-31');
+        if (state.sort === 'software-first') {
+          return (a.dataset.status === 'expired' ? 1 : 0) - (b.dataset.status === 'expired' ? 1 : 0)
+            || (softwareRank[a.dataset.cat] ?? 7) - (softwareRank[b.dataset.cat] ?? 7)
+            || (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9)
+            || deadlineA - deadlineB
+            || matchB - matchA;
+        }
         if (state.sort === 'urgent-first') {
           return (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9) || deadlineA - deadlineB || matchB - matchA;
         }

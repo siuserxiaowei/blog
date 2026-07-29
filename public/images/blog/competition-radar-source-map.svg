@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="450" viewBox="0 0 1200 450" role="img" aria-labelledby="title desc">
+  <title id="title">比赛雷达的四层信息源</title>
+  <desc id="desc">官网、活动平台、公众号、社群海报汇入比赛雷达，经过资格和截止时间复核后供读者检索。</desc>
+  <rect width="1200" height="450" rx="28" fill="#1f1c18"/>
+  <text x="62" y="74" fill="#fffaf0" font-size="36" font-weight="800" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">好比赛，不该继续散落在群聊里</text>
+  <text x="62" y="112" fill="#bcb2a4" font-size="21" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">四层信息源 → 资格与时间复核 → 一处搜索</text>
+  <g font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">
+    <g transform="translate(64 166)">
+      <rect width="188" height="104" rx="18" fill="#fffaf0"/>
+      <text x="94" y="47" text-anchor="middle" fill="#1f1c18" font-size="24" font-weight="800">官方网站</text>
+      <text x="94" y="77" text-anchor="middle" fill="#71685d" font-size="17">规则 · 截止日</text>
+    </g>
+    <g transform="translate(284 166)">
+      <rect width="188" height="104" rx="18" fill="#fffaf0"/>
+      <text x="94" y="47" text-anchor="middle" fill="#1f1c18" font-size="24" font-weight="800">活动平台</text>
+      <text x="94" y="77" text-anchor="middle" fill="#71685d" font-size="17">报名 · 赛程</text>
+    </g>
+    <g transform="translate(504 166)">
+      <rect width="188" height="104" rx="18" fill="#fffaf0"/>
+      <text x="94" y="47" text-anchor="middle" fill="#1f1c18" font-size="24" font-weight="800">公众号</text>
+      <text x="94" y="77" text-anchor="middle" fill="#71685d" font-size="17">通知 · 补充说明</text>
+    </g>
+    <g transform="translate(724 166)">
+      <rect width="188" height="104" rx="18" fill="#f4ca32"/>
+      <text x="94" y="47" text-anchor="middle" fill="#1f1c18" font-size="24" font-weight="800">社群海报</text>
+      <text x="94" y="77" text-anchor="middle" fill="#5a4618" font-size="17">小而新的机会</text>
+    </g>
+    <path d="M936 218h74" stroke="#f4ca32" stroke-width="7" stroke-linecap="round"/>
+    <path d="m1000 202 24 16-24 16" fill="none" stroke="#f4ca32" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(1034 152)">
+      <rect width="112" height="132" rx="22" fill="#d94b35"/>
+      <text x="56" y="55" text-anchor="middle" fill="#fffaf0" font-size="21" font-weight="800">比赛</text>
+      <text x="56" y="84" text-anchor="middle" fill="#fffaf0" font-size="21" font-weight="800">雷达</text>
+      <text x="56" y="112" text-anchor="middle" fill="#ffe2d8" font-size="15">可搜索</text>
+    </g>
+  </g>
+  <rect x="62" y="326" width="1084" height="68" rx="16" fill="#2e2a25" stroke="#534c44"/>
+  <text x="92" y="369" fill="#fffaf0" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif">每条都保留：参赛资格 · 截止时间 · 奖励性质 · 来源信用 · 风险提醒</text>
+</svg>
