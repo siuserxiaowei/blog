@@ -4,6 +4,7 @@ import test from 'node:test';
 import { competitions } from '../src/data/competitions.js';
 import {
   buildCompetitionReviewQueue,
+  formatLocalDate,
   parseArgs,
   reviewCompetition,
   summarizeReviewQueue,
@@ -94,6 +95,8 @@ test('CLI options are bounded and explicit', () => {
   assert.equal(options.urgentDays, 10);
   assert.equal(options.staleDays, 21);
   assert.equal(options.json, true);
+  assert.equal(formatLocalDate(options.today), '2026-07-30');
+  assert.throws(() => parseArgs(['--today', '2026-02-30']), /Invalid date/);
   assert.throws(() => parseArgs(['--limit', '0']), /positive integer/);
   assert.throws(() => parseArgs(['--unknown']), /Unknown argument/);
 });
@@ -105,4 +108,3 @@ test('real collection produces actionable rows without duplicate IDs', () => {
   assert.ok(queue.some((entry) => entry.id === 'stepsoftware2026'));
   assert.ok(queue.some((entry) => entry.reasons.some((reason) => reason.code === 'urgent-unverified')));
 });
-

@@ -11,9 +11,34 @@ import {
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function startOfLocalDay(value) {
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const date = new Date(year, month - 1, day);
+      if (
+        date.getFullYear() !== year
+        || date.getMonth() !== month - 1
+        || date.getDate() !== day
+      ) {
+        throw new Error(`Invalid date: ${value}`);
+      }
+      return date;
+    }
+  }
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) throw new Error(`Invalid date: ${value}`);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function formatLocalDate(value) {
+  const date = startOfLocalDay(value);
+  const year = String(date.getFullYear()).padStart(4, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function daysBetween(from, to) {
@@ -211,7 +236,7 @@ async function main() {
   if (options.json) {
     console.log(JSON.stringify({
       generatedAt: new Date().toISOString(),
-      reviewDate: startOfLocalDay(options.today).toISOString().slice(0, 10),
+      reviewDate: formatLocalDate(options.today),
       summary,
       items: queue.slice(0, options.limit),
     }, null, 2));
@@ -228,4 +253,3 @@ if (invokedPath && import.meta.url === pathToFileURL(invokedPath).href) {
     process.exitCode = 1;
   });
 }
-
