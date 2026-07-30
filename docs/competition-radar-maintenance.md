@@ -12,6 +12,22 @@
 4. **校验**：运行数据校验、构建和链接审计，查看数量、状态桶、详情页、JSON 输出及安全负例。
 5. **部署**：只部署已经人工复核并通过构建的改动；上线后抽查雷达、一个详情页、JSON 和外部行动链接。
 
+## 人工复核队列
+
+先生成按风险排序的人工复核队列。它会把即将截止但未核验、死链／不确定链接、估算日期、已过期日期、陈旧核验和缺少一手来源的记录排到前面：
+
+```bash
+npm run radar:review -- --today 2026-07-30 --limit 30
+```
+
+在自动化或维护提醒中，可用 JSON 输出并让 critical 项触发非零退出码：
+
+```bash
+npm run radar:review -- --json --fail-on-critical
+```
+
+`--today` 只用于可复现审计，日常运行可省略。队列是“优先人工检查什么”，不是自动删除或自动改写依据。
+
 ## 数据编辑原则
 
 - `id` 发布后保持稳定，它同时用于详情路由、URL hash 和 JSON feed。
@@ -52,25 +68,25 @@ find dist/competitions -mindepth 2 -name index.html | wc -l
 先做目标策略与 DNS 安全检查：
 
 ```bash
-node scripts/competition-link-audit.mjs --dry-run --limit 5
+npm run radar:links -- --dry-run --limit 5
 ```
 
 再对少量记录发起真实检查：
 
 ```bash
-node scripts/competition-link-audit.mjs --id amddevmaster2026 --limit 3
+npm run radar:links -- --id amddevmaster2026 --limit 3
 ```
 
 完整审计：
 
 ```bash
-node scripts/competition-link-audit.mjs
+npm run radar:links
 ```
 
 需要把确定的 404／410 作为命令失败时：
 
 ```bash
-node scripts/competition-link-audit.mjs --fail-on-dead
+npm run radar:links -- --fail-on-dead
 ```
 
 安全边界：
