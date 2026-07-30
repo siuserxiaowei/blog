@@ -12,6 +12,7 @@
     "astro": "astro",
     "test:data": "node --test tests/*.test.mjs",
     "radar:check": "node scripts/competition-audit.mjs",
+    "radar:review": "node scripts/competition-review-queue.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name=siuserxiaowei-blog --branch=main"
   },
   "dependencies": {
