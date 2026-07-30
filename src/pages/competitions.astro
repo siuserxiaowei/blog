@@ -15,6 +15,45 @@ const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法',
 const softwareCount = enriched.filter(c => c.status.kind !== 'expired' && softwareCategories.has(c.cat)).length;
 const categories = getCompetitionCategories(enriched);
 const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo(c)]));
+const workbenchRecords = enriched.map(c => {
+  const deadline = deadlineInfo.get(c.id);
+  return {
+    id: c.id,
+    name: c.name,
+    fullName: c.fullName,
+    org: c.org,
+    rel: c.rel,
+    loc: c.loc,
+    date: c.date,
+    tier: c.tier,
+    cat: c.cat,
+    match: c.match,
+    suit: c.suit,
+    desc: c.desc,
+    strategy: c.strategy,
+    audience: c.audience,
+    rewards: c.rewards,
+    pros: c.pros,
+    cons: c.cons,
+    winning: c.winning,
+    timeline: c.timeline,
+    sources: c.sources ?? [],
+    url: c.url,
+    deadline: deadline?.date ?? c.deadlineISO,
+    deadlineConfidence: deadline?.confidence ?? 'legacy',
+    deadlineType: deadline?.type ?? 'deadline',
+    deadlineLabel: deadline?.label ?? '关键截止',
+    calendarEligible: deadline?.calendarEligible ?? false,
+  };
+});
+const serializedWorkbenchRecords = JSON.stringify(workbenchRecords)
+  .replaceAll('<', '\\u003c')
+  .replaceAll('>', '\\u003e')
+  .replaceAll('&', '\\u0026')
+  .replaceAll('\u2028', '\\u2028')
+  .replaceAll('\u2029', '\\u2029');
+const initialCompetition = enriched[0];
+const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition.id) : null;
 ---
 
 <BaseLayout title="AI 产品赛事雷达 · siuser小伟" description="面向 AI 软件、Agent、独立开发与轻硬件团队的赛事和行业活动看板。">
@@ -170,35 +209,18 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
             <span id="list-count" class="text-xs" aria-live="polite" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
           </div>
           <div id="competition-list" class="competition-list space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
-            {enriched.map(c => {
-              const deadline = deadlineInfo.get(c.id);
-              return (
+            {enriched.map(c => (
               <article
                 data-id={c.id}
-                data-name={c.name}
-                data-full-name={c.fullName}
-                data-cat={c.cat}
-                data-tier={c.tier}
                 data-status={c.status.kind}
-                data-match={c.match}
-                data-deadline={deadline?.date ?? c.deadlineISO}
-                data-deadline-confidence={deadline?.confidence ?? 'legacy'}
-                data-deadline-type={deadline?.type ?? 'deadline'}
-                data-deadline-label={deadline?.label ?? '关键截止'}
-                data-calendar-eligible={deadline?.calendarEligible ? 'true' : 'false'}
-                data-strategy={c.strategy}
-                data-loc={c.loc}
-                data-url={c.url}
-                data-sources={(c.sources ?? []).map(source => `${source.title} ${source.date} ${source.url}`).join(' | ')}
-                data-search={`${c.name} ${c.fullName} ${c.cat} ${c.tier} ${c.status.label} ${c.desc} ${c.strategy} ${c.org} ${c.loc} ${c.winning.join(' ')} ${(c.sources ?? []).map(source => source.title).join(' ')}`}
                 class="cp-list-item relative"
               >
-                <button
-                  type="button"
+                <a
+                  href={`/competitions/${encodeURIComponent(c.id)}/`}
                   data-select-competition
                   class="cp-list-select w-full text-left p-4"
                   aria-current="false"
-                  aria-label={`查看 ${c.fullName}`}
+                  aria-label={`在工作台查看 ${c.fullName}；无 JavaScript 时打开独立详情页`}
                 >
                   <div class="flex items-start justify-between gap-3 mb-2 pr-9">
                     <h3 class="text-base font-semibold leading-tight truncate" style="color: var(--text); font-family: var(--font-heading);">{c.name}</h3>
@@ -215,7 +237,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
                     <span style="color: var(--text-secondary); font-family: var(--font-mono); letter-spacing: 0.08em;">MATCH</span>
                     <span style="font-family: var(--font-heading); color: var(--color-accent); font-weight: 600; font-size: 14px;">{c.match.toFixed(1)}<span style="color: var(--text-secondary); font-size: 10px; font-weight: 400;"> / 10</span></span>
                   </div>
-                </button>
+                </a>
                 <button
                   type="button"
                   data-favorite={c.id}
@@ -225,168 +247,149 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
                   title="收藏到当前浏览器"
                 ><span aria-hidden="true">☆</span></button>
               </article>
-            )})}
+            ))}
           </div>
           <div id="competition-empty" class="empty-state hidden" role="status">
             <p>没有符合当前条件的赛事。</p>
             <button type="button" data-empty-reset class="summary-button">清除筛选</button>
           </div>
+          <noscript>
+            <p class="workbench-note mt-4">筛选与收藏需要 JavaScript；上方 184 条赛事链接仍可直接打开独立详情页。</p>
+          </noscript>
         </aside>
 
         <!-- 右侧详情 -->
-        <section class="space-y-8">
+        <section id="competition-detail" class="space-y-8" aria-live="polite" aria-busy="false">
           <div id="detail-workbench" class="detail-workbench" aria-label="当前赛事快捷操作">
             <span class="section-kicker">// 当前赛事</span>
             <div class="detail-workbench-actions">
               <button
                 type="button"
                 id="detail-favorite"
-                data-favorite={enriched[0]?.id}
+                data-favorite={initialCompetition?.id}
                 class="summary-button favorite-detail"
-                aria-label={`收藏 ${enriched[0]?.fullName ?? '当前赛事'}`}
+                aria-label={`收藏 ${initialCompetition?.fullName ?? '当前赛事'}`}
                 aria-pressed="false"
               ><span aria-hidden="true">☆</span><span data-favorite-label>收藏</span></button>
               <button
                 type="button"
                 id="detail-export-ics"
-                data-export-ics={enriched[0]?.id}
+                data-export-ics={initialCompetition?.id}
                 class="summary-button"
-                disabled={!deadlineInfo.get(enriched[0]?.id)?.calendarEligible}
-                title={deadlineInfo.get(enriched[0]?.id)?.calendarEligible ? '下载关键截止日历' : '日期尚未确认，暂不提供日历'}
+                disabled={!initialDeadline?.calendarEligible}
+                title={initialDeadline?.calendarEligible ? '下载关键截止日历' : '日期尚未确认，暂不提供日历'}
               >加入日历</button>
             </div>
           </div>
-          {enriched.map((c, i) => (
-            <div data-detail={c.id} class:list={["detail-panel space-y-7", i !== 0 && "hidden"]}>
-
-              <!-- 主卡 -->
-              <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
-                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
-                  <div class="flex-1 min-w-0 space-y-3">
-                    <div class="flex flex-wrap items-center gap-2.5">
-                      <span class={`tier-tag tier-${c.tier} tier-lg`}>{c.tier} 级</span>
-                      <span class="pill-note"><span class={`status-dot status-${c.status.kind}`}></span><span data-status-label>{c.status.label}</span></span>
-                      <span class="pill-note">来源等级 {c.rel}</span>
-                      <span class="pill-note">{c.cat}</span>
-                    </div>
-                    <h2 class="text-2xl md:text-3xl leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.022em;">{c.fullName}</h2>
-                    <div class="flex flex-wrap gap-x-6 gap-y-1.5 text-sm" style="color: var(--text-secondary);">
-                      <span class="flex items-center gap-1.5"><span class="opacity-50">◎</span>{c.loc}</span>
-                      <span class="flex items-center gap-1.5"><span class="opacity-50">◷</span>{c.date}</span>
-                      <span class="flex items-center gap-1.5"><span class="opacity-50">◆</span>{c.org}</span>
-                    </div>
+          <div id="detail-panel" class="detail-panel space-y-7">
+            <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
+                <div class="flex-1 min-w-0 space-y-3">
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <span id="detail-tier" class={`tier-tag tier-${initialCompetition?.tier ?? 'B'} tier-lg`}>{initialCompetition?.tier ?? '—'} 级</span>
+                    <span class="pill-note"><span id="detail-status-dot" class={`status-dot status-${initialCompetition?.status.kind ?? 'unknown'}`}></span><span id="detail-status">{initialCompetition?.status.label ?? '日期待确认'}</span></span>
+                    <span id="detail-reliability" class="pill-note">来源等级 {initialCompetition?.rel ?? '—'}</span>
+                    <span id="detail-category" class="pill-note">{initialCompetition?.cat ?? '未分类'}</span>
                   </div>
-
-                  <div class="metric-tile px-5 py-4 flex flex-col items-center justify-center min-w-[120px]">
-                    <span class="text-[10px] uppercase tracking-[0.2em]" style="color: var(--text-secondary); font-family: var(--font-mono);">Match</span>
-                    <span class="text-5xl font-semibold leading-none mt-1" style="color: var(--color-accent); font-family: var(--font-heading);">{c.match.toFixed(1)}</span>
-                    <span class="text-[10px] mt-1" style="color: var(--text-secondary);">/ 10</span>
-                    <span class="text-[11px] mt-2 px-2 py-0.5 rounded-full" style="color: var(--color-accent-2); background: color-mix(in srgb, var(--color-accent-2) 12%, transparent);">{c.suit}</span>
+                  <h2 id="detail-title" class="text-2xl md:text-3xl leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.022em;">{initialCompetition?.fullName ?? '选择一项赛事查看详情'}</h2>
+                  <div class="flex flex-wrap gap-x-6 gap-y-1.5 text-sm" style="color: var(--text-secondary);">
+                    <span class="flex items-center gap-1.5"><span class="opacity-50">◎</span><span id="detail-location">{initialCompetition?.loc ?? '—'}</span></span>
+                    <span class="flex items-center gap-1.5"><span class="opacity-50">◷</span><span id="detail-date">{initialCompetition?.date ?? '—'}</span></span>
+                    <span class="flex items-center gap-1.5"><span class="opacity-50">◆</span><span id="detail-org">{initialCompetition?.org ?? '—'}</span></span>
                   </div>
                 </div>
 
-                <!-- 时间轴 -->
-                <div class="mb-10">
-                  <p class="section-kicker mb-5">// 关键时间节点</p>
-                    <div class="timeline-track relative pt-2">
-                      <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
-                    <div class="timeline-grid relative grid gap-2" style={`--timeline-count: ${c.timeline.length}; grid-template-columns: repeat(${c.timeline.length}, minmax(0, 1fr));`}>
-                      {c.timeline.map(n => {
-                        const past = new Date(n.date) < TODAY;
-                        const dotClass = past ? 'past' : n.critical ? 'critical' : 'normal';
-                        return (
-                          <div class="flex flex-col items-center text-center min-w-0 px-1">
-                            <div class={`timeline-dot ${dotClass}`}></div>
-                            <p class="mt-3 mb-1 text-[11px] font-medium leading-tight" style={`color: ${n.critical && !past ? 'var(--text)' : 'var(--text-secondary)'}; max-width: 100%;`}>{n.event}</p>
-                            <small class="text-[10px]" style="color: var(--text-secondary); opacity: 0.6; font-family: var(--font-mono);">{n.date}</small>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <div class="metric-tile px-5 py-4 flex flex-col items-center justify-center min-w-[120px]">
+                  <span class="text-[10px] uppercase tracking-[0.2em]" style="color: var(--text-secondary); font-family: var(--font-mono);">Match</span>
+                  <span id="detail-match" class="text-5xl font-semibold leading-none mt-1" style="color: var(--color-accent); font-family: var(--font-heading);">{initialCompetition?.match.toFixed(1) ?? '—'}</span>
+                  <span class="text-[10px] mt-1" style="color: var(--text-secondary);">/ 10</span>
+                  <span id="detail-suit" class="text-[11px] mt-2 px-2 py-0.5 rounded-full" style="color: var(--color-accent-2); background: color-mix(in srgb, var(--color-accent-2) 12%, transparent);">{initialCompetition?.suit ?? '—'}</span>
                 </div>
+              </div>
 
-                <!-- 定位 / 打法 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div>
-                    <p class="section-kicker mb-3">// 赛事定位</p>
-                    <p class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text-secondary); background: color-mix(in srgb, var(--surface) 55%, transparent); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">{c.desc}</p>
-                  </div>
-                  <div>
-                    <p class="section-kicker mb-3">// 参赛打法</p>
-                    <p class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text); background: color-mix(in srgb, var(--color-accent) 7%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);">{c.strategy}</p>
-                  </div>
-                </div>
-
-                <!-- 奖励 / 卖点 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
-                  <div>
-                    <p class="section-kicker mb-3">// 核心奖励 / 资源</p>
-                    <div class="flex flex-wrap gap-1.5">
-                      {c.rewards.map(r => (
-                        <span class="reward-chip">{r}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p class="section-kicker mb-3">// 评审匹配点</p>
-                    <div class="flex flex-wrap gap-1.5">
-                      {c.winning.map(w => (
-                        <span class="winning-chip">{w}</span>
-                      ))}
-                    </div>
+              <div class="mb-10">
+                <p class="section-kicker mb-5">// 关键时间节点</p>
+                <div class="timeline-track relative pt-2">
+                  <div class="absolute top-4 left-1.5 right-1.5 h-px" style="background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), color-mix(in srgb, var(--border) 80%, transparent) 55%, transparent);"></div>
+                  <div id="detail-timeline" class="timeline-grid relative grid gap-2" style={`--timeline-count: ${initialCompetition?.timeline.length ?? 1}; grid-template-columns: repeat(${initialCompetition?.timeline.length ?? 1}, minmax(0, 1fr));`}>
+                    {initialCompetition?.timeline.map(n => {
+                      const past = new Date(n.date) < TODAY;
+                      const dotClass = past ? 'past' : n.critical ? 'critical' : 'normal';
+                      return (
+                        <div class="flex flex-col items-center text-center min-w-0 px-1">
+                          <div class={`timeline-dot ${dotClass}`}></div>
+                          <p class="mt-3 mb-1 text-[11px] font-medium leading-tight" style="color: var(--text-secondary); max-width: 100%;">{n.event}</p>
+                          <small class="text-[10px]" style="color: var(--text-secondary); opacity: 0.6; font-family: var(--font-mono);">{n.date}</small>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              <!-- 优势 / 难点 -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
-                  <p class="section-kicker mb-3" style="color: var(--color-accent-2);">// + 优势</p>
-                  <ul class="space-y-2">
-                    {c.pros.map(p => (
-                      <li class="flex gap-2.5 text-sm leading-relaxed" style="color: var(--text-secondary);"><span style="color: var(--color-accent-2); margin-top: 2px;">●</span><span>{p}</span></li>
-                    ))}
-                  </ul>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <p class="section-kicker mb-3">// 赛事定位</p>
+                  <p id="detail-description" class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text-secondary); background: color-mix(in srgb, var(--surface) 55%, transparent); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">{initialCompetition?.desc ?? ''}</p>
                 </div>
-                <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
-                  <p class="section-kicker mb-3" style="color: var(--color-accent);">// ! 难点 / 风险</p>
-                  <ul class="space-y-2">
-                    {c.cons.map(p => (
-                      <li class="flex gap-2.5 text-sm leading-relaxed" style="color: var(--text-secondary);"><span style="color: var(--color-accent); margin-top: 2px;">●</span><span>{p}</span></li>
-                    ))}
-                  </ul>
+                <div>
+                  <p class="section-kicker mb-3">// 参赛打法</p>
+                  <p id="detail-strategy" class="text-sm leading-relaxed p-4 rounded-[14px]" style="color: var(--text); background: color-mix(in srgb, var(--color-accent) 7%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);">{initialCompetition?.strategy ?? ''}</p>
                 </div>
               </div>
 
-              <!-- 受众 + CTA -->
-              <div class="glass-card p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6" style="border-radius: var(--radius-lg);">
-                <div class="flex-1 min-w-0">
-                  <p class="section-kicker mb-2">// 适合谁</p>
-                  <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">{c.audience}</p>
-                  {c.sources?.length ? (
-                    <div class="source-links">
-                      <span class="section-kicker source-label">// 参考来源</span>
-                      {c.sources.map(source => (
-                        <a href={source.url} target="_blank" rel="noopener" class="source-link">
-                          <span>{source.title}</span>
-                          <small>{source.date}</small>
-                        </a>
-                      ))}
-                    </div>
-                  ) : null}
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+                <div>
+                  <p class="section-kicker mb-3">// 核心奖励 / 资源</p>
+                  <div id="detail-rewards" class="flex flex-wrap gap-1.5">
+                    {initialCompetition?.rewards.map(item => <span class="reward-chip">{item}</span>)}
+                  </div>
                 </div>
-                <div class="detail-actions">
-                  <button type="button" data-copy-summary={c.id} class="summary-button">
-                    复制参赛摘要
-                  </button>
-                  <a href={c.url} target="_blank" rel="noopener" class="cta-button">
-                    查看赛事页面 <span aria-hidden="true">→</span>
-                  </a>
+                <div>
+                  <p class="section-kicker mb-3">// 评审匹配点</p>
+                  <div id="detail-winning" class="flex flex-wrap gap-1.5">
+                    {initialCompetition?.winning.map(item => <span class="winning-chip">{item}</span>)}
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
+                <p class="section-kicker mb-3" style="color: var(--color-accent-2);">// + 优势</p>
+                <ul id="detail-pros" class="space-y-2">
+                  {initialCompetition?.pros.map(item => <li class="detail-point detail-point-pro">{item}</li>)}
+                </ul>
+              </div>
+              <div class="glass-card p-6" style="border-radius: var(--radius-lg);">
+                <p class="section-kicker mb-3" style="color: var(--color-accent);">// ! 难点 / 风险</p>
+                <ul id="detail-cons" class="space-y-2">
+                  {initialCompetition?.cons.map(item => <li class="detail-point detail-point-con">{item}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <div class="glass-card p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6" style="border-radius: var(--radius-lg);">
+              <div class="flex-1 min-w-0">
+                <p class="section-kicker mb-2">// 适合谁</p>
+                <p id="detail-audience" class="text-sm leading-relaxed" style="color: var(--text-secondary);">{initialCompetition?.audience ?? ''}</p>
+                <div id="detail-sources" class="source-links">
+                  <span class="section-kicker source-label">// 参考来源</span>
+                  {initialCompetition?.sources?.map(source => (
+                    <a href={source.url} target="_blank" rel="noopener" class="source-link">
+                      <span>{source.title}</span>
+                      <small>{source.date}</small>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <div class="detail-actions">
+                <a id="detail-permalink" href={`/competitions/${encodeURIComponent(initialCompetition?.id ?? '')}/`} class="summary-button">独立详情页</a>
+                <button id="detail-copy-summary" type="button" data-copy-summary={initialCompetition?.id} class="summary-button">复制参赛摘要</button>
+                <a id="detail-official-link" href={initialCompetition?.url} target="_blank" rel="noopener" class="cta-button">查看赛事页面 <span aria-hidden="true">→</span></a>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
 
@@ -397,6 +400,8 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
   </main>
 
   <Footer />
+  <script id="competition-data" type="application/json" set:html={serializedWorkbenchRecords}></script>
+  <script src="../lib/competition-workbench.js"></script>
 </BaseLayout>
 
 <style is:global>
@@ -636,6 +641,27 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
     display: flex;
     flex-wrap: wrap;
     gap: 0.55rem;
+  }
+
+  .detail-point {
+    display: flex;
+    gap: 0.625rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+
+  .detail-point-bullet {
+    flex: 0 0 auto;
+    margin-top: 0.125rem;
+  }
+
+  .detail-point-pro .detail-point-bullet {
+    color: var(--color-accent-2);
+  }
+
+  .detail-point-con .detail-point-bullet {
+    color: var(--color-accent);
   }
 
   /* ============ 等级标签 ============ */
@@ -966,6 +992,7 @@ const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo
 
 <script is:inline>
   (function () {
+    if (document.getElementById('competition-data')) return;
     const abortKey = '__competitionRadarAbort';
     const favoriteStorageKey = 'competition-radar:favorites:v1';
     const favoriteStorageVersion = 1;
