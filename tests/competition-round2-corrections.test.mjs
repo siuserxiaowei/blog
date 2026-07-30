@@ -130,10 +130,11 @@ test('cash, credits, investment and financing are not conflated', () => {
 test('known dead action links have explicit safe fallbacks or warnings', () => {
   const openHarmony = correctedById.get('oh');
   assert.equal(openHarmony.url, 'https://www.openharmony.cn/');
-  assert.equal(openHarmony.verification.linkHealth, 'dead');
+  assert.equal(openHarmony.verification.linkHealth, 'reachable');
   assert.equal(openHarmony.primaryDeadline.certainty, 'unknown');
 
   const miraclePlus = correctedById.get('mp');
   assert.equal(new URL(miraclePlus.url).hostname, 'www.miracleplus.com');
   assert.equal(miraclePlus.verification.linkHealth, 'reachable');
+  assert.equal(miraclePlus.primaryDeadline.certainty, 'rolling');
 });

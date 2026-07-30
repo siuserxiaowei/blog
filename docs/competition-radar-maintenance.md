@@ -125,6 +125,28 @@ npm run radar:links -- --fail-on-dead
 - 如果失败集中发生在同一次运行、同一网络、同一域名或多数站点，应视为系统性失败，不得批量更改数据。
 - 审计输出应作为 CI／维护记录保留，以便比较连续结果；脚本本身保持只读，不维护隐式状态。
 
+## 每日安全监控
+
+本机 LaunchAgent `com.siuser.competition-monitor` 每天 08:30 运行：
+
+```bash
+npm run radar:monitor
+```
+
+它会把人工复核队列、全量有界链接审计、与上次相比的新增死链／恢复项写入：
+
+```text
+~/.competition-monitor/radar-report.json
+```
+
+本地手动验证可使用：
+
+```bash
+npm run radar:monitor -- --dry-run --today 2026-07-30 --no-notify
+```
+
+监控不会编辑赛事数据、自动发布、登录、提交表单或绕过 TLS。只有“新确认死链”或“死链恢复”时才发送 macOS 通知；日期、资格、奖励和规则仍必须由人工查看一手来源后再改数据。仓库内旧的 `competition-monitor.py` 仅作为历史实现保留，不再由 LaunchAgent 调用；它覆盖不足且不满足当前 TLS 安全要求，不应重新启用。
+
 ## JSON 与公开边界
 
 `/competitions.json` 仅公开赛事发现需要的固定字段：

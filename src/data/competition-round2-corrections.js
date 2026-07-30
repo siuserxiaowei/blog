@@ -729,11 +729,12 @@ export const competitionRound2Corrections = Object.freeze({
     ],
     notes: '原 action URL /competition/introduction/ 返回 404，改为可达官网；尚无可核验的 2026 届规则，保持 unknown。',
     status: 'stale',
-    linkHealth: 'dead',
+    linkHealth: 'reachable',
   }),
 
   mp: reviewedPatch({
     url: 'https://www.miracleplus.com/apply/',
+    date: '2026 秋季常规申请已截止 · 延期申请全年开放',
     desc: '奇绩创坛 2026 秋季创业营常规申请已截止，但官网仍接受延期申请。官方当前条款为每家 30 万美元或等值人民币投资，换取 7% 股权；这是股权投资，不是奖金。',
     audience: '早期创业公司的创始人；申请人须持团队至少 5% 股权，单人创始人也可申请',
     rewards: [
@@ -749,7 +750,6 @@ export const competitionRound2Corrections = Object.freeze({
         certainty: 'confirmed',
         timezone: 'Asia/Shanghai',
         label: '2026 秋季常规申请截止（已截止）',
-        primary: true,
       },
       {
         type: 'application',
@@ -757,20 +757,21 @@ export const competitionRound2Corrections = Object.freeze({
         certainty: 'rolling',
         timezone: 'Asia/Shanghai',
         label: '延期申请全年开放',
+        primary: true,
       },
     ],
     primaryDeadline: {
       type: 'application',
-      date: '2026-06-12',
-      certainty: 'confirmed',
+      date: null,
+      certainty: 'rolling',
       timezone: 'Asia/Shanghai',
-      label: '2026 秋季常规申请截止（已截止）',
+      label: '延期申请全年开放',
     },
     sources: [
       source('MiraclePlus｜2026 Fall Accelerator Application', 'https://www.miracleplus.com/apply/'),
       source('MiraclePlus｜FAQ', 'https://www.miracleplus.com/faq/'),
     ],
-    notes: '原 miraclepl.us 域名 DNS 失效，投资条款也从参考 $250K 更新为官方当前 $300K / 7%；投资不得计作现金奖金。',
+    notes: '原 miraclepl.us 域名 DNS 失效，投资条款也从参考 $250K 更新为官方当前 $300K / 7%；官网明确常规申请已截止但延期申请仍全年开放，投资不得计作现金奖金。',
   }),
 });
 

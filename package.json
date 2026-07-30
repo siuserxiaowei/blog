@@ -14,6 +14,7 @@
     "radar:check": "node scripts/competition-audit.mjs",
     "radar:review": "node scripts/competition-review-queue.mjs",
     "radar:links": "node scripts/competition-link-audit.mjs",
+    "radar:monitor": "node scripts/competition-radar-monitor.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name=siuserxiaowei-blog --branch=main"
   },
   "dependencies": {

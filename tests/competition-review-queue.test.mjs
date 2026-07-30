@@ -106,5 +106,5 @@ test('real collection produces actionable rows without duplicate IDs', () => {
   assert.ok(queue.length > 0);
   assert.equal(new Set(queue.map((entry) => entry.id)).size, queue.length);
   assert.ok(queue.some((entry) => entry.id === 'stepsoftware2026'));
-  assert.ok(queue.some((entry) => entry.reasons.some((reason) => reason.code === 'urgent-unverified')));
+  assert.ok(queue.some((entry) => entry.reasons.some((reason) => reason.code === 'uncertain-deadline')));
 });

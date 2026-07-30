@@ -4,6 +4,7 @@ import {
   validateCompetitionCollectionV2,
 } from './competition-schema.js';
 import { competitionV2Overrides } from './competition-v2-overrides.js';
+import { competitionRound2Corrections } from './competition-round2-corrections.js';
 
 export const RADAR_UPDATED_AT = '2026-07-30';
 
@@ -142,7 +143,7 @@ function xfyunSkillCompetition({ id, name, fullName = name, flag, desc, strategy
   });
 }
 
-export const competitions = normalizeCompetitionCollection([
+const baselineCompetitions = normalizeCompetitionCollection([
   trackedCompetition({
     id:'amddevmaster2026', name:'AMD AI DevMaster', fullName:'AMD AI DevMaster Hackathon 2026',
     org:'AMD · PyTorch Foundation 社区', rel:'A+', loc:'全球线上 · 个人或最多 3 人团队', date:'截止 2026-08-06 23:59 北京时间',
@@ -2440,6 +2441,12 @@ export const competitions = normalizeCompetitionCollection([
     sources:[{title:'国家工业信息安全发展研究中心｜第八届工业互联网大赛通知',date:'2026-07-10',url:'https://www.cics-cert.org.cn/web_root/webpage/articlecontent_101003_2076480900006154241.html',kind:'official'}],
     url:'https://www.cii-contest.cn' }),
 ], competitionV2Overrides, { updatedAt: RADAR_UPDATED_AT });
+
+export const competitions = normalizeCompetitionCollection(
+  baselineCompetitions,
+  competitionRound2Corrections,
+  { updatedAt: RADAR_UPDATED_AT },
+);
 
 export function parseCompetitionDate(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;
