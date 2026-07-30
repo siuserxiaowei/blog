@@ -5,6 +5,7 @@ import {
 } from './competition-schema.js';
 import { competitionV2Overrides } from './competition-v2-overrides.js';
 import { competitionRound2Corrections } from './competition-round2-corrections.js';
+import { competitionRound2Additions } from './competition-round2-additions.js';
 
 export const RADAR_UPDATED_AT = '2026-07-30';
 
@@ -2442,11 +2443,16 @@ const baselineCompetitions = normalizeCompetitionCollection([
     url:'https://www.cii-contest.cn' }),
 ], competitionV2Overrides, { updatedAt: RADAR_UPDATED_AT });
 
-export const competitions = normalizeCompetitionCollection(
+const auditedCompetitions = normalizeCompetitionCollection(
   baselineCompetitions,
   competitionRound2Corrections,
   { updatedAt: RADAR_UPDATED_AT },
 );
+
+export const competitions = [
+  ...auditedCompetitions,
+  ...competitionRound2Additions,
+];
 
 export function parseCompetitionDate(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;

@@ -46,4 +46,7 @@ test('client detail renderer does not interpolate record text into HTML', async 
   assert.doesNotMatch(source, /insertAdjacentHTML/);
   assert.match(source, /textContent/);
   assert.match(source, /record\.calendarEligible !== true/);
+  assert.match(source, /statusForDeadline\(record\.deadline, record\.calendarEligible\)/);
+  assert.match(source, /isConfirmed !== true/);
+  assert.match(source, /event\.metaKey/);
 });

@@ -52,7 +52,7 @@ function trackedAddition(record) {
     fullName: record.name,
     timeline: [{ event: primaryDeadline.label, date: primaryDeadline.date, critical: true }],
     deadlines: [primaryDeadline],
-    sources: [officialSource(`官方赛事页｜${record.name}`, sourceUrl)],
+    sources: [officialSource(`核验来源｜${record.name}`, sourceUrl)],
     verification: {
       status: 'verified',
       checkedAt: ROUND2_ADDITIONS_CHECKED_AT,

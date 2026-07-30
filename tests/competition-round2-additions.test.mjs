@@ -17,19 +17,24 @@ import {
 const additionsById = new Map(
   competitionRound2Additions.map((competition) => [competition.id, competition]),
 );
-const existingIds = new Set(competitions.map((competition) => competition.id));
 const researchCutoff = '2026-07-30';
 
 test('round-two additions stay within the requested 10–20 record delivery range', () => {
   assert.equal(ROUND2_ADDITIONS_CHECKED_AT, researchCutoff);
-  assert.equal(competitions.length, 184, 'deduplication baseline changed unexpectedly');
+  assert.equal(competitions.length, 202, 'final merged catalogue changed unexpectedly');
   assert.equal(competitionRound2Additions.length, 18);
 });
 
-test('addition ids are internally unique and disjoint from the existing 184 records', () => {
+test('addition ids are internally unique and present exactly once in the merged catalogue', () => {
   const ids = competitionRound2Additions.map((competition) => competition.id);
   assert.equal(new Set(ids).size, ids.length);
-  assert.deepEqual(ids.filter((id) => existingIds.has(id)), []);
+  for (const id of ids) {
+    assert.equal(
+      competitions.filter((competition) => competition.id === id).length,
+      1,
+      id,
+    );
+  }
 });
 
 test('every addition satisfies the legacy and V2 data contracts', () => {

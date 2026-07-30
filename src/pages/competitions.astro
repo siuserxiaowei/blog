@@ -152,6 +152,7 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
               <option value="ongoing">进行中</option>
               <option value="upcoming">即将开始</option>
               <option value="expired">已过期</option>
+              <option value="unknown">待确认</option>
             </select>
           </label>
           <label class="radar-field">
@@ -254,7 +255,7 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
             <button type="button" data-empty-reset class="summary-button">清除筛选</button>
           </div>
           <noscript>
-            <p class="workbench-note mt-4">筛选与收藏需要 JavaScript；上方 184 条赛事链接仍可直接打开独立详情页。</p>
+            <p class="workbench-note mt-4">筛选与收藏需要 JavaScript；上方 {enriched.length} 条赛事链接仍可直接打开独立详情页。</p>
           </noscript>
         </aside>
 

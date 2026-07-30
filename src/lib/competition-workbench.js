@@ -25,7 +25,7 @@ const SOFTWARE_CATEGORIES = new Set([
   '创业路演',
 ]);
 const VALID_SORTS = new Set(['software-first', 'urgent-first', 'match-desc', 'deadline-asc', 'tier-desc']);
-const VALID_STATUSES = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired']);
+const VALID_STATUSES = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired', 'unknown']);
 const VALID_TIERS = new Set(['全部', 'S', 'A', 'B']);
 
 function parseRecords() {
@@ -40,7 +40,8 @@ function parseRecords() {
   }
 }
 
-function statusForDeadline(value) {
+function statusForDeadline(value, isConfirmed) {
+  if (isConfirmed !== true) return { kind: 'unknown', days: null, label: '日期待确认' };
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
   if (!match) return { kind: 'unknown', days: null, label: '日期待确认' };
   const deadline = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
@@ -287,7 +288,7 @@ function initCompetitionRadar() {
   const favorites = readFavoriteIds(validIds);
 
   records.forEach(record => {
-    record.status = statusForDeadline(record.deadline);
+    record.status = statusForDeadline(record.deadline, record.calendarEligible);
     record.searchText = [
       record.name,
       record.fullName,
@@ -671,6 +672,13 @@ function initCompetitionRadar() {
 
   items.forEach(item => {
     item.querySelector('[data-select-competition]')?.addEventListener('click', event => {
+      if (
+        event.button !== 0
+        || event.metaKey
+        || event.ctrlKey
+        || event.shiftKey
+        || event.altKey
+      ) return;
       event.preventDefault();
       state.selectedId = item.dataset.id || '';
       applySelect({ address: 'push', scroll: window.innerWidth < 1024 });
