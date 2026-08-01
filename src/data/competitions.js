@@ -6,8 +6,11 @@ import {
 import { competitionV2Overrides } from './competition-v2-overrides.js';
 import { competitionRound2Corrections } from './competition-round2-corrections.js';
 import { competitionRound2Additions } from './competition-round2-additions.js';
+import { competitionRound3Corrections } from './competition-round3-corrections.js';
+import { competitionRound3Additions } from './competition-round3-additions.js';
 
-export const RADAR_UPDATED_AT = '2026-07-30';
+export const RADAR_UPDATED_AT = '2026-08-02';
+const BASELINE_CHECKED_AT = '2026-07-30';
 
 export const DAY_MS = 86400000;
 
@@ -22,6 +25,7 @@ export const COMPETITION_CATEGORIES = Object.freeze([
   '创意 AI',
   '创业路演',
   '学生限定',
+  '青年限定',
   '地区限定',
   '政府政策',
   '创投曝光',
@@ -2441,17 +2445,28 @@ const baselineCompetitions = normalizeCompetitionCollection([
     verification:{status:'verified',checkedAt:'2026-07-30',sourceKind:'official',linkHealth:'reachable',notes:'官方通知明确主题赛报名期为 7 月 10 日至 9 月 21 日工作日 9:00—18:00；直通赛滚动发布。'},
     sources:[{title:'国家工业信息安全发展研究中心｜第八届工业互联网大赛通知',date:'2026-07-10',url:'https://www.cics-cert.org.cn/web_root/webpage/articlecontent_101003_2076480900006154241.html',kind:'official'}],
     url:'https://www.cii-contest.cn' }),
-], competitionV2Overrides, { updatedAt: RADAR_UPDATED_AT });
+], competitionV2Overrides, { updatedAt: BASELINE_CHECKED_AT });
 
-const auditedCompetitions = normalizeCompetitionCollection(
+const round2AuditedCompetitions = normalizeCompetitionCollection(
   baselineCompetitions,
   competitionRound2Corrections,
+  { updatedAt: BASELINE_CHECKED_AT },
+);
+
+const round2Competitions = [
+  ...round2AuditedCompetitions,
+  ...competitionRound2Additions,
+];
+
+const round3AuditedCompetitions = normalizeCompetitionCollection(
+  round2Competitions,
+  competitionRound3Corrections,
   { updatedAt: RADAR_UPDATED_AT },
 );
 
 export const competitions = [
-  ...auditedCompetitions,
-  ...competitionRound2Additions,
+  ...round3AuditedCompetitions,
+  ...competitionRound3Additions,
 ];
 
 export function parseCompetitionDate(value) {

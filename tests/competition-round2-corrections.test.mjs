@@ -44,7 +44,7 @@ test('every correction carries review provenance and HTTP(S) sources', () => {
 });
 
 test('the complete collection remains valid after applying corrections', () => {
-  assert.equal(corrected.length, 202);
+  assert.equal(corrected.length, 210);
   const validation = validateCompetitionCollectionV2(corrected);
   assert.deepEqual(validation.errors, []);
 });
