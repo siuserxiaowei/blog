@@ -4,7 +4,9 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 import { competitions, RADAR_UPDATED_AT, enrichCompetitions, getCompetitionCategories } from '../data/competitions.js';
+import { HERCLAW_PROFILE, PROJECT_PRESETS } from '../data/competition-project-presets.js';
 import { getCompetitionDeadlineInfo } from '../lib/competition-radar.js';
+import { getHerClawCompetitionFit, getMatchingProjectPresetIds } from '../lib/competition-project-fit.js';
 
 const TODAY = new Date();
 const enriched = enrichCompetitions(competitions, TODAY);
@@ -15,8 +17,14 @@ const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法',
 const softwareCount = enriched.filter(c => c.status.kind !== 'expired' && softwareCategories.has(c.cat)).length;
 const categories = getCompetitionCategories(enriched);
 const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo(c)]));
+const projectPresetIdsByCompetition = new Map(enriched.map(c => [c.id, getMatchingProjectPresetIds(c)]));
+const projectPresetCounts = new Map(PROJECT_PRESETS.map(preset => [
+  preset.id,
+  enriched.filter(c => projectPresetIdsByCompetition.get(c.id)?.includes(preset.id)).length,
+]));
 const workbenchRecords = enriched.map(c => {
   const deadline = deadlineInfo.get(c.id);
+  const herclawFit = getHerClawCompetitionFit(c);
   return {
     id: c.id,
     name: c.name,
@@ -44,6 +52,8 @@ const workbenchRecords = enriched.map(c => {
     deadlineType: deadline?.type ?? 'deadline',
     deadlineLabel: deadline?.label ?? '关键截止',
     calendarEligible: deadline?.calendarEligible ?? false,
+    projectPresetIds: projectPresetIdsByCompetition.get(c.id) ?? ['all'],
+    ...(herclawFit ? { herclawFit } : {}),
   };
 });
 const serializedWorkbenchRecords = JSON.stringify(workbenchRecords)
@@ -54,6 +64,10 @@ const serializedWorkbenchRecords = JSON.stringify(workbenchRecords)
   .replaceAll('\u2029', '\\u2029');
 const initialCompetition = enriched[0];
 const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition.id) : null;
+const initialActionRecords = enriched
+  .filter(c => c.status.kind !== 'expired' && deadlineInfo.get(c.id)?.calendarEligible)
+  .sort((a, b) => (a.status.days ?? Number.POSITIVE_INFINITY) - (b.status.days ?? Number.POSITIVE_INFINITY) || b.match - a.match)
+  .slice(0, 5);
 ---
 
 <BaseLayout title="AI 产品赛事雷达 · siuser小伟" description="面向 AI 软件、Agent、独立开发与轻硬件团队的赛事和行业活动看板。">
@@ -100,38 +114,75 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
       </div>
     </section>
 
-    <!-- 核心结论 -->
+    <!-- 项目入口 -->
+    <section class="mx-auto px-6 pb-8" style="max-width: var(--container-max);">
+      <div class="project-picker glass-card gradient-border p-6 md:p-8">
+        <div class="project-picker-heading">
+          <div>
+            <p class="section-kicker mb-2">// 我手里有什么</p>
+            <h2 class="text-xl md:text-2xl" style="font-family: var(--font-heading); color: var(--text);">先选现有项目，再看能投什么</h2>
+          </div>
+          <p class="project-match-summary">当前组合 <strong id="project-match-count">{enriched.length}</strong> 条赛事</p>
+        </div>
+        <div class="project-preset-grid" role="group" aria-label="按现有项目筛选赛事">
+          {PROJECT_PRESETS.map((preset, index) => (
+            <button
+              type="button"
+              class:list={['project-preset', index === 0 && 'is-on']}
+              data-project={preset.id}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+              aria-describedby={`project-preset-description-${preset.id}`}
+            >
+              <span class="project-preset-title">{preset.title}</span>
+              <span id={`project-preset-description-${preset.id}`} class="project-preset-description">{preset.description}</span>
+              <span class="project-preset-count" aria-label={`${projectPresetCounts.get(preset.id) ?? 0} 条匹配`}>{projectPresetCounts.get(preset.id) ?? 0}</span>
+            </button>
+          ))}
+        </div>
+        <noscript>
+          <p class="workbench-note mt-4">项目筛选需要 JavaScript；下方仍保留全部赛事的独立详情链接。</p>
+        </noscript>
+      </div>
+    </section>
+
+    <!-- 项目行动摘要 -->
     <section class="mx-auto px-6 pb-10" style="max-width: var(--container-max);">
       <div class="animate-fade-in glass-card gradient-border p-7 md:p-10 grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8" style="border-radius: var(--radius-xl);">
         <div>
-          <p class="section-kicker mb-4">// Priority Matrix</p>
-          <h2 class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">
-            Shipaton <span style="color: var(--text-secondary); font-weight: 400;">›</span> 讯飞教育 AI <span style="color: var(--text-secondary); font-weight: 400;">›</span> Agent Security <span style="color: var(--text-secondary); font-weight: 400;">›</span> CCF OPC
-          </h2>
-          <p class="text-sm md:text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-            <strong style="color: var(--color-accent);">软件主线分成三种回报</strong>：RevenueCat Shipaton 奖励真实上架、增长与收入；讯飞教育和情感数字人适合复用现有产品；Kaggle Agent Security、ARC 与 Pokémon 更偏算法和技术影响力。中国居民被排除、仅学生或仅特定地区可报的项目不会进入默认优先队列。
+          <p class="section-kicker mb-4">// 项目行动摘要</p>
+          <h2 id="project-summary-title" class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">全部项目的近期可行动机会</h2>
+          <p id="project-summary-description" class="text-sm md:text-base leading-relaxed" style="color: var(--text-secondary);">
+            这里只使用未过期且关键日期已经确认的记录；选择上方项目预设后，会按访问当天重新计算可投清单。
           </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="pill-note"><span class="dot-accent"></span>上架变现 · Shipaton · 9-30</span>
-            <span class="pill-note"><span class="dot-accent"></span>教育 Agent · 讯飞 · 9-25</span>
-            <span class="pill-note"><span class="dot-accent"></span>安全研究 · Kaggle · 9-01</span>
-            <span class="pill-note"><span class="dot-accent"></span>语音 Agent · CALL-E · 9-14</span>
+          <div id="herclaw-profile" class="project-profile mt-6" hidden>
+            <p class="project-profile-title">HerClaw · {HERCLAW_PROFILE.positioning}</p>
+            <ul class="project-profile-points">
+              {HERCLAW_PROFILE.currentCapabilities.map(capability => <li>{capability}</li>)}
+            </ul>
+            <p class="project-profile-caveat">不作为已完成能力：{HERCLAW_PROFILE.notAssumed.join('；')}</p>
+          </div>
+          <div id="project-no-go" class="project-no-go mt-6" hidden>
+            <p class="section-kicker mb-2">// 明确降级</p>
+            <ul id="project-no-go-list" class="project-no-go-list"></ul>
           </div>
         </div>
 
         <div class="border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-8" style="border-color: color-mix(in srgb, var(--border) 55%, transparent);">
-          <p class="section-kicker mb-4">// 14 天紧急</p>
-          <ul id="urgent-list" class:list={["space-y-2.5", urgentCount === 0 && "hidden"]}>
-            {enriched.filter(c => c.status.kind === 'urgent').sort((a,b)=>a.status.days-b.status.days).map(c => (
+          <p class="section-kicker mb-4">// 现在先做</p>
+          <ol id="project-action-list" class:list={["space-y-2.5", initialActionRecords.length === 0 && "hidden"]}>
+            {initialActionRecords.map(c => (
               <li>
-                <button data-jump={c.id} class="urgent-chip group">
-                  <span class="flex-1 text-sm font-medium truncate" style="color: var(--text);">{c.name}</span>
-                  <span class="urgent-badge">{c.status.days}d</span>
-                </button>
+                <a href={`/competitions/${encodeURIComponent(c.id)}/`} data-action-jump={c.id} class="project-action-card">
+                  <span class="project-action-name">{c.name}</span>
+                  <span class="project-action-deadline">{c.status.label}</span>
+                </a>
               </li>
             ))}
-          </ul>
-          <p id="urgent-empty" class:list={["text-sm", urgentCount > 0 && "hidden"]} style="color: var(--text-secondary);">14 天内暂无赛事截止。</p>
+          </ol>
+          <div id="project-action-empty" class:list={["project-action-empty", initialActionRecords.length > 0 && "hidden"]}>
+            <p>当前项目没有日期可信且仍可行动的匹配项。</p>
+            <button type="button" data-project-reset class="summary-button">查看全部项目</button>
+          </div>
         </div>
       </div>
     </section>
@@ -251,7 +302,7 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
             ))}
           </div>
           <div id="competition-empty" class="empty-state hidden" role="status">
-            <p>没有符合当前条件的赛事。</p>
+            <p id="competition-empty-message">没有符合当前条件的赛事。</p>
             <button type="button" data-empty-reset class="summary-button">清除筛选</button>
           </div>
           <noscript>
@@ -281,6 +332,15 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
                 title={initialDeadline?.calendarEligible ? '下载关键截止日历' : '日期尚未确认，暂不提供日历'}
               >加入日历</button>
             </div>
+          </div>
+          <div id="detail-project-fit" class="detail-project-fit" hidden>
+            <div class="detail-project-fit-heading">
+              <span class="section-kicker">// HerClaw 匹配判断</span>
+              <span id="detail-project-fit-decision" class="pill-note"></span>
+            </div>
+            <p><strong>匹配角度</strong><span id="detail-project-fit-angle"></span></p>
+            <p><strong>硬门槛</strong><span id="detail-project-fit-gate"></span></p>
+            <p><strong>预计投入</strong><span id="detail-project-fit-effort"></span></p>
           </div>
           <div id="detail-panel" class="detail-panel space-y-7">
             <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
@@ -406,6 +466,249 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
 </BaseLayout>
 
 <style is:global>
+  /* ============ Project-first discovery ============ */
+  .project-picker {
+    border-radius: var(--radius-xl);
+  }
+
+  .project-picker-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-match-summary {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .project-match-summary strong {
+    color: var(--color-accent);
+    font-size: 1.1rem;
+  }
+
+  .project-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .project-preset {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.32rem 0.65rem;
+    min-height: 88px;
+    padding: 0.9rem 0.95rem;
+    color: var(--text);
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .project-preset:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--color-accent) 46%, var(--border));
+  }
+
+  .project-preset.is-on {
+    border-color: color-mix(in srgb, var(--color-accent) 72%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--surface));
+    box-shadow: 0 16px 30px -26px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+
+  .project-preset-title {
+    align-self: center;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .project-preset-description {
+    grid-column: 1 / -1;
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .project-preset-count {
+    display: inline-grid;
+    min-width: 1.65rem;
+    height: 1.65rem;
+    place-items: center;
+    padding: 0 0.38rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+  }
+
+  .project-preset.is-on .project-preset-count {
+    color: var(--color-accent-ink);
+    background: var(--color-accent);
+  }
+
+  .project-profile,
+  .project-no-go,
+  .detail-project-fit {
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 34%, var(--border));
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-accent) 7%, var(--surface));
+  }
+
+  .project-profile-title {
+    margin-bottom: 0.55rem;
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+    font-weight: 650;
+  }
+
+  .project-profile-points,
+  .project-no-go-list {
+    display: grid;
+    gap: 0.38rem;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .project-profile-points li::before {
+    content: '·';
+    margin-right: 0.45rem;
+    color: var(--color-accent-2);
+  }
+
+  .project-profile-caveat {
+    margin-top: 0.7rem;
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .project-no-go {
+    border-color: color-mix(in srgb, var(--border) 80%, transparent);
+    background: color-mix(in srgb, var(--surface-2) 58%, transparent);
+  }
+
+  .project-no-go-list li strong {
+    color: var(--text);
+  }
+
+  .project-action-card {
+    display: grid;
+    gap: 0.38rem;
+    width: 100%;
+    min-height: 58px;
+    padding: 0.7rem 0.8rem;
+    text-align: left;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface) 50%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .project-action-card:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--border));
+    background: color-mix(in srgb, var(--color-accent) 6%, var(--surface));
+    transform: translateX(2px);
+  }
+
+  .project-action-name {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.35;
+  }
+
+  .project-action-deadline,
+  .project-action-meta {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .project-action-fit,
+  .project-action-gate {
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .project-action-fit strong,
+  .project-action-gate strong {
+    color: var(--text);
+    margin-right: 0.3rem;
+  }
+
+  .project-action-empty {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .project-action-empty.hidden {
+    display: none;
+  }
+
+  .detail-project-fit-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-project-fit {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .detail-project-fit[hidden] {
+    display: none;
+  }
+
+  .detail-project-fit p {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .detail-project-fit p strong {
+    color: var(--text);
+  }
+
+  @media (max-width: 900px) {
+    .project-preset-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .project-picker-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .project-preset-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* ============ Filter rows ============ */
   .filter-rows {
     display: grid;
@@ -553,6 +856,8 @@ const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition
 
   .cp-list-select:focus-visible,
   .favorite-button:focus-visible,
+  .project-preset:focus-visible,
+  .project-action-card:focus-visible,
   .filter-chip:focus-visible,
   .summary-button:focus-visible,
   .cta-button:focus-visible,

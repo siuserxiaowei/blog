@@ -1,3 +1,9 @@
+import {
+  DEFAULT_PROJECT_PRESET_ID,
+  HERCLAW_PROJECT_PRESET_ID,
+  PROJECT_PRESET_BY_ID,
+} from '../data/competition-project-presets.js';
+
 const ABORT_KEY = '__competitionRadarWorkbenchAbort';
 const FAVORITE_STORAGE_KEY = 'competition-radar:favorites:v1';
 const FAVORITE_STORAGE_VERSION = 1;
@@ -27,6 +33,14 @@ const SOFTWARE_CATEGORIES = new Set([
 const VALID_SORTS = new Set(['software-first', 'urgent-first', 'match-desc', 'deadline-asc', 'tier-desc']);
 const VALID_STATUSES = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired', 'unknown']);
 const VALID_TIERS = new Set(['全部', 'S', 'A', 'B']);
+const VALID_PROJECT_IDS = new Set(PROJECT_PRESET_BY_ID.keys());
+const HERCLAW_NO_GO_ORDER = new Map([
+  'shipaton2026',
+  'amddevmaster2026',
+  'armaiopt2026',
+  'agenticcinema2026',
+  'xfyedu2026',
+].map((id, index) => [id, index]));
 
 function parseRecords() {
   const dataElement = document.getElementById('competition-data');
@@ -288,6 +302,12 @@ function initCompetitionRadar() {
   const favorites = readFavoriteIds(validIds);
 
   records.forEach(record => {
+    record.projectPresetIds = Array.isArray(record.projectPresetIds)
+      ? record.projectPresetIds.filter(id => VALID_PROJECT_IDS.has(id))
+      : [DEFAULT_PROJECT_PRESET_ID];
+    if (!record.projectPresetIds.includes(DEFAULT_PROJECT_PRESET_ID)) {
+      record.projectPresetIds.unshift(DEFAULT_PROJECT_PRESET_ID);
+    }
     record.status = statusForDeadline(record.deadline, record.calendarEligible);
     record.searchText = [
       record.name,
@@ -310,6 +330,7 @@ function initCompetitionRadar() {
   });
 
   const countElement = document.getElementById('list-count');
+  const projectMatchCountElement = document.getElementById('project-match-count');
   const searchElement = document.getElementById('radar-search');
   const statusElement = document.getElementById('radar-status');
   const sortElement = document.getElementById('radar-sort');
@@ -319,12 +340,21 @@ function initCompetitionRadar() {
   const clearFiltersElement = document.getElementById('clear-filters');
   const emptyElement = document.getElementById('competition-empty');
   const announcerElement = document.getElementById('radar-announcer');
+  const emptyMessageElement = document.getElementById('competition-empty-message');
+  const projectActionList = document.getElementById('project-action-list');
+  const projectActionEmpty = document.getElementById('project-action-empty');
+  const projectSummaryTitle = document.getElementById('project-summary-title');
+  const projectSummaryDescription = document.getElementById('project-summary-description');
+  const herclawProfile = document.getElementById('herclaw-profile');
+  const projectNoGo = document.getElementById('project-no-go');
+  const projectNoGoList = document.getElementById('project-no-go-list');
   const detailSection = document.getElementById('competition-detail');
   const detailWorkbench = document.getElementById('detail-workbench');
   const detailPanel = document.getElementById('detail-panel');
   const detailFavorite = document.getElementById('detail-favorite');
   const detailExport = document.getElementById('detail-export-ics');
   const detailCopy = document.getElementById('detail-copy-summary');
+  const detailProjectFit = document.getElementById('detail-project-fit');
 
   const params = new URLSearchParams(window.location.search);
   const defaultRecord = records.slice().sort((a, b) =>
@@ -335,6 +365,9 @@ function initCompetitionRadar() {
   )[0] || records[0];
   const initialId = getAddressId();
   const state = {
+    project: VALID_PROJECT_IDS.has(params.get('project') || '')
+      ? params.get('project')
+      : DEFAULT_PROJECT_PRESET_ID,
     cat: categoryValues.has(params.get('cat') || '') ? params.get('cat') : '全部',
     tier: VALID_TIERS.has(params.get('tier') || '') ? params.get('tier') : '全部',
     status: VALID_STATUSES.has(params.get('status') || '') ? params.get('status') : '全部',
@@ -352,8 +385,20 @@ function initCompetitionRadar() {
     });
   }
 
+  function currentProjectPreset() {
+    return PROJECT_PRESET_BY_ID.get(state.project)
+      ?? PROJECT_PRESET_BY_ID.get(DEFAULT_PROJECT_PRESET_ID);
+  }
+
+  function recordMatchesProject(record) {
+    return state.project === DEFAULT_PROJECT_PRESET_ID
+      || record.projectPresetIds.includes(state.project);
+  }
+
   function writeAddress(mode = 'replace') {
     const url = new URL(window.location.href);
+    if (state.project !== DEFAULT_PROJECT_PRESET_ID) url.searchParams.set('project', state.project);
+    else url.searchParams.delete('project');
     const query = state.search.trim();
     if (query) url.searchParams.set('q', query);
     else url.searchParams.delete('q');
@@ -385,6 +430,7 @@ function initCompetitionRadar() {
     if (searchElement) searchElement.value = state.search;
     if (statusElement) statusElement.value = state.status;
     if (sortElement) sortElement.value = state.sort;
+    setChipState('.project-preset', 'project', state.project);
     setChipState('.filter-cat', 'fcat', state.cat);
     setChipState('.filter-tier', 'ftier', state.tier);
     favoritesOnlyElement?.classList.toggle('is-on', state.favoritesOnly);
@@ -462,6 +508,19 @@ function initCompetitionRadar() {
         ? '日期尚未确认，暂不提供日历'
         : '下载关键截止日历';
     }
+    const showHerClawFit = state.project === HERCLAW_PROJECT_PRESET_ID
+      && record.herclawFit
+      && record.herclawFit.decision !== 'no-go';
+    if (detailProjectFit) detailProjectFit.hidden = !showHerClawFit;
+    if (showHerClawFit) {
+      setText(
+        'detail-project-fit-decision',
+        record.herclawFit.decision === 'stretch' ? '补条件后再投' : `显式推荐 #${record.herclawFit.rank}`,
+      );
+      setText('detail-project-fit-angle', record.herclawFit.fitAngle);
+      setText('detail-project-fit-gate', record.herclawFit.gate);
+      setText('detail-project-fit-effort', record.herclawFit.effort);
+    }
     syncFavorites();
     detailSection?.setAttribute('aria-busy', 'false');
   }
@@ -472,6 +531,10 @@ function initCompetitionRadar() {
     const deadlineA = Date.parse(a.deadline || '9999-12-31');
     const deadlineB = Date.parse(b.deadline || '9999-12-31');
     if (state.sort === 'software-first') {
+      if (state.project === HERCLAW_PROJECT_PRESET_ID) {
+        return (a.herclawFit?.rank ?? Number.POSITIVE_INFINITY)
+          - (b.herclawFit?.rank ?? Number.POSITIVE_INFINITY);
+      }
       return (a.status.kind === 'expired' ? 1 : 0) - (b.status.kind === 'expired' ? 1 : 0)
         || (SOFTWARE_RANK[a.cat] ?? 7) - (SOFTWARE_RANK[b.cat] ?? 7)
         || (STATUS_RANK[a.status.kind] ?? 9) - (STATUS_RANK[b.status.kind] ?? 9)
@@ -499,7 +562,10 @@ function initCompetitionRadar() {
     });
     detailWorkbench?.classList.toggle('hidden', !record);
     detailPanel?.classList.toggle('hidden', !record);
-    if (!record) return;
+    if (!record) {
+      if (detailProjectFit) detailProjectFit.hidden = true;
+      return;
+    }
     renderDetail(record);
     if (options.address) writeAddress(options.address);
     if (options.scroll) {
@@ -515,7 +581,8 @@ function initCompetitionRadar() {
     let visible = 0;
     records.forEach(record => {
       const matches =
-        (state.cat === '全部' || record.cat === state.cat)
+        recordMatchesProject(record)
+        && (state.cat === '全部' || record.cat === state.cat)
         && (state.tier === '全部' || record.tier === state.tier)
         && (state.status === '全部' || record.status.kind === state.status)
         && (!state.favoritesOnly || favorites.has(record.id))
@@ -529,7 +596,14 @@ function initCompetitionRadar() {
       if (item) list.append(item);
     });
     if (countElement) countElement.textContent = `${visible} items`;
+    if (projectMatchCountElement) projectMatchCountElement.textContent = String(visible);
     emptyElement?.classList.toggle('hidden', visible !== 0);
+    if (emptyMessageElement) {
+      emptyMessageElement.textContent = visible === 0 && state.project !== DEFAULT_PROJECT_PRESET_ID
+        ? `${currentProjectPreset()?.title || '当前项目'}没有符合组合条件的赛事；可清除筛选或查看全部项目。`
+        : '没有符合当前条件的赛事。';
+    }
+    refreshProjectSummary();
 
     const currentItem = itemById.get(state.selectedId);
     if (!currentItem || currentItem.classList.contains('hidden')) {
@@ -542,10 +616,14 @@ function initCompetitionRadar() {
     } else {
       applySelect({ address: options.preserveAddress ? '' : options.address, scroll: options.scroll });
     }
-    announce(visible ? `已显示 ${visible} 条赛事。` : '没有符合当前条件的赛事。');
+    const projectLabel = state.project === DEFAULT_PROJECT_PRESET_ID
+      ? ''
+      : `${currentProjectPreset()?.title || '当前项目'}，`;
+    announce(visible ? `${projectLabel}已显示 ${visible} 条赛事。` : `${projectLabel}没有符合当前条件的赛事。`);
   }
 
   function resetFilters(options = {}) {
+    state.project = DEFAULT_PROJECT_PRESET_ID;
     state.cat = '全部';
     state.tier = '全部';
     state.status = '全部';
@@ -560,6 +638,9 @@ function initCompetitionRadar() {
   function syncStateFromAddress() {
     const urlParams = new URLSearchParams(window.location.search);
     const id = getAddressId();
+    state.project = VALID_PROJECT_IDS.has(urlParams.get('project') || '')
+      ? urlParams.get('project')
+      : DEFAULT_PROJECT_PRESET_ID;
     state.search = urlParams.get('q') || '';
     state.cat = categoryValues.has(urlParams.get('cat') || '') ? urlParams.get('cat') : '全部';
     state.tier = VALID_TIERS.has(urlParams.get('tier') || '') ? urlParams.get('tier') : '全部';
@@ -642,32 +723,89 @@ function initCompetitionRadar() {
     }
   }
 
-  function refreshSummary() {
-    const urgent = records.filter(record => record.status.kind === 'urgent')
-      .sort((a, b) => a.status.days - b.status.days);
-    const active = records.filter(record => record.status.kind !== 'expired');
+  function refreshProjectSummary() {
+    const preset = currentProjectPreset();
+    const projectRecords = records.filter(record => recordMatchesProject(record));
+    const active = projectRecords.filter(record => record.status.kind !== 'expired');
+    const urgent = active.filter(record => record.status.kind === 'urgent');
+    const actionable = active
+      .filter(record => record.calendarEligible === true && record.status.kind !== 'unknown')
+      .sort((a, b) => {
+        if (state.project === HERCLAW_PROJECT_PRESET_ID) {
+          return (a.herclawFit?.rank ?? Number.POSITIVE_INFINITY)
+            - (b.herclawFit?.rank ?? Number.POSITIVE_INFINITY);
+        }
+        return (a.status.days ?? Number.POSITIVE_INFINITY) - (b.status.days ?? Number.POSITIVE_INFINITY)
+          || Number(b.match || 0) - Number(a.match || 0);
+      });
+
     setText('metric-urgent', urgent.length);
     setText('metric-active', active.length);
     setText('metric-software', active.filter(record => SOFTWARE_CATEGORIES.has(record.cat)).length);
-    const urgentList = document.getElementById('urgent-list');
-    const urgentEmpty = document.getElementById('urgent-empty');
-    if (!urgentList) return;
-    urgentList.replaceChildren(...urgent.map(record => {
-      const item = document.createElement('li');
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.dataset.jump = record.id;
-      button.className = 'urgent-chip group';
-      button.setAttribute('aria-label', `查看 ${record.name || '赛事'}，${record.status.label}`);
-      button.append(
-        createTextElement('span', 'flex-1 text-sm font-medium truncate', record.name),
-        createTextElement('span', 'urgent-badge', record.status.days === 0 ? '今天' : `${record.status.days}d`),
-      );
-      item.append(button);
-      return item;
-    }));
-    urgentList.classList.toggle('hidden', urgent.length === 0);
-    urgentEmpty?.classList.toggle('hidden', urgent.length > 0);
+    if (projectSummaryTitle) {
+      projectSummaryTitle.textContent = `${preset?.shortTitle || preset?.title || '全部项目'}：${actionable.length} 个日期可信的可行动项`;
+    }
+    if (projectSummaryDescription) {
+      projectSummaryDescription.textContent = state.project === HERCLAW_PROJECT_PRESET_ID
+        ? '以下结果只来自 HerClaw 显式赛事清单；不会因为赛事出现“硬件”或“Agent”关键词就自动入选。'
+        : `${preset?.description || ''} 行动摘要按访问当天重算，只纳入未过期且关键日期已确认的记录。`;
+    }
+    if (herclawProfile) herclawProfile.hidden = state.project !== HERCLAW_PROJECT_PRESET_ID;
+
+    if (projectActionList) {
+      projectActionList.replaceChildren(...actionable.slice(0, 5).map(record => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = `/competitions/${encodeURIComponent(record.id)}/`;
+        link.dataset.actionJump = record.id;
+        link.className = 'project-action-card';
+        link.setAttribute('aria-label', `查看 ${record.name || '赛事'}，${record.status.label}`);
+        link.append(
+          createTextElement('span', 'project-action-name', record.name),
+          createTextElement(
+            'span',
+            'project-action-deadline',
+            record.herclawFit?.effort
+              ? `${record.status.label} · 预计投入 ${record.herclawFit.effort}`
+              : record.status.label,
+          ),
+        );
+        if (state.project === HERCLAW_PROJECT_PRESET_ID && record.herclawFit) {
+          const angle = createTextElement('span', 'project-action-fit', '');
+          angle.append(
+            createTextElement('strong', '', '匹配角度'),
+            document.createTextNode(record.herclawFit.fitAngle || ''),
+          );
+          const gate = createTextElement('span', 'project-action-gate', '');
+          gate.append(
+            createTextElement('strong', '', '硬门槛'),
+            document.createTextNode(record.herclawFit.gate || ''),
+          );
+          link.append(angle, gate);
+        }
+        item.append(link);
+        return item;
+      }));
+      projectActionList.classList.toggle('hidden', actionable.length === 0);
+    }
+    projectActionEmpty?.classList.toggle('hidden', actionable.length > 0);
+
+    const noGoRecords = records
+      .filter(record => record.herclawFit?.decision === 'no-go')
+      .sort((a, b) => (HERCLAW_NO_GO_ORDER.get(a.id) ?? 99) - (HERCLAW_NO_GO_ORDER.get(b.id) ?? 99))
+      .slice(0, 5);
+    const showNoGo = state.project === HERCLAW_PROJECT_PRESET_ID && noGoRecords.length > 0;
+    if (projectNoGo) projectNoGo.hidden = !showNoGo;
+    if (projectNoGoList) {
+      projectNoGoList.replaceChildren(...noGoRecords.map(record => {
+        const item = document.createElement('li');
+        item.append(
+          createTextElement('strong', '', `${record.name || '赛事'}：`),
+          document.createTextNode(record.herclawFit.noGoReason || ''),
+        );
+        return item;
+      }));
+    }
   }
 
   items.forEach(item => {
@@ -685,6 +823,14 @@ function initCompetitionRadar() {
     }, { signal });
   });
 
+  document.querySelectorAll('.project-preset').forEach(button => {
+    button.addEventListener('click', () => {
+      const project = button.dataset.project || DEFAULT_PROJECT_PRESET_ID;
+      state.project = VALID_PROJECT_IDS.has(project) ? project : DEFAULT_PROJECT_PRESET_ID;
+      syncControls();
+      applyFilter({ address: 'push' });
+    }, { signal });
+  });
   document.querySelectorAll('.filter-cat').forEach(button => {
     button.addEventListener('click', () => {
       state.cat = button.dataset.fcat || '全部';
@@ -703,10 +849,26 @@ function initCompetitionRadar() {
     button.addEventListener('click', () => toggleFavorite(button.dataset.favorite || ''), { signal });
   });
   document.querySelector('[data-empty-reset]')?.addEventListener('click', () => resetFilters({ address: 'push' }), { signal });
-  document.getElementById('urgent-list')?.addEventListener('click', event => {
-    const button = event.target.closest('[data-jump]');
-    if (!button) return;
-    state.selectedId = button.dataset.jump || '';
+  document.querySelector('[data-project-reset]')?.addEventListener('click', () => {
+    state.project = DEFAULT_PROJECT_PRESET_ID;
+    syncControls();
+    applyFilter({ address: 'push' });
+  }, { signal });
+  projectActionList?.addEventListener('click', event => {
+    const link = event.target.closest('[data-action-jump]');
+    const item = link ? itemById.get(link.dataset.actionJump || '') : null;
+    if (
+      !link
+      || !item
+      || item.classList.contains('hidden')
+      || event.button !== 0
+      || event.metaKey
+      || event.ctrlKey
+      || event.shiftKey
+      || event.altKey
+    ) return;
+    event.preventDefault();
+    state.selectedId = link.dataset.actionJump || '';
     applySelect({ address: 'push', scroll: true });
   }, { signal });
 
@@ -749,7 +911,6 @@ function initCompetitionRadar() {
     if (state.favoritesOnly) applyFilter({ preserveAddress: true });
   }, { signal });
 
-  refreshSummary();
   syncControls();
   syncFavorites();
   applyFilter({ address: 'replace' });
