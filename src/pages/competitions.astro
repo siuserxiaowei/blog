@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 
 import { competitions, RADAR_UPDATED_AT, enrichCompetitions, getCompetitionCategories } from '../data/competitions.js';
 import { HERCLAW_PROFILE, PROJECT_PRESETS } from '../data/competition-project-presets.js';
+import { ACCESS_FILTERS, getCompetitionAccessSummary } from '../lib/competition-access.js';
 import { getCompetitionDeadlineInfo } from '../lib/competition-radar.js';
 import { getHerClawCompetitionFit, getMatchingProjectPresetIds } from '../lib/competition-project-fit.js';
 
@@ -17,6 +18,7 @@ const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法',
 const softwareCount = enriched.filter(c => c.status.kind !== 'expired' && softwareCategories.has(c.cat)).length;
 const categories = getCompetitionCategories(enriched);
 const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo(c)]));
+const accessByCompetition = new Map(enriched.map(c => [c.id, getCompetitionAccessSummary(c)]));
 const projectPresetIdsByCompetition = new Map(enriched.map(c => [c.id, getMatchingProjectPresetIds(c)]));
 const projectPresetCounts = new Map(PROJECT_PRESETS.map(preset => [
   preset.id,
@@ -52,6 +54,7 @@ const workbenchRecords = enriched.map(c => {
     deadlineType: deadline?.type ?? 'deadline',
     deadlineLabel: deadline?.label ?? '关键截止',
     calendarEligible: deadline?.calendarEligible ?? false,
+    access: accessByCompetition.get(c.id),
     projectPresetIds: projectPresetIdsByCompetition.get(c.id) ?? ['all'],
     ...(herclawFit ? { herclawFit } : {}),
   };
@@ -64,8 +67,13 @@ const serializedWorkbenchRecords = JSON.stringify(workbenchRecords)
   .replaceAll('\u2029', '\\u2029');
 const initialCompetition = enriched[0];
 const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition.id) : null;
+const initialAccess = initialCompetition
+  ? accessByCompetition.get(initialCompetition.id)
+  : getCompetitionAccessSummary(null);
 const initialActionRecords = enriched
-  .filter(c => c.status.kind !== 'expired' && deadlineInfo.get(c.id)?.calendarEligible)
+  .filter(c => c.status.kind !== 'expired'
+    && deadlineInfo.get(c.id)?.calendarEligible
+    && accessByCompetition.get(c.id)?.group !== 'blocked')
   .sort((a, b) => (a.status.days ?? Number.POSITIVE_INFINITY) - (b.status.days ?? Number.POSITIVE_INFINITY) || b.match - a.match)
   .slice(0, 5);
 ---
@@ -235,6 +243,19 @@ const initialActionRecords = enriched
             ))}
           </div>
         </div>
+        <div class="filter-row">
+          <span class="section-kicker filter-label">// 资格</span>
+          <div class="filter-group" role="group" aria-label="按大陆团队参赛资格筛选">
+            {ACCESS_FILTERS.map((filter, index) => (
+              <button
+                type="button"
+                data-faccess={filter.id}
+                class:list={['filter-access', 'filter-chip', index === 0 && 'is-on']}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+              >{filter.label}</button>
+            ))}
+          </div>
+        </div>
         <div class="workbench-row">
           <div class="filter-group" aria-label="收藏筛选">
             <button type="button" id="favorites-only" class="filter-chip workbench-toggle" aria-pressed="false">
@@ -265,6 +286,7 @@ const initialActionRecords = enriched
               <article
                 data-id={c.id}
                 data-status={c.status.kind}
+                data-access={accessByCompetition.get(c.id)?.group}
                 class="cp-list-item relative"
               >
                 <a
@@ -283,6 +305,16 @@ const initialActionRecords = enriched
                     <span data-status-label class="text-[11px]" style="color: var(--text-secondary); font-family: var(--font-mono);">{c.status.label}</span>
                     <span class="text-[11px]" style="color: var(--text-secondary); opacity: 0.5;">·</span>
                     <span class="text-[11px]" style="color: var(--text-secondary);">{c.cat}</span>
+                  </div>
+                  <div class="access-card-row">
+                    <span class={`access-badge access-${accessByCompetition.get(c.id)?.tone}`}>
+                      {accessByCompetition.get(c.id)?.displayLabel}
+                    </span>
+                    {accessByCompetition.get(c.id)?.gates.length > 0 && (
+                      <span class="access-card-gates">
+                        {accessByCompetition.get(c.id)?.gates.slice(0, 2).map(gate => gate.label).join(' · ')}
+                      </span>
+                    )}
                   </div>
                   <p class="text-xs leading-relaxed line-clamp-2 mb-3" style="color: var(--text-secondary);">{c.desc}</p>
                   <div class="flex items-center justify-between pt-2 text-[11px]" style="border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);">
@@ -342,6 +374,24 @@ const initialActionRecords = enriched
             <p><strong>硬门槛</strong><span id="detail-project-fit-gate"></span></p>
             <p><strong>预计投入</strong><span id="detail-project-fit-effort"></span></p>
           </div>
+          <section id="detail-access-summary" class={`detail-access-summary access-panel-${initialAccess?.tone}`} aria-labelledby="detail-access-heading">
+            <div class="detail-access-heading">
+              <div>
+                <span class="section-kicker">// 资格硬门槛</span>
+                <h3 id="detail-access-heading">大陆团队参赛判断</h3>
+              </div>
+              <span id="detail-access-badge" class={`access-badge access-${initialAccess?.tone}`}>{initialAccess?.displayLabel}</span>
+            </div>
+            <p id="detail-access-china" class="detail-access-china">大陆资格：{initialAccess?.chinaEligibility.label}</p>
+            <ul id="detail-access-gates" class="detail-access-gates">
+              {initialAccess?.gates.map(gate => (
+                <li><strong>{gate.label}</strong><span>{gate.value}</span></li>
+              ))}
+            </ul>
+            <p id="detail-access-empty" class:list={['detail-access-empty', initialAccess?.gates.length && 'hidden']}>
+              暂无可确认的结构化硬门槛；请在报名之前逐条核对官方规则。
+            </p>
+          </section>
           <div id="detail-panel" class="detail-panel space-y-7">
             <div class="glass-card gradient-border p-7 md:p-11" style="border-radius: var(--radius-xl);">
               <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
@@ -709,6 +759,141 @@ const initialActionRecords = enriched
     }
   }
 
+  /* ============ Access gates ============ */
+  .access-card-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    margin-bottom: 0.65rem;
+  }
+
+  .access-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.55rem;
+    max-width: 100%;
+    padding: 0.22rem 0.58rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .access-open {
+    color: var(--color-accent-2);
+    background: color-mix(in srgb, var(--color-accent-2) 10%, transparent);
+  }
+
+  .access-special {
+    color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  }
+
+  .access-unknown {
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--surface-2) 72%, transparent);
+  }
+
+  .access-blocked {
+    color: #ff7b72;
+    background: color-mix(in srgb, #ff7b72 10%, transparent);
+  }
+
+  .access-card-gates {
+    min-width: 0;
+    color: var(--text-secondary);
+    font-size: 10px;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detail-access-summary {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+  }
+
+  .detail-access-summary.access-panel-open {
+    border-color: color-mix(in srgb, var(--color-accent-2) 42%, var(--border));
+  }
+
+  .detail-access-summary.access-panel-special {
+    border-color: color-mix(in srgb, var(--color-accent) 50%, var(--border));
+  }
+
+  .detail-access-summary.access-panel-unknown {
+    border-style: dashed;
+  }
+
+  .detail-access-summary.access-panel-blocked {
+    border-color: color-mix(in srgb, #ff7b72 64%, var(--border));
+    background: color-mix(in srgb, #ff7b72 7%, var(--surface));
+  }
+
+  .detail-access-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .detail-access-heading h3 {
+    margin-top: 0.25rem;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+  }
+
+  .detail-access-china,
+  .detail-access-empty {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .detail-access-gates {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .detail-access-gates li {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, max-content) minmax(0, 1fr);
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .detail-access-gates strong {
+    color: var(--text);
+  }
+
+  .detail-access-empty.hidden {
+    display: none;
+  }
+
+  @media (max-width: 520px) {
+    .detail-access-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .detail-access-gates li {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
   /* ============ Filter rows ============ */
   .filter-rows {
     display: grid;
@@ -879,6 +1064,12 @@ const initialActionRecords = enriched
   }
   .cp-list-item.is-active h3 { color: var(--color-accent) !important; }
   .cp-list-item[data-status="expired"] { opacity: 0.55; }
+  .cp-list-item[data-access="blocked"] {
+    border-color: color-mix(in srgb, #ff7b72 52%, var(--border));
+  }
+  .cp-list-item[data-access="unknown"] {
+    border-style: dashed;
+  }
 
   .favorite-button {
     display: inline-grid;
@@ -1295,642 +1486,3 @@ const initialActionRecords = enriched
     }
   }
 </style>
-
-<script is:inline>
-  (function () {
-    if (document.getElementById('competition-data')) return;
-    const abortKey = '__competitionRadarAbort';
-    const favoriteStorageKey = 'competition-radar:favorites:v1';
-    const favoriteStorageVersion = 1;
-    const tierRank = { S: 3, A: 2, B: 1 };
-    const statusRank = { urgent: 0, ongoing: 1, upcoming: 2, expired: 3 };
-    const validSorts = new Set(['software-first', 'urgent-first', 'match-desc', 'deadline-asc', 'tier-desc']);
-    const validStatuses = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired']);
-    const validTiers = new Set(['全部', 'S', 'A', 'B']);
-    const softwareRank = {
-      'AI 软件': 0,
-      '开源开发': 1,
-      '数据算法': 2,
-      '安全攻防': 3,
-      '游戏创作': 4,
-      '创意 AI': 5,
-      '创业路演': 6,
-      '学生限定': 8,
-      '地区限定': 9,
-    };
-    const softwareCategories = new Set(['AI 软件', '开源开发', '数据算法', '安全攻防', '游戏创作', '创意 AI', '创业路演']);
-    const dayMs = 86400000;
-
-    function statusForDeadline(value) {
-      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
-      if (!match) return { kind: 'unknown', days: null, label: '日期待确认' };
-      const deadline = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const days = Math.ceil((deadline.getTime() - today.getTime()) / dayMs);
-      if (days < 0) return { kind: 'expired', days, label: '已截止' };
-      if (days <= 14) return { kind: 'urgent', days, label: days === 0 ? '今天截止' : `${days} 天后截止` };
-      if (days <= 60) return { kind: 'ongoing', days, label: `${days} 天后截止` };
-      return { kind: 'upcoming', days, label: `${days} 天后` };
-    }
-
-    function updateStatusDot(dot, kind) {
-      if (!dot) return;
-      dot.classList.remove('status-urgent', 'status-ongoing', 'status-upcoming', 'status-expired', 'status-unknown');
-      dot.classList.add(`status-${kind}`);
-    }
-
-    function refreshStatuses(items, panelById) {
-      const urgent = [];
-      let active = 0;
-      let software = 0;
-
-      items.forEach(item => {
-        const status = statusForDeadline(item.dataset.deadline);
-        item.dataset.status = status.kind;
-        item.querySelector('[data-status-label]')?.replaceChildren(status.label);
-        updateStatusDot(item.querySelector('.status-dot'), status.kind);
-
-        const panel = panelById.get(item.dataset.id || '');
-        panel?.querySelector('[data-status-label]')?.replaceChildren(status.label);
-        updateStatusDot(panel?.querySelector('.status-dot'), status.kind);
-
-        if (status.kind === 'urgent') urgent.push({ item, status });
-        if (status.kind !== 'expired') {
-          active++;
-          if (softwareCategories.has(item.dataset.cat)) software++;
-        }
-      });
-
-      document.getElementById('metric-urgent')?.replaceChildren(String(urgent.length));
-      document.getElementById('metric-active')?.replaceChildren(String(active));
-      document.getElementById('metric-software')?.replaceChildren(String(software));
-
-      const urgentList = document.getElementById('urgent-list');
-      const urgentEmpty = document.getElementById('urgent-empty');
-      if (!urgentList) return;
-      urgentList.replaceChildren();
-
-      urgent.sort((a, b) => a.status.days - b.status.days).forEach(({ item, status }) => {
-        const li = document.createElement('li');
-        const button = document.createElement('button');
-        const name = document.createElement('span');
-        const badge = document.createElement('span');
-        button.type = 'button';
-        button.dataset.jump = item.dataset.id || '';
-        button.className = 'urgent-chip group';
-        button.setAttribute('aria-label', `查看 ${item.dataset.name || '赛事'}，${status.label}`);
-        name.className = 'flex-1 text-sm font-medium truncate';
-        name.style.color = 'var(--text)';
-        name.textContent = item.dataset.name || '';
-        badge.className = 'urgent-badge';
-        badge.textContent = status.days === 0 ? '今天' : `${status.days}d`;
-        button.append(name, badge);
-        li.append(button);
-        urgentList.append(li);
-      });
-
-      urgentList.classList.toggle('hidden', urgent.length === 0);
-      urgentEmpty?.classList.toggle('hidden', urgent.length > 0);
-    }
-
-    function getAddressId() {
-      const params = new URLSearchParams(window.location.search);
-      const queryId = params.get('competition') || params.get('event');
-      let hashId = '';
-      try {
-        hashId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
-      } catch {
-        hashId = window.location.hash.slice(1);
-      }
-      return queryId || hashId || '';
-    }
-
-    function readFavoriteIds(validIds) {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(favoriteStorageKey) || 'null');
-        if (
-          !parsed
-          || parsed.version !== favoriteStorageVersion
-          || !Array.isArray(parsed.ids)
-        ) {
-          if (parsed !== null) localStorage.removeItem(favoriteStorageKey);
-          return new Set();
-        }
-        return new Set(parsed.ids.filter(id => typeof id === 'string' && validIds.has(id)));
-      } catch {
-        localStorage.removeItem(favoriteStorageKey);
-        return new Set();
-      }
-    }
-
-    function writeFavoriteIds(ids) {
-      try {
-        localStorage.setItem(favoriteStorageKey, JSON.stringify({
-          version: favoriteStorageVersion,
-          ids: Array.from(ids).sort(),
-        }));
-      } catch {
-        // Private browsing or a full storage quota should not break the workbench.
-      }
-    }
-
-    function escapeIcsText(value) {
-      return String(value ?? '')
-        .replaceAll('\\', '\\\\')
-        .replace(/\r?\n/g, '\\n')
-        .replaceAll(';', '\\;')
-        .replaceAll(',', '\\,');
-    }
-
-    function foldIcsLine(line) {
-      const encoder = new TextEncoder();
-      const chunks = [];
-      let chunk = '';
-      for (const character of String(line)) {
-        const candidate = chunk + character;
-        if (chunk && encoder.encode(candidate).length > 73) {
-          chunks.push(chunk);
-          chunk = character;
-        } else {
-          chunk = candidate;
-        }
-      }
-      if (chunk || !chunks.length) chunks.push(chunk);
-      return chunks.join('\r\n ');
-    }
-
-    function compactDate(value) {
-      return value.replaceAll('-', '');
-    }
-
-    function nextDate(value) {
-      const [year, month, day] = value.split('-').map(Number);
-      const date = new Date(Date.UTC(year, month - 1, day + 1));
-      return [
-        date.getUTCFullYear(),
-        String(date.getUTCMonth() + 1).padStart(2, '0'),
-        String(date.getUTCDate()).padStart(2, '0'),
-      ].join('-');
-    }
-
-    function buildCalendar(item) {
-      const deadline = item.dataset.deadline || '';
-      if (item.dataset.calendarEligible !== 'true' || !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
-        throw new Error('Deadline is not eligible for calendar export.');
-      }
-      const id = (item.dataset.id || 'competition').replace(/[^a-zA-Z0-9._-]/g, '-');
-      const name = item.dataset.fullName || item.dataset.name || '赛事';
-      const deadlineLabel = item.dataset.deadlineLabel || '关键截止';
-      const officialUrl = item.dataset.url || `${window.location.origin}/competitions/#${encodeURIComponent(id)}`;
-      const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-      const lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//siuserxiaowei.com//Competition Radar//ZH-CN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        'BEGIN:VEVENT',
-        `UID:competition-${id}@siuserxiaowei.com`,
-        `DTSTAMP:${stamp}`,
-        `DTSTART;VALUE=DATE:${compactDate(deadline)}`,
-        `DTEND;VALUE=DATE:${compactDate(nextDate(deadline))}`,
-        `SUMMARY:${escapeIcsText(`${deadlineLabel}｜${name}`)}`,
-        `DESCRIPTION:${escapeIcsText([
-          item.dataset.strategy || '',
-          `赛事页面：${officialUrl}`,
-          '由赛事雷达人工整理，请在提交前复核主办方最新规则。',
-        ].filter(Boolean).join('\n'))}`,
-        `URL:${escapeIcsText(officialUrl)}`,
-        item.dataset.loc ? `LOCATION:${escapeIcsText(item.dataset.loc)}` : '',
-        'STATUS:CONFIRMED',
-        'TRANSP:TRANSPARENT',
-        'END:VEVENT',
-        'END:VCALENDAR',
-      ].filter(Boolean).map(foldIcsLine);
-      return `${lines.join('\r\n')}\r\n`;
-    }
-
-    function initCompetitionRadar() {
-      window[abortKey]?.abort();
-      const controller = new AbortController();
-      window[abortKey] = controller;
-      const { signal } = controller;
-
-      const items = Array.from(document.querySelectorAll('.cp-list-item[data-id]'));
-      const panels = Array.from(document.querySelectorAll('[data-detail]'));
-      const itemById = new Map(items.map(item => [item.dataset.id || '', item]));
-      const panelById = new Map(panels.map(panel => [panel.dataset.detail || '', panel]));
-      const validIds = new Set(itemById.keys());
-      const countEl = document.getElementById('list-count');
-      const searchEl = document.getElementById('radar-search');
-      const statusEl = document.getElementById('radar-status');
-      const sortEl = document.getElementById('radar-sort');
-      const favoritesOnlyEl = document.getElementById('favorites-only');
-      const clearFavoritesEl = document.getElementById('clear-favorites');
-      const favoriteCountEl = document.getElementById('favorite-count');
-      const clearFiltersEl = document.getElementById('clear-filters');
-      const emptyEl = document.getElementById('competition-empty');
-      const announcerEl = document.getElementById('radar-announcer');
-      const detailWorkbenchEl = document.getElementById('detail-workbench');
-      const detailFavoriteEl = document.getElementById('detail-favorite');
-      const detailExportEl = document.getElementById('detail-export-ics');
-      const listEl = items[0]?.parentElement;
-      if (!items.length || !listEl) return;
-      refreshStatuses(items, panelById);
-
-      const params = new URLSearchParams(window.location.search);
-      const categoryValues = new Set(['全部', ...items.map(item => item.dataset.cat || '').filter(Boolean)]);
-
-      const defaultItem = items
-        .filter(item => item.dataset.status !== 'expired')
-        .sort((a, b) =>
-          (softwareRank[a.dataset.cat] ?? 7) - (softwareRank[b.dataset.cat] ?? 7)
-          || (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9)
-          || Date.parse(a.dataset.deadline || '9999-12-31') - Date.parse(b.dataset.deadline || '9999-12-31')
-        )[0] || items[0];
-
-      const initialId = getAddressId();
-      const state = {
-        cat: categoryValues.has(params.get('cat') || '') ? params.get('cat') : '全部',
-        tier: validTiers.has(params.get('tier') || '') ? params.get('tier') : '全部',
-        status: validStatuses.has(params.get('status') || '') ? params.get('status') : '全部',
-        search: params.get('q') || '',
-        sort: validSorts.has(params.get('sort') || '') ? params.get('sort') : 'software-first',
-        favoritesOnly: params.get('saved') === '1',
-        selectedId: validIds.has(initialId) ? initialId : defaultItem.dataset.id,
-      };
-      const favorites = readFavoriteIds(validIds);
-
-      function announce(message) {
-        if (!announcerEl) return;
-        announcerEl.textContent = '';
-        window.requestAnimationFrame(() => {
-          announcerEl.textContent = message;
-        });
-      }
-
-      function writeAddress(mode = 'replace') {
-        if (!window.history) return;
-        const url = new URL(window.location.href);
-        const query = state.search.trim();
-        if (query) url.searchParams.set('q', query);
-        else url.searchParams.delete('q');
-        if (state.cat !== '全部') url.searchParams.set('cat', state.cat);
-        else url.searchParams.delete('cat');
-        if (state.tier !== '全部') url.searchParams.set('tier', state.tier);
-        else url.searchParams.delete('tier');
-        if (state.status !== '全部') url.searchParams.set('status', state.status);
-        else url.searchParams.delete('status');
-        if (state.sort !== 'software-first') url.searchParams.set('sort', state.sort);
-        else url.searchParams.delete('sort');
-        if (state.favoritesOnly) url.searchParams.set('saved', '1');
-        else url.searchParams.delete('saved');
-        url.searchParams.delete('competition');
-        url.searchParams.delete('event');
-        url.hash = state.selectedId ? encodeURIComponent(state.selectedId) : '';
-        window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url);
-      }
-
-      function visibleItems() {
-        return items.filter(item => !item.classList.contains('hidden'));
-      }
-
-      function syncControls() {
-        if (searchEl) searchEl.value = state.search;
-        if (statusEl) statusEl.value = state.status;
-        if (sortEl) sortEl.value = state.sort;
-        setChipState('.filter-cat', 'fcat', state.cat);
-        setChipState('.filter-tier', 'ftier', state.tier);
-        favoritesOnlyEl?.classList.toggle('is-on', state.favoritesOnly);
-        favoritesOnlyEl?.setAttribute('aria-pressed', state.favoritesOnly ? 'true' : 'false');
-      }
-
-      function syncFavorites() {
-        document.querySelectorAll('[data-favorite]').forEach(button => {
-          const id = button.dataset.favorite || '';
-          const isFavorite = favorites.has(id);
-          button.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
-          const icon = button.querySelector('[aria-hidden="true"]');
-          if (icon) icon.textContent = isFavorite ? '★' : '☆';
-          const label = button.querySelector('[data-favorite-label]');
-          if (label) label.textContent = isFavorite ? '已收藏' : '收藏';
-          const item = itemById.get(id);
-          const name = item?.dataset.fullName || item?.dataset.name || '赛事';
-          button.setAttribute('aria-label', `${isFavorite ? '取消收藏' : '收藏'} ${name}`);
-        });
-        if (favoriteCountEl) favoriteCountEl.textContent = String(favorites.size);
-        if (clearFavoritesEl) clearFavoritesEl.disabled = favorites.size === 0;
-      }
-
-      function toggleFavorite(id) {
-        if (!validIds.has(id)) return;
-        const item = itemById.get(id);
-        if (favorites.has(id)) favorites.delete(id);
-        else favorites.add(id);
-        writeFavoriteIds(favorites);
-        syncFavorites();
-        if (state.favoritesOnly) applyFilter({ address: 'replace' });
-        announce(`${item?.dataset.name || '赛事'}${favorites.has(id) ? '已收藏' : '已取消收藏'}，当前共 ${favorites.size} 条收藏。`);
-      }
-
-      function resetFilters(options = {}) {
-        state.cat = '全部';
-        state.tier = '全部';
-        state.status = '全部';
-        state.search = '';
-        state.sort = 'software-first';
-        state.favoritesOnly = false;
-        syncControls();
-        applyFilter({ address: options.address || 'push' });
-        searchEl?.focus({ preventScroll: true });
-      }
-
-      function syncStateFromAddress() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = getAddressId();
-        state.search = urlParams.get('q') || '';
-        state.cat = categoryValues.has(urlParams.get('cat') || '') ? urlParams.get('cat') : '全部';
-        state.tier = validTiers.has(urlParams.get('tier') || '') ? urlParams.get('tier') : '全部';
-        state.status = validStatuses.has(urlParams.get('status') || '') ? urlParams.get('status') : '全部';
-        state.sort = validSorts.has(urlParams.get('sort') || '') ? urlParams.get('sort') : 'software-first';
-        state.favoritesOnly = urlParams.get('saved') === '1';
-        if (validIds.has(id)) state.selectedId = id;
-        syncControls();
-        applyFilter({ preserveAddress: true });
-      }
-
-      function compareItems(a, b) {
-        const matchA = Number(a.dataset.match || 0);
-        const matchB = Number(b.dataset.match || 0);
-        const deadlineA = Date.parse(a.dataset.deadline || '9999-12-31');
-        const deadlineB = Date.parse(b.dataset.deadline || '9999-12-31');
-        if (state.sort === 'software-first') {
-          return (a.dataset.status === 'expired' ? 1 : 0) - (b.dataset.status === 'expired' ? 1 : 0)
-            || (softwareRank[a.dataset.cat] ?? 7) - (softwareRank[b.dataset.cat] ?? 7)
-            || (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9)
-            || deadlineA - deadlineB
-            || matchB - matchA;
-        }
-        if (state.sort === 'urgent-first') {
-          return (statusRank[a.dataset.status] ?? 9) - (statusRank[b.dataset.status] ?? 9) || deadlineA - deadlineB || matchB - matchA;
-        }
-        if (state.sort === 'deadline-asc') {
-          return deadlineA - deadlineB || matchB - matchA;
-        }
-        if (state.sort === 'tier-desc') {
-          return (tierRank[b.dataset.tier] ?? 0) - (tierRank[a.dataset.tier] ?? 0) || matchB - matchA;
-        }
-        return matchB - matchA || deadlineA - deadlineB;
-      }
-
-      function applySort() {
-        items.slice().sort(compareItems).forEach(item => listEl.appendChild(item));
-      }
-
-      function applySelect(options = {}) {
-        const hasPanel = panelById.has(state.selectedId);
-        panels.forEach(panel => panel.classList.toggle('hidden', panel.dataset.detail !== state.selectedId || !hasPanel));
-        items.forEach(item => {
-          const active = item.dataset.id === state.selectedId;
-          item.classList.toggle('is-active', active);
-          item.querySelector('[data-select-competition]')?.setAttribute('aria-current', active ? 'true' : 'false');
-        });
-        detailWorkbenchEl?.classList.toggle('hidden', !hasPanel);
-        const selectedItem = itemById.get(state.selectedId);
-        if (hasPanel && selectedItem) {
-          if (detailFavoriteEl) detailFavoriteEl.dataset.favorite = state.selectedId;
-          if (detailExportEl) {
-            detailExportEl.dataset.exportIcs = state.selectedId;
-            detailExportEl.disabled = selectedItem.dataset.calendarEligible !== 'true';
-            detailExportEl.title = detailExportEl.disabled
-              ? '日期尚未确认，暂不提供日历'
-              : '下载关键截止日历';
-          }
-          syncFavorites();
-        }
-        if (hasPanel && options.address) writeAddress(options.address);
-        if (hasPanel && options.scroll) {
-          panelById.get(state.selectedId)?.scrollIntoView({
-            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-            block: 'start',
-          });
-        }
-      }
-
-      function applyFilter(options = {}) {
-        const query = state.search.trim().toLowerCase();
-        let visible = 0;
-        items.forEach(item => {
-          const haystack = (item.dataset.search || '').toLowerCase();
-          const ok =
-            (state.cat === '全部' || item.dataset.cat === state.cat) &&
-            (state.tier === '全部' || item.dataset.tier === state.tier) &&
-            (state.status === '全部' || item.dataset.status === state.status) &&
-            (!state.favoritesOnly || favorites.has(item.dataset.id || '')) &&
-            (!query || haystack.includes(query));
-          item.classList.toggle('hidden', !ok);
-          if (ok) visible++;
-        });
-        if (countEl) countEl.textContent = visible + ' items';
-        emptyEl?.classList.toggle('hidden', visible !== 0);
-        applySort();
-
-        const current = itemById.get(state.selectedId);
-        if (!current || current.classList.contains('hidden')) {
-          state.selectedId = visibleItems()[0]?.dataset.id || '';
-          const addressMode = options.preserveAddress ? 'replace' : (options.address || 'replace');
-          applySelect({ address: state.selectedId ? addressMode : '' });
-          if (!state.selectedId) writeAddress(addressMode);
-          announce(visible ? `已显示 ${visible} 条赛事。` : '没有符合当前条件的赛事。');
-          return;
-        }
-        applySelect({ address: options.preserveAddress ? '' : options.address, scroll: options.scroll });
-        announce(`已显示 ${visible} 条赛事。`);
-      }
-
-      function setChipState(selector, dataName, value) {
-        document.querySelectorAll(selector).forEach(button => {
-          const active = button.dataset[dataName] === value;
-          button.classList.toggle('is-on', active);
-          button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-      }
-
-      async function copySummary(id, button) {
-        const item = itemById.get(id) || itemById.get(state.selectedId);
-        if (!item) return;
-        const summary = [
-          '赛事：' + (item.dataset.fullName || item.dataset.name || ''),
-          '截止时间：' + (item.dataset.deadline || ''),
-          '参赛打法：' + (item.dataset.strategy || ''),
-          '赛事页面：' + (item.dataset.url || ''),
-          item.dataset.sources ? '参考来源：' + item.dataset.sources : '',
-          '说明：赛事雷达人工整理，请在提交前复核赛事页面的资格、日期与奖励。',
-        ].filter(Boolean).join('\n');
-
-        try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(summary);
-          } else {
-            const textarea = document.createElement('textarea');
-            textarea.value = summary;
-            textarea.setAttribute('readonly', '');
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            textarea.remove();
-          }
-          const original = button.textContent;
-          button.textContent = '已复制';
-          button.classList.add('is-copied');
-          window.setTimeout(() => {
-            if (signal.aborted) return;
-            button.textContent = original || '复制参赛摘要';
-            button.classList.remove('is-copied');
-          }, 1400);
-        } catch {
-          button.textContent = '复制失败';
-          window.setTimeout(() => {
-            if (signal.aborted) return;
-            button.textContent = '复制参赛摘要';
-          }, 1400);
-        }
-      }
-
-      function downloadCalendar(id, button) {
-        const item = itemById.get(id);
-        if (!item) return;
-        try {
-          const calendar = buildCalendar(item);
-          const blob = new Blob([calendar], { type: 'text/calendar;charset=utf-8' });
-          const blobUrl = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          const baseName = (item.dataset.name || id || 'competition-deadline')
-            .normalize('NFKC')
-            .replace(/[\\/:*?"<>|]+/g, '-')
-            .replace(/\s+/g, '-')
-            .slice(0, 80);
-          link.href = blobUrl;
-          link.download = `${baseName || 'competition-deadline'}.ics`;
-          link.hidden = true;
-          document.body.append(link);
-          link.click();
-          link.remove();
-          window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
-          announce(`已下载 ${item.dataset.name || '赛事'} 的关键截止日历。`);
-          const original = button.textContent;
-          button.textContent = '已下载';
-          window.setTimeout(() => {
-            if (!signal.aborted) button.textContent = original || '加入日历';
-          }, 1400);
-        } catch {
-          announce('该赛事日期尚未确认，暂时不能导出日历。');
-        }
-      }
-
-      items.forEach(item => {
-        item.querySelector('[data-select-competition]')?.addEventListener('click', () => {
-          state.selectedId = item.dataset.id;
-          applySelect({ address: 'push', scroll: window.innerWidth < 1024 });
-        }, { signal });
-      });
-
-      document.querySelectorAll('.filter-cat').forEach(button => {
-        button.addEventListener('click', () => {
-          state.cat = button.dataset.fcat || '全部';
-          setChipState('.filter-cat', 'fcat', state.cat);
-          applyFilter({ address: 'push' });
-        }, { signal });
-      });
-
-      document.querySelectorAll('.filter-tier').forEach(button => {
-        button.addEventListener('click', () => {
-          state.tier = button.dataset.ftier || '全部';
-          setChipState('.filter-tier', 'ftier', state.tier);
-          applyFilter({ address: 'push' });
-        }, { signal });
-      });
-
-      searchEl?.addEventListener('input', () => {
-        state.search = searchEl.value;
-        applyFilter({ address: 'replace' });
-      }, { signal });
-
-      statusEl?.addEventListener('change', () => {
-        state.status = statusEl.value;
-        applyFilter({ address: 'push' });
-      }, { signal });
-
-      sortEl?.addEventListener('change', () => {
-        state.sort = sortEl.value;
-        applyFilter({ address: 'push' });
-      }, { signal });
-
-      document.querySelectorAll('[data-jump]').forEach(button => {
-        button.addEventListener('click', () => {
-          state.selectedId = button.dataset.jump;
-          applySelect({ address: 'push', scroll: true });
-        }, { signal });
-      });
-
-      document.querySelectorAll('[data-copy-summary]').forEach(button => {
-        button.addEventListener('click', () => copySummary(button.dataset.copySummary, button), { signal });
-      });
-
-      document.querySelectorAll('[data-export-ics]').forEach(button => {
-        button.addEventListener('click', () => downloadCalendar(button.dataset.exportIcs, button), { signal });
-      });
-
-      document.querySelectorAll('[data-favorite]').forEach(button => {
-        button.addEventListener('click', () => toggleFavorite(button.dataset.favorite || ''), { signal });
-      });
-
-      favoritesOnlyEl?.addEventListener('click', () => {
-        state.favoritesOnly = !state.favoritesOnly;
-        syncControls();
-        applyFilter({ address: 'push' });
-      }, { signal });
-
-      clearFavoritesEl?.addEventListener('click', () => {
-        if (!favorites.size || !window.confirm(`确定清空 ${favorites.size} 条收藏吗？`)) return;
-        favorites.clear();
-        writeFavoriteIds(favorites);
-        syncFavorites();
-        applyFilter({ address: 'replace' });
-        announce('收藏已清空。');
-      }, { signal });
-
-      clearFiltersEl?.addEventListener('click', () => resetFilters({ address: 'push' }), { signal });
-      document.querySelector('[data-empty-reset]')?.addEventListener('click', () => resetFilters({ address: 'push' }), { signal });
-
-      window.addEventListener('popstate', syncStateFromAddress, { signal });
-      window.addEventListener('hashchange', syncStateFromAddress, { signal });
-      window.addEventListener('storage', event => {
-        if (event.key !== favoriteStorageKey) return;
-        favorites.clear();
-        readFavoriteIds(validIds).forEach(id => favorites.add(id));
-        syncFavorites();
-        if (state.favoritesOnly) applyFilter({ preserveAddress: true });
-      }, { signal });
-
-      syncControls();
-      syncFavorites();
-      applyFilter({ address: 'replace' });
-      if (initialId && validIds.has(initialId)) {
-        window.setTimeout(() => {
-          if (signal.aborted) return;
-          panelById.get(state.selectedId)?.scrollIntoView({
-            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-            block: 'start',
-          });
-        }, 80);
-      }
-    }
-
-    document.addEventListener('astro:page-load', initCompetitionRadar);
-    initCompetitionRadar();
-  })();
-</script>

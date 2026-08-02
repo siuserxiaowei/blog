@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { competitions, RADAR_UPDATED_AT } from '../../data/competitions.js';
+import { getCompetitionAccessSummary } from '../../lib/competition-access.js';
 
 export function getStaticPaths() {
   return competitions.map((competition) => ({
@@ -19,6 +20,7 @@ const timeline = Array.isArray(competition.timeline) ? competition.timeline : []
 const verification = competition.verification && typeof competition.verification === 'object'
   ? competition.verification
   : {};
+const access = getCompetitionAccessSummary(competition);
 
 const uncertainDatePattern = /(预计|参考|待公告|滚动|可能延期|暂定)/;
 const nonEventDatePattern = /(截止|报名|申请|提交|提案|征集|评审|公布|通知|开放|招募|入围|结果|投票)/;
@@ -93,6 +95,7 @@ const description = `${competition.fullName}：${competition.desc}`;
           <span class={`tier-tag tier-${competition.tier} tier-lg`}>{competition.tier} 级</span>
           <span class="pill-note">{competition.cat}</span>
           <span class="pill-note">来源等级 {competition.rel}</span>
+          <span class={`access-badge access-${access.tone}`}>{access.displayLabel}</span>
         </div>
 
         <h1 class="detail-title">{competition.fullName}</h1>
@@ -128,9 +131,28 @@ const description = `${competition.fullName}：${competition.desc}`;
       <div class="detail-grid mt-8">
         <section class="glass-card detail-section">
           <p class="section-kicker mb-3">// 资格与适用人群</p>
-          <h2>谁适合参加</h2>
+          <div class={`access-decision access-panel-${access.tone}`}>
+            <div class="access-decision-heading">
+              <h2>大陆团队参赛判断</h2>
+              <span class={`access-badge access-${access.tone}`}>{access.displayLabel}</span>
+            </div>
+            <p>大陆资格：{access.chinaEligibility.label}</p>
+            {access.gates.length > 0 ? (
+              <dl class="access-gates">
+                {access.gates.map(gate => (
+                  <div>
+                    <dt>{gate.label}</dt>
+                    <dd>{gate.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p class="access-empty">暂无可确认的结构化硬门槛。</p>
+            )}
+          </div>
+          <h2 class="mt-5">谁适合参加</h2>
           <p>{competition.audience}</p>
-          <p class="subtle mt-3">地区、团队人数、身份与费用等硬性资格仍应以赛事规则页为准。</p>
+          <p class="subtle mt-3">本页只做保守资格摘要；地区、团队人数、身份、费用及线下要求仍应以赛事规则页为准。</p>
         </section>
 
         <section class="glass-card detail-section">
@@ -313,6 +335,100 @@ const description = `${competition.fullName}：${competition.desc}`;
     line-height: 1.75;
   }
 
+  .access-badge {
+    align-items: center;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    min-height: 1.6rem;
+    padding: 0.25rem 0.62rem;
+    white-space: nowrap;
+  }
+
+  .access-open {
+    background: color-mix(in srgb, var(--color-accent-2) 10%, transparent);
+    color: var(--color-accent-2);
+  }
+
+  .access-special {
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+    color: var(--color-accent);
+  }
+
+  .access-unknown {
+    background: color-mix(in srgb, var(--surface-2) 72%, transparent);
+    color: var(--text-secondary);
+  }
+
+  .access-blocked {
+    background: color-mix(in srgb, #ff7b72 10%, transparent);
+    color: #ff7b72;
+  }
+
+  .access-decision {
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: 0.7rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+  }
+
+  .access-panel-open {
+    border-color: color-mix(in srgb, var(--color-accent-2) 42%, var(--border));
+  }
+
+  .access-panel-special {
+    border-color: color-mix(in srgb, var(--color-accent) 50%, var(--border));
+  }
+
+  .access-panel-unknown {
+    border-style: dashed;
+  }
+
+  .access-panel-blocked {
+    background: color-mix(in srgb, #ff7b72 7%, transparent);
+    border-color: color-mix(in srgb, #ff7b72 64%, var(--border));
+  }
+
+  .access-decision-heading {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+
+  .access-decision-heading h2 {
+    margin-bottom: 0;
+  }
+
+  .access-gates {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .access-gates div {
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: minmax(5.5rem, max-content) minmax(0, 1fr);
+  }
+
+  .access-gates dt {
+    color: var(--text);
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  .access-gates dd,
+  .access-empty {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
   .subtle {
     font-size: 0.78rem !important;
     opacity: 0.75;
@@ -429,6 +545,16 @@ const description = `${competition.fullName}：${competition.desc}`;
       border-left: 1px solid var(--border);
       border-top: 0;
       padding: 0 0 1.25rem 1.25rem;
+    }
+
+    .access-decision-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .access-gates div {
+      gap: 0.15rem;
+      grid-template-columns: 1fr;
     }
 
     .timeline-marker {

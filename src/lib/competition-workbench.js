@@ -3,6 +3,7 @@ import {
   HERCLAW_PROJECT_PRESET_ID,
   PROJECT_PRESET_BY_ID,
 } from '../data/competition-project-presets.js';
+import { ACCESS_FILTER_IDS } from './competition-access.js';
 
 const ABORT_KEY = '__competitionRadarWorkbenchAbort';
 const FAVORITE_STORAGE_KEY = 'competition-radar:favorites:v1';
@@ -34,6 +35,7 @@ const VALID_SORTS = new Set(['software-first', 'urgent-first', 'match-desc', 'de
 const VALID_STATUSES = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired', 'unknown']);
 const VALID_TIERS = new Set(['全部', 'S', 'A', 'B']);
 const VALID_PROJECT_IDS = new Set(PROJECT_PRESET_BY_ID.keys());
+const ACCESS_RANK = { open: 0, special: 1, unknown: 2, blocked: 3 };
 const HERCLAW_NO_GO_ORDER = new Map([
   'shipaton2026',
   'amddevmaster2026',
@@ -284,6 +286,35 @@ function replaceSources(record) {
   container.hidden = links.length === 0;
 }
 
+function replaceAccessSummary(record) {
+  const summary = record?.access;
+  const container = document.getElementById('detail-access-summary');
+  const badge = document.getElementById('detail-access-badge');
+  const gates = document.getElementById('detail-access-gates');
+  const empty = document.getElementById('detail-access-empty');
+  if (!summary || !container || !badge || !gates) return;
+
+  container.classList.remove(
+    'access-panel-open',
+    'access-panel-special',
+    'access-panel-unknown',
+    'access-panel-blocked',
+  );
+  container.classList.add(`access-panel-${ACCESS_RANK[summary.tone] === undefined ? 'unknown' : summary.tone}`);
+  badge.className = `access-badge access-${ACCESS_RANK[summary.tone] === undefined ? 'unknown' : summary.tone}`;
+  badge.textContent = String(summary.displayLabel || '资格待核');
+  setText('detail-access-china', `大陆资格：${summary.chinaEligibility?.label || '资格待核'}`);
+  gates.replaceChildren(...(Array.isArray(summary.gates) ? summary.gates : []).map(gate => {
+    const item = document.createElement('li');
+    item.append(
+      createTextElement('strong', '', gate.label),
+      createTextElement('span', '', gate.value),
+    );
+    return item;
+  }));
+  empty?.classList.toggle('hidden', summary.gates?.length > 0);
+}
+
 function initCompetitionRadar() {
   window[ABORT_KEY]?.abort();
   const controller = new AbortController();
@@ -308,6 +339,15 @@ function initCompetitionRadar() {
     if (!record.projectPresetIds.includes(DEFAULT_PROJECT_PRESET_ID)) {
       record.projectPresetIds.unshift(DEFAULT_PROJECT_PRESET_ID);
     }
+    if (!record.access || ACCESS_RANK[record.access.group] === undefined) {
+      record.access = {
+        group: 'unknown',
+        tone: 'unknown',
+        displayLabel: '资格待核',
+        chinaEligibility: { label: '资格待核' },
+        gates: [],
+      };
+    }
     record.status = statusForDeadline(record.deadline, record.calendarEligible);
     record.searchText = [
       record.name,
@@ -319,6 +359,10 @@ function initCompetitionRadar() {
       record.strategy,
       record.org,
       record.loc,
+      record.access.displayLabel,
+      record.access.groupLabel,
+      record.access.chinaEligibility?.label,
+      ...(Array.isArray(record.access.gates) ? record.access.gates.flatMap(gate => [gate.label, gate.value]) : []),
       ...(Array.isArray(record.winning) ? record.winning : []),
       ...(Array.isArray(record.sources) ? record.sources.map(source => source.title) : []),
     ].filter(Boolean).join(' ').toLocaleLowerCase();
@@ -355,10 +399,12 @@ function initCompetitionRadar() {
   const detailExport = document.getElementById('detail-export-ics');
   const detailCopy = document.getElementById('detail-copy-summary');
   const detailProjectFit = document.getElementById('detail-project-fit');
+  const detailAccessSummary = document.getElementById('detail-access-summary');
 
   const params = new URLSearchParams(window.location.search);
   const defaultRecord = records.slice().sort((a, b) =>
     (a.status.kind === 'expired' ? 1 : 0) - (b.status.kind === 'expired' ? 1 : 0)
+    || (ACCESS_RANK[a.access.group] ?? 9) - (ACCESS_RANK[b.access.group] ?? 9)
     || (SOFTWARE_RANK[a.cat] ?? 7) - (SOFTWARE_RANK[b.cat] ?? 7)
     || (STATUS_RANK[a.status.kind] ?? 9) - (STATUS_RANK[b.status.kind] ?? 9)
     || Date.parse(a.deadline || '9999-12-31') - Date.parse(b.deadline || '9999-12-31')
@@ -368,6 +414,7 @@ function initCompetitionRadar() {
     project: VALID_PROJECT_IDS.has(params.get('project') || '')
       ? params.get('project')
       : DEFAULT_PROJECT_PRESET_ID,
+    access: ACCESS_FILTER_IDS.has(params.get('access') || '') ? params.get('access') : 'all',
     cat: categoryValues.has(params.get('cat') || '') ? params.get('cat') : '全部',
     tier: VALID_TIERS.has(params.get('tier') || '') ? params.get('tier') : '全部',
     status: VALID_STATUSES.has(params.get('status') || '') ? params.get('status') : '全部',
@@ -399,6 +446,8 @@ function initCompetitionRadar() {
     const url = new URL(window.location.href);
     if (state.project !== DEFAULT_PROJECT_PRESET_ID) url.searchParams.set('project', state.project);
     else url.searchParams.delete('project');
+    if (state.access !== 'all') url.searchParams.set('access', state.access);
+    else url.searchParams.delete('access');
     const query = state.search.trim();
     if (query) url.searchParams.set('q', query);
     else url.searchParams.delete('q');
@@ -431,6 +480,7 @@ function initCompetitionRadar() {
     if (statusElement) statusElement.value = state.status;
     if (sortElement) sortElement.value = state.sort;
     setChipState('.project-preset', 'project', state.project);
+    setChipState('.filter-access', 'faccess', state.access);
     setChipState('.filter-cat', 'fcat', state.cat);
     setChipState('.filter-tier', 'ftier', state.tier);
     favoritesOnlyElement?.classList.toggle('is-on', state.favoritesOnly);
@@ -490,6 +540,7 @@ function initCompetitionRadar() {
     replacePoints('detail-pros', record.pros, 'pro');
     replacePoints('detail-cons', record.cons, 'con');
     replaceSources(record);
+    replaceAccessSummary(record);
 
     const permalink = document.getElementById('detail-permalink');
     if (permalink) permalink.href = `/competitions/${encodeURIComponent(record.id)}/`;
@@ -536,6 +587,7 @@ function initCompetitionRadar() {
           - (b.herclawFit?.rank ?? Number.POSITIVE_INFINITY);
       }
       return (a.status.kind === 'expired' ? 1 : 0) - (b.status.kind === 'expired' ? 1 : 0)
+        || (ACCESS_RANK[a.access.group] ?? 9) - (ACCESS_RANK[b.access.group] ?? 9)
         || (SOFTWARE_RANK[a.cat] ?? 7) - (SOFTWARE_RANK[b.cat] ?? 7)
         || (STATUS_RANK[a.status.kind] ?? 9) - (STATUS_RANK[b.status.kind] ?? 9)
         || deadlineA - deadlineB
@@ -562,6 +614,7 @@ function initCompetitionRadar() {
     });
     detailWorkbench?.classList.toggle('hidden', !record);
     detailPanel?.classList.toggle('hidden', !record);
+    detailAccessSummary?.classList.toggle('hidden', !record);
     if (!record) {
       if (detailProjectFit) detailProjectFit.hidden = true;
       return;
@@ -582,6 +635,7 @@ function initCompetitionRadar() {
     records.forEach(record => {
       const matches =
         recordMatchesProject(record)
+        && (state.access === 'all' || record.access.group === state.access)
         && (state.cat === '全部' || record.cat === state.cat)
         && (state.tier === '全部' || record.tier === state.tier)
         && (state.status === '全部' || record.status.kind === state.status)
@@ -619,11 +673,15 @@ function initCompetitionRadar() {
     const projectLabel = state.project === DEFAULT_PROJECT_PRESET_ID
       ? ''
       : `${currentProjectPreset()?.title || '当前项目'}，`;
-    announce(visible ? `${projectLabel}已显示 ${visible} 条赛事。` : `${projectLabel}没有符合当前条件的赛事。`);
+    const accessLabel = state.access === 'all'
+      ? ''
+      : `${document.querySelector(`[data-faccess="${state.access}"]`)?.textContent?.trim() || '当前资格'}，`;
+    announce(visible ? `${projectLabel}${accessLabel}已显示 ${visible} 条赛事。` : `${projectLabel}${accessLabel}没有符合当前条件的赛事。`);
   }
 
   function resetFilters(options = {}) {
     state.project = DEFAULT_PROJECT_PRESET_ID;
+    state.access = 'all';
     state.cat = '全部';
     state.tier = '全部';
     state.status = '全部';
@@ -641,6 +699,7 @@ function initCompetitionRadar() {
     state.project = VALID_PROJECT_IDS.has(urlParams.get('project') || '')
       ? urlParams.get('project')
       : DEFAULT_PROJECT_PRESET_ID;
+    state.access = ACCESS_FILTER_IDS.has(urlParams.get('access') || '') ? urlParams.get('access') : 'all';
     state.search = urlParams.get('q') || '';
     state.cat = categoryValues.has(urlParams.get('cat') || '') ? urlParams.get('cat') : '全部';
     state.tier = VALID_TIERS.has(urlParams.get('tier') || '') ? urlParams.get('tier') : '全部';
@@ -729,7 +788,9 @@ function initCompetitionRadar() {
     const active = projectRecords.filter(record => record.status.kind !== 'expired');
     const urgent = active.filter(record => record.status.kind === 'urgent');
     const actionable = active
-      .filter(record => record.calendarEligible === true && record.status.kind !== 'unknown')
+      .filter(record => record.calendarEligible === true
+        && record.status.kind !== 'unknown'
+        && record.access.group !== 'blocked')
       .sort((a, b) => {
         if (state.project === HERCLAW_PROJECT_PRESET_ID) {
           return (a.herclawFit?.rank ?? Number.POSITIVE_INFINITY)
@@ -828,6 +889,14 @@ function initCompetitionRadar() {
       const project = button.dataset.project || DEFAULT_PROJECT_PRESET_ID;
       state.project = VALID_PROJECT_IDS.has(project) ? project : DEFAULT_PROJECT_PRESET_ID;
       syncControls();
+      applyFilter({ address: 'push' });
+    }, { signal });
+  });
+  document.querySelectorAll('.filter-access').forEach(button => {
+    button.addEventListener('click', () => {
+      const access = button.dataset.faccess || 'all';
+      state.access = ACCESS_FILTER_IDS.has(access) ? access : 'all';
+      setChipState('.filter-access', 'faccess', state.access);
       applyFilter({ address: 'push' });
     }, { signal });
   });

@@ -5,6 +5,7 @@ import test from 'node:test';
 import { competitions } from '../src/data/competitions.js';
 
 const builtPageUrl = new URL('../dist/competitions/index.html', import.meta.url);
+const pageSourceUrl = new URL('../src/pages/competitions.astro', import.meta.url);
 const workbenchSourceUrl = new URL('../src/lib/competition-workbench.js', import.meta.url);
 const HTML_BUDGET_BYTES = 1_200_000;
 const DOM_ELEMENT_BUDGET = 8_000;
@@ -36,15 +37,21 @@ test('budget savings retain every record, no-JS links, and one reusable detail p
   const noJsDetailLinkCount = html.match(/<a\b[^>]*data-select-competition/g)?.length ?? 0;
   const detailPanelCount = html.match(/id="detail-panel"/g)?.length ?? 0;
   const projectPresetCount = html.match(/\bdata-project="[^"]+"/g)?.length ?? 0;
+  const accessFilterCount = html.match(/\bdata-faccess="[^"]+"/g)?.length ?? 0;
   assert.equal(listItemCount, competitions.length, 'all records remain server-rendered in the basic list');
   assert.equal(noJsDetailLinkCount, competitions.length, 'each record keeps a no-JS detail-page link');
   assert.equal(detailPanelCount, 1, 'the workbench reuses one detail DOM container');
   assert.equal(projectPresetCount, 8, 'the project-first picker stays a small fixed control set');
+  assert.equal(accessFilterCount, 5, 'access filters stay a small fixed control set');
   assert.ok(records.every(record => Array.isArray(record.projectPresetIds)));
+  assert.ok(records.every(record => ['open', 'special', 'unknown', 'blocked'].includes(record.access?.group)));
 });
 
 test('client detail renderer does not interpolate record text into HTML', async () => {
+  const pageSource = await readFile(pageSourceUrl, 'utf8');
   const source = await readFile(workbenchSourceUrl, 'utf8');
+  assert.equal(pageSource.match(/competition-workbench\.js/g)?.length, 1);
+  assert.doesNotMatch(pageSource, /__competitionRadarAbort/);
   assert.doesNotMatch(source, /\.innerHTML\s*=/);
   assert.doesNotMatch(source, /insertAdjacentHTML/);
   assert.match(source, /textContent/);
