@@ -32,7 +32,7 @@ test('round-three catalogue date and delivery size are explicit', () => {
   assert.equal(ROUND3_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND3_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound3Additions.length, 8);
-  assert.equal(competitions.length, 210);
+  assert.equal(competitions.length, 221);
 });
 
 test('addition and final catalogue ids are unique', () => {
@@ -159,9 +159,10 @@ test('round-three correction sidecar targets existing records with dated provena
 
 test('cash, eligibility and deadline corrections match the reviewed evidence', () => {
   const agentic = competitionsById.get('agenticcinema2026');
-  assert.equal(agentic.prizeBoundary.cash[0].amount, 50000);
-  assert.match(agentic.rewards.join(' '), /5 个奖金轨/);
-  assert.match(agentic.rewards.join(' '), /\$5,000/);
+  assert.equal(agentic.prizeBoundary.cash.reduce((sum, item) => sum + item.amount, 0), 65000);
+  assert.equal(agentic.prizeBoundary.cash.length, 5);
+  assert.match(agentic.rewards.join(' '), /\$7,500/);
+  assert.match(agentic.verification.notes, /USD 75,000/);
   assert.equal(agentic.eligibility.chinaEligible, 'no');
 
   const waxal = competitionsById.get('waxalasr2026');
@@ -184,9 +185,9 @@ test('cash, eligibility and deadline corrections match the reviewed evidence', (
 test('uncertain and conflicting records cannot masquerade as confirmed facts', () => {
   const nanning = competitionsById.get('nanningopc2026');
   assert.equal(nanning.verification.status, 'partially-verified');
-  assert.equal(getPrimaryDeadline(nanning).certainty, 'unknown');
-  assert.equal(getPrimaryDeadline(nanning).date, null);
-  assert.match(nanning.verification.notes, /8 月 20 日或 9 月 20 日/);
+  assert.equal(getPrimaryDeadline(nanning).certainty, 'confirmed');
+  assert.equal(getPrimaryDeadline(nanning).date, '2026-08-20');
+  assert.match(nanning.verification.notes, /不等同直接打开政府原文/);
 
   const callE = competitionsById.get('calle');
   assert.equal(callE.verification.status, 'partially-verified');

@@ -15,7 +15,7 @@ const byId = new Map(competitions.map((competition) => [competition.id, competit
 const today = new Date('2026-07-30T00:00:00+08:00');
 
 test('the collection is unique and valid in both legacy and V2 schemas', () => {
-  assert.equal(competitions.length, 210);
+  assert.equal(competitions.length, 221);
   assert.equal(new Set(competitions.map((competition) => competition.id)).size, competitions.length);
   assert.deepEqual(validateCompetitions(competitions).errors, []);
   assert.deepEqual(validateCompetitionCollectionV2(competitions).errors, []);
@@ -187,14 +187,16 @@ test('rolling, unknown, and estimated dates never enter urgent countdown', () =>
   }
 });
 
-test('Agentic Cinema has five prize tracks totaling $50,000', () => {
+test('Agentic Cinema retains five rule tracks totaling $65,000 and the directory conflict', () => {
   const competition = byId.get('agenticcinema2026');
   assert.match(competition.desc, /5 个奖金轨/);
-  assert.match(competition.desc, /总现金 50,000 美元/);
-  assert.ok(competition.rewards.some((reward) => reward.includes('$50,000')));
-  assert.ok(competition.rewards.some((reward) => reward.includes('$5,000')));
-  assert.ok(competition.rewards.some((reward) => reward.includes('$3,000')));
-  assert.ok(competition.rewards.some((reward) => reward.includes('$2,000')));
+  assert.match(competition.desc, /合计现金 65,000 美元/);
+  assert.equal(competition.prizeBoundary.cash.length, 5);
+  assert.equal(
+    competition.prizeBoundary.cash.reduce((sum, prize) => sum + prize.amount, 0),
+    65000,
+  );
+  assert.match(competition.verification.notes, /USD 75,000/);
 });
 
 test('all twelve high-confidence research additions are present', () => {
