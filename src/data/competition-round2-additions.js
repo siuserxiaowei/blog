@@ -33,7 +33,10 @@ function confirmedDeadline({
 function trackedAddition(record) {
   const sourceUrl = record.url;
   const deadlineTimezone = record.deadlineTimezone;
-  const primaryDeadline = record.primaryDeadline ?? confirmedDeadline({
+  const explicitlyPrimaryDeadline = Array.isArray(record.deadlines)
+    ? record.deadlines.find((deadline) => deadline?.primary)
+    : null;
+  const primaryDeadline = explicitlyPrimaryDeadline ?? record.primaryDeadline ?? confirmedDeadline({
     date: record.deadlineISO,
     sourceUrl,
     timezone: deadlineTimezone,
@@ -638,6 +641,7 @@ const additions = [
         label: '注册截止',
         timezone: 'IST / Asia/Kolkata',
         sourceUrl: 'https://indehub.org/hackathon/2026/guide',
+        primary: true,
       }),
       confirmedDeadline({
         type: 'submission',
@@ -645,17 +649,8 @@ const additions = [
         label: '项目提交截止',
         timezone: 'IST / Asia/Kolkata',
         sourceUrl: 'https://indehub.org/hackathon/2026/guide',
-        primary: true,
       }),
     ],
-    primaryDeadline: confirmedDeadline({
-      type: 'registration',
-      date: '2026-07-31',
-      label: '注册截止',
-      timezone: 'IST / Asia/Kolkata',
-      sourceUrl: 'https://indehub.org/hackathon/2026/guide',
-      primary: true,
-    }),
     eligibility: {
       scope: 'country-limited',
       regions: ['仅限印度公民；入围决赛在 Bengaluru'],

@@ -27,6 +27,15 @@ const ACTIONABLE_DEADLINE_TYPES = new Set([
   'submission',
 ]);
 
+const PRIMARY_DEADLINE_FIELDS = Object.freeze([
+  'date',
+  'type',
+  'certainty',
+  'timezone',
+  'label',
+  'sourceUrl',
+]);
+
 function isDateOnly(value) {
   if (typeof value !== 'string') return false;
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -254,6 +263,31 @@ export function validateCompetitionV2(record, index = 0) {
     addError('primaryDeadline.certainty', `has unsupported certainty "${primary.certainty}"`);
   } else if (primary.certainty === 'confirmed' && !isDateOnly(primary.date)) {
     addError('primaryDeadline.date', 'confirmed primary deadline must use YYYY-MM-DD');
+  }
+
+  const explicitlyPrimaryDeadlines = Array.isArray(record?.deadlines)
+    ? record.deadlines.filter((deadline) => deadline?.primary)
+    : [];
+  if (explicitlyPrimaryDeadlines.length > 1) {
+    addError('deadlines', `contains ${explicitlyPrimaryDeadlines.length} explicit primary deadlines; exactly one is allowed`);
+  } else if (explicitlyPrimaryDeadlines.length === 1 && primary) {
+    const explicitPrimary = normalizeDeadline(explicitlyPrimaryDeadlines[0], {
+      sourceUrl: record?.url,
+      timezone: record?.deadlineTimezone,
+    });
+    const normalizedPrimary = normalizeDeadline(primary, {
+      sourceUrl: record?.url,
+      timezone: record?.deadlineTimezone,
+    });
+
+    for (const field of PRIMARY_DEADLINE_FIELDS) {
+      if ((normalizedPrimary[field] ?? null) !== (explicitPrimary[field] ?? null)) {
+        addError(
+          `primaryDeadline.${field}`,
+          `must match deadlines explicit primary ${field} (${JSON.stringify(explicitPrimary[field] ?? null)})`,
+        );
+      }
+    }
   }
 
   if (!VERIFICATION_STATUSES.includes(record?.verification?.status)) {

@@ -31,7 +31,10 @@ function confirmedDeadline({
 }
 
 function trackedAddition(record) {
-  const primaryDeadline = record.primaryDeadline ?? confirmedDeadline({
+  const explicitlyPrimaryDeadline = Array.isArray(record.deadlines)
+    ? record.deadlines.find((deadline) => deadline?.primary)
+    : null;
+  const primaryDeadline = explicitlyPrimaryDeadline ?? record.primaryDeadline ?? confirmedDeadline({
     date: record.deadlineISO,
     sourceUrl: record.url,
     timezone: record.deadlineTimezone,

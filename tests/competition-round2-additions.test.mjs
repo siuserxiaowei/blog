@@ -13,6 +13,7 @@ import {
   ROUND2_ADDITIONS_CHECKED_AT,
   competitionRound2Additions,
 } from '../src/data/competition-round2-additions.js';
+import { getCompetitionEntryStatus } from '../src/lib/competition-entry-status.js';
 
 const additionsById = new Map(
   competitionRound2Additions.map((competition) => [competition.id, competition]),
@@ -141,7 +142,9 @@ test('qualification-sensitive additions preserve their decisive constraints', ()
   const indeHub = additionsById.get('indehub-hackathon-2026');
   assert.equal(getPrimaryDeadline(indeHub).type, 'registration');
   assert.equal(getPrimaryDeadline(indeHub).date, '2026-07-31');
-  assert.equal(indeHub.deadlines.find((deadline) => deadline.type === 'submission').date, '2026-08-07');
+  const registration = indeHub.deadlines.find((deadline) => deadline.type === 'registration');
+  assert.equal(registration.date, '2026-07-31');
+  assert.equal(registration.primary, true);
 
   const aicomp = additionsById.get('aicomp-agent-development-2026');
   assert.match(aicomp.audience, /正式学籍/);
@@ -156,4 +159,12 @@ test('qualification-sensitive additions preserve their decisive constraints', ()
   const festiav = additionsById.get('festiav-valencia-2026');
   assert.equal(getPrimaryDeadline(festiav).date, '2026-10-04');
   assert.match(festiav.verification.notes, /10 月 15 日\/20 日冲突/);
+});
+
+test('IndeHub closes to new entrants after registration while preserving submission access', () => {
+  const indeHub = additionsById.get('indehub-hackathon-2026');
+  assert.equal(getCompetitionEntryStatus(indeHub, '2026-08-02'), 'registered-only');
+  const submission = indeHub.deadlines.find((deadline) => deadline.type === 'submission');
+  assert.equal(submission.date, '2026-08-07');
+  assert.equal(submission.primary, false);
 });

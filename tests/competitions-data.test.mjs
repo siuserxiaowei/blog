@@ -39,6 +39,119 @@ test('normalization preserves legacy fields while adding V2 fields', () => {
   assert.equal(normalized.seriesId, null);
 });
 
+test('an explicit primary deadline is the single source of truth for tracked additions', () => {
+  const fields = ['date', 'type', 'certainty', 'timezone', 'label', 'sourceUrl'];
+  const ids = [
+    'square-enix-game-contest-2026',
+    'indehub-hackathon-2026',
+    'binzhi-graduate-robot-2026',
+  ];
+
+  for (const id of ids) {
+    const competition = byId.get(id);
+    const explicitPrimaries = competition.deadlines.filter((deadline) => deadline.primary);
+    assert.equal(explicitPrimaries.length, 1, id);
+    for (const field of fields) {
+      assert.equal(competition.primaryDeadline[field], explicitPrimaries[0][field], `${id}.${field}`);
+    }
+  }
+
+  const indeHub = byId.get('indehub-hackathon-2026');
+  assert.equal(indeHub.deadlineISO, '2026-07-31');
+  assert.equal(indeHub.primaryDeadline.type, 'registration');
+  const registration = indeHub.deadlines.find((deadline) => deadline.type === 'registration');
+  assert.equal(registration.date, '2026-07-31');
+  assert.equal(registration.primary, true);
+  const submission = indeHub.deadlines.find((deadline) => deadline.type === 'submission');
+  assert.equal(submission.date, '2026-08-07');
+  assert.equal(submission.primary, false);
+});
+
+test('V2 validation rejects primary deadline drift across every identity field', () => {
+  const [record] = normalizeCompetitionCollection([{
+    id: 'primary-drift',
+    name: 'Primary drift',
+    deadlineISO: '2026-08-21',
+    url: 'https://example.com/competition',
+    primaryDeadline: {
+      date: '2026-08-21',
+      type: 'application',
+      certainty: 'estimated',
+      timezone: 'UTC',
+      label: 'Different label',
+      sourceUrl: 'https://example.com/other-source',
+    },
+    deadlines: [{
+      date: '2026-08-20',
+      type: 'submission',
+      certainty: 'confirmed',
+      timezone: 'Asia/Shanghai',
+      label: '投稿截止',
+      sourceUrl: 'https://example.com/competition',
+      primary: true,
+    }],
+  }], {}, { updatedAt: '2026-07-30' });
+
+  const result = validateCompetitionCollectionV2([record]);
+  assert.equal(result.valid, false);
+  const fields = new Set(result.errors.map((error) => error.field));
+  for (const field of ['date', 'type', 'certainty', 'timezone', 'label', 'sourceUrl']) {
+    assert.ok(fields.has(`primaryDeadline.${field}`), field);
+  }
+});
+
+test('V2 validation rejects multiple explicit primaries but keeps fallback compatibility', () => {
+  const records = normalizeCompetitionCollection([{
+    id: 'multiple-primary',
+    name: 'Multiple primary',
+    deadlineISO: '2026-08-20',
+    url: 'https://example.com/multiple',
+    deadlines: [
+      {
+        date: '2026-08-20',
+        type: 'registration',
+        certainty: 'confirmed',
+        timezone: 'UTC',
+        label: '报名截止',
+        sourceUrl: 'https://example.com/multiple',
+        primary: true,
+      },
+      {
+        date: '2026-08-27',
+        type: 'submission',
+        certainty: 'confirmed',
+        timezone: 'UTC',
+        label: '投稿截止',
+        sourceUrl: 'https://example.com/multiple',
+        primary: true,
+      },
+    ],
+  }, {
+    id: 'implicit-primary',
+    name: 'Implicit primary',
+    deadlineISO: '2026-09-01',
+    url: 'https://example.com/implicit',
+    deadlines: [{
+      date: '2026-09-01',
+      type: 'submission',
+      certainty: 'confirmed',
+      timezone: 'UTC',
+      label: '投稿截止',
+      sourceUrl: 'https://example.com/implicit',
+      primary: false,
+    }],
+  }], {}, { updatedAt: '2026-07-30' });
+
+  const multiple = validateCompetitionCollectionV2([records[0]]);
+  assert.equal(multiple.valid, false);
+  assert.ok(multiple.errors.some((error) => error.field === 'deadlines'));
+
+  const implicit = validateCompetitionCollectionV2([records[1]]);
+  assert.equal(implicit.valid, true);
+  assert.equal(records[1].primaryDeadline.date, '2026-09-01');
+  assert.equal(records[1].primaryDeadline.type, 'submission');
+});
+
 test('Pokémon primary deadline is the mandatory intent, not the final report', () => {
   const pokemon = byId.get('pokemonagent2026');
   assert.equal(getPrimaryDeadline(pokemon).date, '2026-08-09');
