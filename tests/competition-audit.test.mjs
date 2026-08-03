@@ -33,22 +33,22 @@ test('CLI options default to the visiting local day and allow deterministic over
   assert.equal(explicit.json, true);
 });
 
-test('2026-08-02 audit is reproducible for the final round-four collection', () => {
+test('2026-08-02 audit is reproducible for the final round-five collection', () => {
   const result = auditCompetitionCollection(competitions, baselineDate);
-  assert.equal(result.total, 221);
+  assert.equal(result.total, 271);
   assert.deepEqual(result.byStatus, {
-    urgent: 50,
-    ongoing: 100,
-    upcoming: 25,
+    urgent: 58,
+    ongoing: 121,
+    upcoming: 36,
     expired: 30,
-    unknown: 16,
+    unknown: 26,
   });
-  assert.equal(result.urgentCount, 50);
+  assert.equal(result.urgentCount, 58);
   assert.deepEqual(result.byDeadlineCertainty, {
-    confirmed: 205,
-    estimated: 11,
-    unknown: 1,
-    rolling: 4,
+    confirmed: 245,
+    estimated: 17,
+    unknown: 4,
+    rolling: 5,
   });
   assert.equal(result.p0Count, 0);
 });
@@ -70,7 +70,7 @@ test('CLI JSON is parseable and invalid parameters retain a distinct exit code',
   assert.equal(valid.status, 0, valid.stderr);
   const report = JSON.parse(valid.stdout);
   assert.equal(report.auditDate, '2026-08-02');
-  assert.equal(report.total, 221);
+  assert.equal(report.total, 271);
   assert.equal(report.p0Count, 0);
 
   const invalid = spawnSync(process.execPath, [cliUrl.pathname, '--today', '2026-02-30'], {

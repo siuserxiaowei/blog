@@ -42,6 +42,38 @@ export const HERCLAW_EXPLICIT_COMPETITION_IDS = Object.freeze([
   'global-excellent-engineer-innovation-2026',
   'xfyspacemind2026',
   'datahubagent',
+  'bilibili-ai-create-2026',
+  'dongguan-industrial-ai-100-2026',
+  'tianchi-industry-agent-2026',
+  'seeed-xiao-productization-2026',
+  'kaggle-benchflow-skill-lift-2026',
+  'weibo-vibelab-2026',
+]);
+
+export const OCG_PROJECT_PRESET_ID = 'ocg';
+
+export const OCG_EXPLICIT_COMPETITION_IDS = Object.freeze([
+  'pokemonagent2026',
+  'talestribute2026',
+  'ggac-7th-2026',
+  'valorant-ggac-card-2026',
+  'tencentgamecreator2026',
+  'unitychina2026',
+  'gwb2026',
+  'igf2027',
+  'devgammawards2026',
+  'tgsiga2027',
+  'bigbytejam2026',
+  'game1440k2026',
+  'ifcomp-2026',
+  'roblox-inspire-2026',
+  'square-enix-game-contest-2026',
+  'fightingicellm2026',
+  'fightingicesound2026',
+  'brackeys-jam-2026-2',
+  'lowrezjam-2026',
+  'inkjam-2026',
+  'ludum-dare-60',
 ]);
 
 export const PROJECT_PRESETS = Object.freeze([
@@ -60,6 +92,16 @@ export const PROJECT_PRESETS = Object.freeze([
     rules: {
       type: 'explicit',
       includeCompetitionIds: HERCLAW_EXPLICIT_COMPETITION_IDS,
+    },
+  }),
+  createPreset({
+    id: OCG_PROJECT_PRESET_ID,
+    title: 'OCG 网站',
+    shortTitle: 'OCG',
+    description: '按 OCG 卡牌/游戏网站受众筛选：TCG 与卡牌 AI 赛、游戏开发 jam、卡面与游戏美术设计赛。',
+    rules: {
+      type: 'explicit',
+      includeCompetitionIds: OCG_EXPLICIT_COMPETITION_IDS,
     },
   }),
   createPreset({

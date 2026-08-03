@@ -88,6 +88,36 @@ const HERCLAW_FITS = Object.freeze({
     decision: 'no-go',
     noGoReason: '默认教育赛与企业 / 运营 AI 一体机定位不符，除非先形成真实教育产品证据。',
   }),
+  'bilibili-ai-create-2026': Object.freeze({
+    decision: 'recommend', rank: 11, effort: '中',
+    fitAngle: '「AI 造物」硬件原型方向：龙虾盒子整机 + 双 Agent 运行栈做成 3–5 分钟可演示视频，一等奖 100 万元。',
+    gate: '投稿前不得在其他平台公开发布该作品，获奖后须 B站独家；须 ≥1 分钟原创横屏视频。',
+  }),
+  'tianchi-industry-agent-2026': Object.freeze({
+    decision: 'recommend', rank: 12, effort: '低',
+    fitAngle: '以「已落地 / 试运营的企业运营 Agent」直接申报真实行业 Agent 项目，材料当天可备齐。',
+    gate: '无现金奖，价值在天池背书与云资源；截止 8-10 很近，勿重投入。',
+  }),
+  'dongguan-industrial-ai-100-2026': Object.freeze({
+    decision: 'recommend', rank: 13, effort: '中',
+    fitAngle: '选企业运营 / 质检 / 知识库相关赛题，用现有 Agent 栈快速出 POC，目标是 300 万订单直通。',
+    gate: '赛题偏工业垂直，需按赛季节奏持续投入；1–5 人组队，可配 ≤2 指导老师。',
+  }),
+  'seeed-xiao-productization-2026': Object.freeze({
+    decision: 'stretch', rank: 14, effort: '高',
+    fitAngle: '若有 PCB 能力，语音控制器或 PoE 边界路由方向与产品栈最近，入选方案由 Seeed 产品化。',
+    gate: '须交付 KiCad 工程与样机；没有硬件工程能力则不建议投入。',
+  }),
+  'kaggle-benchflow-skill-lift-2026': Object.freeze({
+    decision: 'stretch', rank: 15, effort: '中',
+    fitAngle: '把 OpenClaw 生态沉淀的高质量 Skill 资产脱敏后投 Static / Meta-Skills 双赛道。',
+    gate: '截止日按官方列表倒计时推算，提交前以 Kaggle 赛页实际倒计时为准；英文提交。',
+  }),
+  'weibo-vibelab-2026': Object.freeze({
+    decision: 'recommend', rank: 16, effort: '低',
+    fitAngle: 'VibeWork 职场自动化赛道：发一条含可体验链接 + 工作流拆解的长微博即完成参赛。',
+    gate: '奖池分配细则未公开；须公开创作思路与 Demo 效果，依赖微博传播数据。',
+  }),
 });
 
 function normalized(value) {

@@ -32,7 +32,7 @@ test('round-three catalogue date and delivery size are explicit', () => {
   assert.equal(ROUND3_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND3_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound3Additions.length, 8);
-  assert.equal(competitions.length, 221);
+  assert.equal(competitions.length, 271);
 });
 
 test('addition and final catalogue ids are unique', () => {

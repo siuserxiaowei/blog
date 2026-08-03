@@ -7,7 +7,9 @@ import { competitions } from '../src/data/competitions.js';
 const builtPageUrl = new URL('../dist/competitions/index.html', import.meta.url);
 const pageSourceUrl = new URL('../src/pages/competitions.astro', import.meta.url);
 const workbenchSourceUrl = new URL('../src/lib/competition-workbench.js', import.meta.url);
-const HTML_BUDGET_BYTES = 1_200_000;
+// Round5（2026-08-02）起记录数 221 → 271，HTML 预算按数据量等比上调；
+// 线上经 Brotli/gzip 后传输量远小于原始字节，元素预算保持不变。
+const HTML_BUDGET_BYTES = 1_400_000;
 const DOM_ELEMENT_BUDGET = 8_000;
 
 test('competition radar stays within the production page budget', async () => {
@@ -41,7 +43,7 @@ test('budget savings retain every record, no-JS links, and one reusable detail p
   assert.equal(listItemCount, competitions.length, 'all records remain server-rendered in the basic list');
   assert.equal(noJsDetailLinkCount, competitions.length, 'each record keeps a no-JS detail-page link');
   assert.equal(detailPanelCount, 1, 'the workbench reuses one detail DOM container');
-  assert.equal(projectPresetCount, 8, 'the project-first picker stays a small fixed control set');
+  assert.equal(projectPresetCount, 9, 'the project-first picker stays a small fixed control set');
   assert.equal(accessFilterCount, 5, 'access filters stay a small fixed control set');
   assert.ok(records.every(record => Array.isArray(record.projectPresetIds)));
   assert.ok(records.every(record => ['open', 'special', 'unknown', 'blocked'].includes(record.access?.group)));
