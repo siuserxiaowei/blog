@@ -8,8 +8,9 @@ const builtPageUrl = new URL('../dist/competitions/index.html', import.meta.url)
 const pageSourceUrl = new URL('../src/pages/competitions.astro', import.meta.url);
 const workbenchSourceUrl = new URL('../src/lib/competition-workbench.js', import.meta.url);
 // Round5（2026-08-02）起记录数 221 → 271，HTML 预算按数据量等比上调；
+// Round6（2026-08-04）271 → 313（约 +15.5%），预算按同一等比规则上调至 1.62MB；
 // 线上经 Brotli/gzip 后传输量远小于原始字节，元素预算保持不变。
-const HTML_BUDGET_BYTES = 1_400_000;
+const HTML_BUDGET_BYTES = 1_620_000;
 const DOM_ELEMENT_BUDGET = 8_000;
 
 test('competition radar stays within the production page budget', async () => {

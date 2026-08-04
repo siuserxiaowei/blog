@@ -26,7 +26,7 @@ function canonicalUrl(raw) {
 test('round-five delivers the fifty social-platform records exactly once', () => {
   assert.equal(ROUND5_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound5Additions.length, 50);
-  assert.equal(competitions.length, 271);
+  assert.equal(competitions.length, 313);
 
   const expected = new Set([
     'bilibili-ai-create-2026',

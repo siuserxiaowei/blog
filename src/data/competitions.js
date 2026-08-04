@@ -11,8 +11,10 @@ import { competitionRound3Additions } from './competition-round3-additions.js';
 import { competitionRound4Corrections } from './competition-round4-corrections.js';
 import { competitionRound4Additions } from './competition-round4-additions.js';
 import { competitionRound5Additions } from './competition-round5-additions.js';
+import { competitionRound6Corrections } from './competition-round6-corrections.js';
+import { competitionRound6Additions } from './competition-round6-additions.js';
 
-export const RADAR_UPDATED_AT = '2026-08-02';
+export const RADAR_UPDATED_AT = '2026-08-04';
 const BASELINE_CHECKED_AT = '2026-07-30';
 
 export const DAY_MS = 86400000;
@@ -2478,10 +2480,19 @@ const round4AuditedCompetitions = normalizeCompetitionCollection(
   { updatedAt: RADAR_UPDATED_AT },
 );
 
+const round6AuditedCompetitions = normalizeCompetitionCollection(
+  [
+    ...round4AuditedCompetitions,
+    ...competitionRound4Additions,
+    ...competitionRound5Additions,
+  ],
+  competitionRound6Corrections,
+  { updatedAt: RADAR_UPDATED_AT },
+);
+
 export const competitions = [
-  ...round4AuditedCompetitions,
-  ...competitionRound4Additions,
-  ...competitionRound5Additions,
+  ...round6AuditedCompetitions,
+  ...competitionRound6Additions,
 ];
 
 export function parseCompetitionDate(value) {

@@ -25,7 +25,7 @@ test('HerClaw is an explicit competition set, not a keyword-shaped hardware shor
   assert.deepEqual(preset.rules.includeCompetitionIds, HERCLAW_EXPLICIT_COMPETITION_IDS);
   assert.equal(preset.rules.keywordAny.length, 0);
   assert.equal(preset.rules.categoryAny.length, 0);
-  assert.equal(new Set(HERCLAW_EXPLICIT_COMPETITION_IDS).size, 16);
+  assert.equal(new Set(HERCLAW_EXPLICIT_COMPETITION_IDS).size, 24);
 });
 
 test('HerClaw profile separates current direction from unverified capabilities', () => {

@@ -118,6 +118,46 @@ const HERCLAW_FITS = Object.freeze({
     fitAngle: 'VibeWork 职场自动化赛道：发一条含可体验链接 + 工作流拆解的长微博即完成参赛。',
     gate: '奖池分配细则未公开；须公开创作思路与 Demo 效果，依赖微博传播数据。',
   }),
+  'huaqiu-cup-ai-hardware-2026': Object.freeze({
+    decision: 'recommend', rank: 17, effort: '中',
+    fitAngle: '端侧 AI / 具身智能赛题对口：龙虾盒子整机原型可投，先申领免费赞助开发板降低硬件成本。',
+    gate: '作品须 100% 开源 + 大赛专属首发；获奖后须寄实物验证；现金档位小且税前。',
+  }),
+  'lcsc-wch-riscv-2026': Object.freeze({
+    decision: 'recommend', rank: 18, effort: '中',
+    fitAngle: '自由命题可做 AI 硬件，复刻赛道含 MoHi AI 对话机器狗；优秀作品有众筹+量产+资本对接。',
+    gate: '参加过嘉立创集团其他赛事（星火计划/硬核手搓/训练营等）的作品不可再参赛，先自查再投入。',
+  }),
+  'iflytek-robot-innovation-2026': Object.freeze({
+    decision: 'recommend', rank: 19, effort: '高',
+    fitAngle: '陪伴机器人/具身智能赛道与产品方向直接重合，入围决赛的实物模型制作与运输费由组委会承担。',
+    gate: '拒收完全由 AI 生成的作品，须有真实工程含量；决赛须线下答辩；≤5 人。',
+  }),
+  'pazhou-international-ai-2026': Object.freeze({
+    decision: 'recommend', rank: 20, effort: '中',
+    fitAngle: '以「AI 硬件 + 出海」叙事投国内组，BP 突出具身智能与海外市场路径；无需代码。',
+    gate: '国内组须具备出海能力并在 BP 说明；奖励是落地扶持与政策而非现金，按资源对接价值投入。',
+  }),
+  'dfrobot-xhs-maker-2026': Object.freeze({
+    decision: 'recommend', rank: 21, effort: '低',
+    fitAngle: '把龙虾盒子的硬件 DIY 过程做成小红书图文/视频带双话题发布即完成参赛。',
+    gate: '须带 #小红书maker创造季 #dfrobot创造分享 双话题；现金为瓜分制单人额度小。',
+  }),
+  'meshtastic-build-off-2026': Object.freeze({
+    decision: 'stretch', rank: 22, effort: '中',
+    fitAngle: 'LoRa mesh 场景显式匹配，可用盒子做离网通信/分布式节点 demo。',
+    gate: '官方日期口径矛盾（README 横幅 8-15 / 表格 8 月下旬），按最早口径 8 月中旬前提交；须开源（GitHub Issue 提交）。',
+  }),
+  'fossee-oshw-makeathon-2026': Object.freeze({
+    decision: 'stretch', rank: 23, effort: '中',
+    fitAngle: '开源硬件 + TinyML 方向弱匹配，价值在 IIT Bombay 背书与开源履历。',
+    gate: '学生限定：须全日制在校学生团队（≤5 人），非学生团队不可投；IP 与 FOSSEE 共有、硬件成本自理，现金仅象征性。',
+  }),
+  'jciiot-embodied-ai-2026': Object.freeze({
+    decision: 'stretch', rank: 24, effort: '中',
+    fitAngle: '工业具身智能方向相关，可复用工业场景 Agent/质检经验。',
+    gate: '新队伍是否仍可报名待确认（队伍合并截止 07-24 已过），先登录 Biendata 核实；实名制（姓名+机构）；奖金拆分待确认。',
+  }),
 });
 
 function normalized(value) {
