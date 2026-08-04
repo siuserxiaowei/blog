@@ -32,6 +32,7 @@ const SOFTWARE_CATEGORIES = new Set([
   '创业路演',
 ]);
 const VALID_SORTS = new Set(['software-first', 'urgent-first', 'match-desc', 'deadline-asc', 'tier-desc']);
+const DEFAULT_SORT = 'deadline-asc';
 const VALID_STATUSES = new Set(['全部', 'urgent', 'ongoing', 'upcoming', 'expired', 'unknown']);
 const VALID_TIERS = new Set(['全部', 'S', 'A', 'B']);
 const VALID_PROJECT_IDS = new Set(PROJECT_PRESET_BY_ID.keys());
@@ -419,7 +420,7 @@ function initCompetitionRadar() {
     tier: VALID_TIERS.has(params.get('tier') || '') ? params.get('tier') : '全部',
     status: VALID_STATUSES.has(params.get('status') || '') ? params.get('status') : '全部',
     search: params.get('q') || '',
-    sort: VALID_SORTS.has(params.get('sort') || '') ? params.get('sort') : 'software-first',
+    sort: VALID_SORTS.has(params.get('sort') || '') ? params.get('sort') : DEFAULT_SORT,
     favoritesOnly: params.get('saved') === '1',
     selectedId: validIds.has(initialId) ? initialId : defaultRecord.id,
   };
@@ -457,7 +458,7 @@ function initCompetitionRadar() {
     else url.searchParams.delete('tier');
     if (state.status !== '全部') url.searchParams.set('status', state.status);
     else url.searchParams.delete('status');
-    if (state.sort !== 'software-first') url.searchParams.set('sort', state.sort);
+    if (state.sort !== DEFAULT_SORT) url.searchParams.set('sort', state.sort);
     else url.searchParams.delete('sort');
     if (state.favoritesOnly) url.searchParams.set('saved', '1');
     else url.searchParams.delete('saved');
@@ -598,7 +599,14 @@ function initCompetitionRadar() {
         || deadlineA - deadlineB
         || matchB - matchA;
     }
-    if (state.sort === 'deadline-asc') return deadlineA - deadlineB || matchB - matchA;
+    if (state.sort === 'deadline-asc') {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
+      const pastA = a.status.kind === 'expired' || deadlineA < todayStart;
+      const pastB = b.status.kind === 'expired' || deadlineB < todayStart;
+      if (pastA !== pastB) return pastA - pastB;
+      if (pastA) return deadlineB - deadlineA || matchB - matchA;
+      return deadlineA - deadlineB || matchB - matchA;
+    }
     if (state.sort === 'tier-desc') {
       return (TIER_RANK[b.tier] ?? 0) - (TIER_RANK[a.tier] ?? 0) || matchB - matchA;
     }
@@ -686,7 +694,7 @@ function initCompetitionRadar() {
     state.tier = '全部';
     state.status = '全部';
     state.search = '';
-    state.sort = 'software-first';
+    state.sort = DEFAULT_SORT;
     state.favoritesOnly = false;
     syncControls();
     applyFilter({ address: options.address || 'push' });
@@ -704,7 +712,7 @@ function initCompetitionRadar() {
     state.cat = categoryValues.has(urlParams.get('cat') || '') ? urlParams.get('cat') : '全部';
     state.tier = VALID_TIERS.has(urlParams.get('tier') || '') ? urlParams.get('tier') : '全部';
     state.status = VALID_STATUSES.has(urlParams.get('status') || '') ? urlParams.get('status') : '全部';
-    state.sort = VALID_SORTS.has(urlParams.get('sort') || '') ? urlParams.get('sort') : 'software-first';
+    state.sort = VALID_SORTS.has(urlParams.get('sort') || '') ? urlParams.get('sort') : DEFAULT_SORT;
     state.favoritesOnly = urlParams.get('saved') === '1';
     if (validIds.has(id)) state.selectedId = id;
     syncControls();

@@ -65,7 +65,22 @@ const serializedWorkbenchRecords = JSON.stringify(workbenchRecords)
   .replaceAll('&', '\\u0026')
   .replaceAll('\u2028', '\\u2028')
   .replaceAll('\u2029', '\\u2029');
-const initialCompetition = enriched[0];
+const deadlineSortTime = (c) => {
+  const value = deadlineInfo.get(c.id)?.date ?? c.deadlineISO ?? '';
+  const time = Date.parse(value || '9999-12-31');
+  return Number.isNaN(time) ? Date.parse('9999-12-31') : time;
+};
+const todayStart = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()).getTime();
+const sortedByDeadline = enriched.slice().sort((a, b) => {
+  const timeA = deadlineSortTime(a);
+  const timeB = deadlineSortTime(b);
+  const pastA = a.status.kind === 'expired' || timeA < todayStart;
+  const pastB = b.status.kind === 'expired' || timeB < todayStart;
+  if (pastA !== pastB) return pastA - pastB;
+  if (pastA) return timeB - timeA || b.match - a.match;
+  return timeA - timeB || b.match - a.match;
+});
+const initialCompetition = sortedByDeadline[0];
 const initialDeadline = initialCompetition ? deadlineInfo.get(initialCompetition.id) : null;
 const initialAccess = initialCompetition
   ? accessByCompetition.get(initialCompetition.id)
@@ -217,10 +232,10 @@ const initialActionRecords = enriched
           <label class="radar-field">
             <span class="section-kicker filter-label">// 排序</span>
             <select id="radar-sort" class="radar-select">
+              <option value="deadline-asc">截止近优先</option>
               <option value="software-first">软件优先</option>
               <option value="urgent-first">紧急优先</option>
               <option value="match-desc">匹配度高优先</option>
-              <option value="deadline-asc">截止近优先</option>
               <option value="tier-desc">等级高优先</option>
             </select>
           </label>
@@ -282,7 +297,7 @@ const initialActionRecords = enriched
             <span id="list-count" class="text-xs" aria-live="polite" style="color: var(--text-secondary); font-family: var(--font-mono);">{enriched.length} items</span>
           </div>
           <div id="competition-list" class="competition-list space-y-5 lg:max-h-[1440px] lg:overflow-y-auto lg:pr-2">
-            {enriched.map(c => (
+            {sortedByDeadline.map(c => (
               <article
                 data-id={c.id}
                 data-status={c.status.kind}
