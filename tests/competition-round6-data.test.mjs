@@ -37,7 +37,7 @@ test('round-six delivers the forty-four synthesis records exactly once', () => {
   assert.equal(ROUND6_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND6_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound6Additions.length, 44);
-  assert.equal(competitions.length, 315);
+  assert.equal(competitions.length, 364);
 
   const expected = new Set([
     'gauntlet-of-gods-2026',
@@ -272,8 +272,8 @@ test('round-six preset additions point at real competition records', () => {
     'climate-jam-2026',
     'craftpix-indie-jam-2026',
   ];
-  assert.equal(HERCLAW_EXPLICIT_COMPETITION_IDS.length, 24);
-  assert.equal(OCG_EXPLICIT_COMPETITION_IDS.length, 29);
+  assert.equal(HERCLAW_EXPLICIT_COMPETITION_IDS.length, 31);
+  assert.equal(OCG_EXPLICIT_COMPETITION_IDS.length, 33);
   for (const id of [...herclawNew, ...ocgNew]) {
     assert.ok(finalById.has(id), `missing competition ${id}`);
   }

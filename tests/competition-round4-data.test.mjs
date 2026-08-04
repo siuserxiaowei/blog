@@ -32,7 +32,7 @@ test('round-four delivers the eleven synthesis records exactly once', () => {
   assert.equal(ROUND4_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND4_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound4Additions.length, 11);
-  assert.equal(competitions.length, 315);
+  assert.equal(competitions.length, 364);
 
   const expected = new Set([
     'chongqing-returnee-innovation-2026',

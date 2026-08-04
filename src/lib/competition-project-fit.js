@@ -158,6 +158,41 @@ const HERCLAW_FITS = Object.freeze({
     fitAngle: '工业具身智能方向相关，可复用工业场景 Agent/质检经验。',
     gate: '新队伍是否仍可报名待确认（队伍合并截止 07-24 已过），先登录 Biendata 核实；实名制（姓名+机构）；奖金拆分待确认。',
   }),
+  'itec-robot-scenario-2026': Object.freeze({
+    decision: 'recommend', rank: 25, effort: '中',
+    fitAngle: '养老陪伴机器人/酒店商场机场服务机器人场景与陪伴机器人方向直接对口，八大真实场景 POC/采购通道。',
+    gate: '方案征集截止 08-31；总奖金池晋级后参评、是否挂钩落地朝阳待确认；复赛路演需到场。',
+  }),
+  'gz-sci-tech-innovation-2026': Object.freeze({
+    decision: 'recommend', rank: 26, effort: '中',
+    fitAngle: '具身智能/AI 终端细分赛道与政府门户背书，奖金池超 1500 万 + 最高 200 万股权投资。',
+    gate: '报名截止 08-14 极近，BP 须突出真实场景与量产路径；股权投资有条件。',
+  }),
+  'jiangyuan-cup-embodied-2026': Object.freeze({
+    decision: 'recommend', rank: 27, effort: '中',
+    fitAngle: '人形/轮式/四足具身智能整机方案直接可投，产业基金最高千万级股权投资+千万级真实场景订单。',
+    gate: '报名截止 08-25；费用待确认；晋级赛/总决赛线下。',
+  }),
+  'openvela-ai-hardware-2026': Object.freeze({
+    decision: 'recommend', rank: 28, effort: '中',
+    fitAngle: '产品定义赛可直接投，小米 openvela 生态+现金近 40 万+开发板/Token/打样配套。',
+    gate: '须基于 openvela 系统；报名截止日待确认，先申领开发板占坑。',
+  }),
+  'jd-joyinside-innovation-2026': Object.freeze({
+    decision: 'recommend', rank: 29, effort: '中',
+    fitAngle: '消费级 AI 终端直达京东货架链路（渠道/零售包销/生态曝光），与产品化方向高度协同。',
+    gate: '截止日待确认（海报图+JS 页），先注册占位；现金口径为参照春季赛的参考值。',
+  }),
+  'chuangpi-ai-robot-2026': Object.freeze({
+    decision: 'stretch', rank: 30, effort: '中',
+    fitAngle: '顺丰百亿级真实场景开放+投资团现场投决，适合已注册公司的 AI+机器人团队。',
+    gate: '需注册公司；报名截止 08-07 极紧，仅材料现成者可冲；报名经邮箱。',
+  }),
+  'golden-panda-2026': Object.freeze({
+    decision: 'recommend', rank: 31, effort: '中',
+    fitAngle: '中韩新人工智能专业赛具身智能方向对口，成都高新区背书+总池 186 万。',
+    gate: '报名截止为 estimated（公告原文 8 月中旬），尽快在官网确认入口与组别；总决赛须赴成都。',
+  }),
 });
 
 function normalized(value) {

@@ -28,12 +28,12 @@ const competitionsById = new Map(
 );
 
 test('round-three catalogue date and delivery size are explicit', () => {
-  // RADAR_UPDATED_AT 随轮次推进（round-six 起为 2026-08-04）；round-three 自身常量保持钉在 researchDate。
-  assert.equal(RADAR_UPDATED_AT, '2026-08-04');
+  // RADAR_UPDATED_AT 随轮次推进（round-seven 起为 2026-08-05）；round-three 自身常量保持钉在 researchDate。
+  assert.equal(RADAR_UPDATED_AT, '2026-08-05');
   assert.equal(ROUND3_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND3_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound3Additions.length, 8);
-  assert.equal(competitions.length, 315);
+  assert.equal(competitions.length, 364);
 });
 
 test('addition and final catalogue ids are unique', () => {

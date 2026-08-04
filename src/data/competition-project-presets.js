@@ -56,6 +56,13 @@ export const HERCLAW_EXPLICIT_COMPETITION_IDS = Object.freeze([
   'meshtastic-build-off-2026',
   'fossee-oshw-makeathon-2026',
   'jciiot-embodied-ai-2026',
+  'itec-robot-scenario-2026',
+  'gz-sci-tech-innovation-2026',
+  'jiangyuan-cup-embodied-2026',
+  'openvela-ai-hardware-2026',
+  'jd-joyinside-innovation-2026',
+  'chuangpi-ai-robot-2026',
+  'golden-panda-2026',
 ]);
 
 export const OCG_PROJECT_PRESET_ID = 'ocg';
@@ -90,6 +97,10 @@ export const OCG_EXPLICIT_COMPETITION_IDS = Object.freeze([
   'spooktober-vn-jam-2026',
   'climate-jam-2026',
   'craftpix-indie-jam-2026',
+  'qiaosheng-card-design-2026',
+  'xwc-newcultural-design-2026',
+  'catdc-ceramic-toy-2026',
+  'ecny-ip-design-2026',
 ]);
 
 export const PROJECT_PRESETS = Object.freeze([
