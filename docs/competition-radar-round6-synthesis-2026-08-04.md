@@ -345,7 +345,7 @@
 - **Venture D Vibe Coding 黑客松**（杭州，8 月底）：仅公众号招募文、无赛制无奖励细节，REJECT 转观察。
 - **TikTok TechJam 2026**：官方规则页确认仅限新加坡居民+新大学在读，中国 No-go 且地域过窄，REJECT。
 - **「2026 哈佛黑客松中国挑战赛」**（杭州 8-21→23，¥10 万）：仅聚合平台单源、无官方页，真实性存疑，REJECT。
-- 已结束不收录（抽样）：UiPath AgentHack（8-04 当天关窗）、Turing Test/Mantle、CopernicusLAC、Doomlings Create-a-Card、OKX.AI Genesis、ATEC2026、GMTK/Kenney/CiGA/BOOOM 春、道通 Physical AI（2027 届蹲守）、固高杯、百雀羚、大足石刻、和鲸 C4/BDC、DataFountain 睿创杯、CSIG 金睛杯、Roblox Developer Challenge、琶洲树根杯（7-20 截止）、台湾 TAIA（7-31 截止且限台湾学生）、AFAC2026（7-20 截止）、长三角聚劲、低空产业创新大赛、数字中国·数字智造赛道。
+- 已结束不收录（抽样）：UiPath AgentHack（提交 2026-06-29 已截止，2026-08-04 公布获奖）、Turing Test/Mantle、CopernicusLAC、Doomlings Create-a-Card、OKX.AI Genesis、ATEC2026、GMTK/Kenney/CiGA/BOOOM 春、道通 Physical AI（2027 届蹲守）、固高杯、百雀羚、大足石刻、和鲸 C4/BDC、DataFountain 睿创杯、CSIG 金睛杯、Roblox Developer Challenge、琶洲树根杯（7-20 截止）、台湾 TAIA（7-31 截止且限台湾学生）、AFAC2026（7-20 截止）、长三角聚劲、低空产业创新大赛、数字中国·数字智造赛道。
 
 ## 修正清单（CORRECTION）
 
@@ -375,3 +375,37 @@
 - 所有新增有来源、复核日期、可行动主截止与显式资格边界；中国资格未知不得写「可参加」；No-go 不进默认推荐。
 - `primaryDeadline` 与唯一 `deadlines[].primary` 对齐；估算/滚动日期必须标注。
 - 数据测试、雷达审计、生产构建、桌面/移动抽查全部通过；271 → 313 条（42 新增），各测试计数断言同步。
+
+---
+
+# 第 6.5 轮 · 遗留观察项逐项核实（2026-08-04 同日补扫）
+
+对第 6 轮 19 个遗留观察项逐项回溯官方页核实（全程未用 Exa——共享额度仍 429；以官方站底层 API/JSON、GitHub、归档快照、搜索索引交叉）。结论：
+
+## 6.5 新增入库（2 条，313 → 315）
+
+43. **ccl26-eval-image-translation-2026** | CCL26-Eval 任务十三 · 第一届跨境电商图像文本翻译大赛【A】
+    - org: 中国中文信息学会 CCL 2026 评测组委会（任务组织：李海军/尚姿芙/梁杰/徐昭/骆卫华，阿里云赞助，天池承办）
+    - url: https://tianchi.aliyun.com/competition/entrance/532463 ；系列入口 http://cips-cl.org/static/CCL2026/cclEval/taskEvaluation/index.html
+    - timeline（UTC+8，confirmed，天池官方 API raceId 532463）：报名截止 2026-08-14 17:59:59；初赛提交 2026-07-13 10:00 → 08-14 18:00（每队全程限 2 次）；复赛 08-17 10:00 → 09-30 18:00；颁奖/研讨于 CCL 2026 大会（2026-10-15→18 宜昌）
+    - 奖励：现金——天池页：一等 ¥20,000×1 / 二等 ¥5,500×2 / 三等 ¥3,000×3（总池 4 万，API bonus 字段吻合）；⚠️ CCL 入口页写 20000/10000/5000×2，名次分布两页不一致（总额同 4 万），以天池页为准并标注待确认；另发 CIPS 荣誉证书，总结论文可入 CCL/ACL Anthology
+    - 资格：每队 ≤3 人、每人限一队；天池实名认证（支付宝）；无国籍限制，中国可参加；已 294 队
+    - 注意：CCL 页描述（训练图翻质量自动评分系统）与天池实际赛题（500 张中文电商原图 ×5 语向直接产出 2500 张译后图）不一致，**以天池页为准**；CCL26-Eval 其余 13 个任务参赛/提交均已截止（最晚任务十四 7-23），故只单收任务十三，desc 注明隶属 series
+    - cat: 算法/数据类；tier A；龙虾盒子/OCG 均不适配（通用算法赛）；置信度高
+
+44. **volcengine-huoshan-cup-agent-2026** | 2026 火山杯 Agent 创新大赛（全年系列赛）【B】
+    - org: 火山引擎（字节跳动）；指定开发平台：扣子/HiAgent/Trae/AgentKit/ArkClaw
+    - url: https://developer.volcengine.com/competition （伞赛事总入口，recordType: series）
+    - timeline: rolling——当前 10 个独立子赛，进行中且可提交的截止分布 2026-08-21 ~ 09-15（南京银行 8-31、福建高校 8-21、青农大 8-31、陕西师大 9-11、南京大学 9-7、深圳燃气 9-15、临平站 9-15、艺云 9-10；林氏家居 8-10 启动、外交学院 9-21 启动）
+    - 奖励：各独立赛自定（参考实例：闽都站一等奖 ¥10,000/赛道 + Trae 企业版账号）；伞赛事统一奖金未公布——待确认
+    - 资格：企业开发者/高校师生/个人；**多数子赛限本校/本企内部**（写入资格边界）；中国可参加
+    - 生态绑定：「琶洲算法大赛×火山杯 Agent 创新大赛生态合作赛」为第五届琶洲算法大赛官方生态合作赛事（三大赛题：企业级知识库/多源文档综述/内容创作品牌传播），报名页 https://www.aicompetition-pz.com/topic_detail/35 （截止与奖金未公布，待确认）——写入 sources
+    - cat: AI 软件类；tier B；partially-verified；与龙虾盒子仅内容创作赛道边缘相关，不进预设
+
+## 6.5 核实结论（不入库项）
+
+- **重复确认**：lablab.ai「AI Factory — native.builder Hackathon」与在库 aifactory2026 同 URL/同主办/同档期（8-03→10），不重复收录。
+- **报名已截止**：快手探索者 LLM-Rec 挑战赛（¥100 万池、SIGIR 联办、全球在校生，报名 6-13→29 已截止，当前复赛阶段；下届 6 月蹲守，高价值）；REBUILD-Z×GEIA 深圳黑客松（报名 6-14→8-01 已截止，现处录取期，9-08→11 举办；奖池未公布，维持「无一手页」判断）。
+- **已结束**：Kaggle Omnilex 法律 Agentic Retrieval（$10k，2026-05-24 关窗，库内本无条目）；第七届粤港澳大湾区文创大赛 AI 主题赛道「智汇湾区」（2025-11-20 已截止，旧文）。
+- **无新进展/无法确认**：Meshtastic Build-Off 日期矛盾无官方澄清（README 自 2026-05-27 未更新，在库条目维持 unknown+矛盾标注，按最早口径 8-15 准备）；ai4hack 无 2026–27 新赛季（站点陈旧，WATCH 降权）；MiniMax Agent Challenge 无 2026 新版迹象（2025 旧站已下线，维持蹲守）；Vidu「100 个 AI 视频创意挑战赛」页面存活但 JS 挑战墙无法核实详情（与在库 vidu-ai-film-hackathon-2026 非同一赛事，WATCH）；CodeBuddy 杯腾讯云游戏开发挑战赛证实存在（琶洲生态合作赛道，小红花游戏/文化表达/叙事三赛道）但无独立官方页与截止信息（WATCH，注意与在库 tencentgamecreator2026 非同一赛事）；蛋仔派对社媒创作赛 8 月期未见开放（官网无公告，下轮走公众号渠道）；CCW 共创世界十周年正赛时间未公布（接口需登录，下轮用 B站登录态看官方号 8-04 视频）。
+- **文档勘误**：第 6 轮淘汰清单中 UiPath AgentHack 的表述修正为「提交 2026-06-29 已截止、2026-08-04 公布获奖」（非 8-04 当天关窗），不收录决定不变。

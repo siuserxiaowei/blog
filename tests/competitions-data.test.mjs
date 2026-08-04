@@ -15,7 +15,7 @@ const byId = new Map(competitions.map((competition) => [competition.id, competit
 const today = new Date('2026-07-30T00:00:00+08:00');
 
 test('the collection is unique and valid in both legacy and V2 schemas', () => {
-  assert.equal(competitions.length, 313);
+  assert.equal(competitions.length, 315);
   assert.equal(new Set(competitions.map((competition) => competition.id)).size, competitions.length);
   assert.deepEqual(validateCompetitions(competitions).errors, []);
   assert.deepEqual(validateCompetitionCollectionV2(competitions).errors, []);

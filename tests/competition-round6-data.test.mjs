@@ -33,11 +33,11 @@ function canonicalUrl(raw) {
   return `${url.hostname.toLowerCase()}${path}${url.search}`;
 }
 
-test('round-six delivers the forty-two synthesis records exactly once', () => {
+test('round-six delivers the forty-four synthesis records exactly once', () => {
   assert.equal(ROUND6_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND6_CORRECTIONS_CHECKED_AT, researchDate);
-  assert.equal(competitionRound6Additions.length, 42);
-  assert.equal(competitions.length, 313);
+  assert.equal(competitionRound6Additions.length, 44);
+  assert.equal(competitions.length, 315);
 
   const expected = new Set([
     'gauntlet-of-gods-2026',
@@ -82,6 +82,8 @@ test('round-six delivers the forty-two synthesis records exactly once', () => {
     'dfrobot-xhs-maker-2026',
     'climate-jam-2026',
     'craftpix-indie-jam-2026',
+    'ccl26-eval-image-translation-2026',
+    'volcengine-huoshan-cup-agent-2026',
   ]);
   assert.deepEqual(new Set(additionsById.keys()), expected);
 });
@@ -93,8 +95,8 @@ test('ids, names and canonical source URLs do not duplicate the prior catalogue'
   const priorUrls = new Set(prior.map((item) => canonicalUrl(item.url)));
 
   assert.equal(new Set(competitions.map((item) => item.id)).size, competitions.length);
-  assert.equal(new Set(competitionRound6Additions.map((item) => item.fullName)).size, 42);
-  assert.equal(new Set(competitionRound6Additions.map((item) => canonicalUrl(item.url))).size, 42);
+  assert.equal(new Set(competitionRound6Additions.map((item) => item.fullName)).size, 44);
+  assert.equal(new Set(competitionRound6Additions.map((item) => canonicalUrl(item.url))).size, 44);
   for (const addition of competitionRound6Additions) {
     assert.ok(!priorNames.has(addition.fullName), addition.id);
     assert.ok(!priorUrls.has(canonicalUrl(addition.url)), addition.id);
