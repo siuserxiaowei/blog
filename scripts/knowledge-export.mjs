@@ -133,6 +133,7 @@ async function transformNote(note, context) {
     if (/^https?:\/\//i.test(value)) {
       const url = publicHttpUrl(value);
       if (!url) throw new Error('An external image or attachment must have a public HTTP(S) URL.');
+      if (path.extname(new URL(url).pathname).toLowerCase() === '.md') throw new Error('Embedding another Markdown note (including remote Markdown) is disabled; publish a link instead.');
       return url;
     }
     const relative = resolveSourceReference(context.root, note.relative, value, context.files, [...ASSET_EXTENSIONS], 'attachment');
