@@ -28,6 +28,10 @@ export async function sourceRoot(input) {
   if (!input) throw new Error('An explicit --source directory is required.');
   const root = path.resolve(input);
   if (root === path.parse(root).root) throw new Error('The filesystem root cannot be a publication directory.');
+  const home = path.resolve(process.env.HOME || '');
+  if (home && (root === home || root === path.dirname(home) || ['Documents', 'Desktop', 'Downloads'].includes(path.basename(root)))) {
+    throw new Error('A broad personal directory cannot be a publication source; choose an explicit publish folder.');
+  }
   await assertNoSymlinks(root);
   const stat = await fs.lstat(root);
   if (!stat.isDirectory()) throw new Error('The publication source must be a directory.');
