@@ -797,6 +797,7 @@ function initCompetitionRadar() {
     const urgent = active.filter(record => record.status.kind === 'urgent');
     const actionable = active
       .filter(record => record.calendarEligible === true
+        && record.recommendationEligible === true
         && record.status.kind !== 'unknown'
         && record.access.group !== 'blocked')
       .sort((a, b) => {

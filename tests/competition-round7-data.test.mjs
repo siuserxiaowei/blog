@@ -31,7 +31,7 @@ function canonicalUrl(raw) {
 test('round-seven delivers the forty-nine synthesis records exactly once', () => {
   assert.equal(ROUND7_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound7Additions.length, 49);
-  assert.equal(competitions.length, 364);
+  assert.equal(competitions.length, 439);
 
   const expected = new Set([
     'gz-sci-tech-innovation-2026',

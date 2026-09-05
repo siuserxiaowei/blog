@@ -22,7 +22,7 @@ const researchCutoff = '2026-07-30';
 
 test('round-two additions stay within the requested 10–20 record delivery range', () => {
   assert.equal(ROUND2_ADDITIONS_CHECKED_AT, researchCutoff);
-  assert.equal(competitions.length, 364, 'final merged catalogue changed unexpectedly');
+  assert.equal(competitions.length, 439, 'final merged catalogue changed unexpectedly');
   assert.equal(competitionRound2Additions.length, 18);
 });
 

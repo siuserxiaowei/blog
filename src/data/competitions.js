@@ -14,8 +14,26 @@ import { competitionRound5Additions } from './competition-round5-additions.js';
 import { competitionRound6Corrections } from './competition-round6-corrections.js';
 import { competitionRound6Additions } from './competition-round6-additions.js';
 import { competitionRound7Additions } from './competition-round7-additions.js';
+import { competitionRound8Corrections } from './competition-round8-corrections.js';
+import { competitionRound9Additions } from './competition-round9-additions.js';
+import { competitionRound10Additions } from './competition-round10-additions.js';
+import { competitionRound10Corrections } from './competition-round10-corrections.js';
+import { competitionRound11Additions } from './competition-round11-additions.js';
+import { competitionRound11Corrections } from './competition-round11-corrections.js';
+import { competitionRound12Corrections } from './competition-round12-corrections.js';
+import { competitionRound13Additions } from './competition-round13-additions.js';
+import { competitionRound14Additions } from './competition-round14-additions.js';
+import { competitionRound15Additions } from './competition-round15-additions.js';
+import { competitionRound16Additions } from './competition-round16-additions.js';
+import { competitionRound17Additions } from './competition-round17-additions.js';
+import { competitionRound17Corrections } from './competition-round17-corrections.js';
+import { competitionRound18Additions } from './competition-round18-additions.js';
+import { competitionRound19Additions } from './competition-round19-additions.js';
+import { competitionRound20Additions } from './competition-round20-additions.js';
+import { competitionRound21Additions } from './competition-round21-additions.js';
+import { competitionRound22Additions } from './competition-round22-additions.js';
 
-export const RADAR_UPDATED_AT = '2026-08-05';
+export const RADAR_UPDATED_AT = '2026-08-09';
 const BASELINE_CHECKED_AT = '2026-07-30';
 
 export const DAY_MS = 86400000;
@@ -2491,11 +2509,34 @@ const round6AuditedCompetitions = normalizeCompetitionCollection(
   { updatedAt: RADAR_UPDATED_AT },
 );
 
-export const competitions = [
-  ...round6AuditedCompetitions,
-  ...competitionRound6Additions,
-  ...competitionRound7Additions,
-];
+export const competitions = normalizeCompetitionCollection(
+  [
+    ...round6AuditedCompetitions,
+    ...competitionRound6Additions,
+    ...competitionRound7Additions,
+    ...competitionRound9Additions,
+    ...competitionRound10Additions,
+    ...competitionRound11Additions,
+    ...competitionRound13Additions,
+    ...competitionRound14Additions,
+    ...competitionRound15Additions,
+    ...competitionRound16Additions,
+    ...competitionRound17Additions,
+    ...competitionRound18Additions,
+    ...competitionRound19Additions,
+    ...competitionRound20Additions,
+    ...competitionRound21Additions,
+    ...competitionRound22Additions,
+  ],
+  {
+    ...competitionRound8Corrections,
+    ...competitionRound10Corrections,
+    ...competitionRound11Corrections,
+    ...competitionRound12Corrections,
+    ...competitionRound17Corrections,
+  },
+  { updatedAt: RADAR_UPDATED_AT },
+);
 
 export function parseCompetitionDate(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;

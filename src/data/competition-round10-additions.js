@@ -1,0 +1,302 @@
+import { normalizeCompetitionCollection } from './competition-schema.js';
+
+export const ROUND10_ADDITIONS_CHECKED_AT = '2026-08-06';
+
+function evidenceSource(title, url, kind = 'official') {
+  return { title, date: ROUND10_ADDITIONS_CHECKED_AT, url, kind };
+}
+
+function trackedAddition(record) {
+  const primaryDeadline = record.primaryDeadline;
+  const deadlines = record.deadlines ?? [primaryDeadline];
+  const timeline = record.timeline ?? [{
+    event: primaryDeadline.label,
+    date: primaryDeadline.date,
+    critical: true,
+  }];
+  const sources = record.sources ?? [evidenceSource(`赛事页面｜${record.name}`, record.url)];
+
+  return {
+    rel: 'A',
+    tier: 'A',
+    cat: 'AI 软件',
+    recordType: 'competition',
+    seriesId: null,
+    parentId: null,
+    fullName: record.name,
+    entryStatus: 'unknown',
+    verification: {
+      status: 'verified',
+      checkedAt: ROUND10_ADDITIONS_CHECKED_AT,
+      sourceKind: 'official',
+      linkHealth: 'reachable',
+      notes: '赛事状态、时间、资格与奖励边界已按所列官方页面复核；未公开的奖项拆分或报名细节不作推断。',
+    },
+    ...record,
+    timeline,
+    deadlines,
+    primaryDeadline,
+    sources,
+  };
+}
+
+const additions = [
+  trackedAddition({
+    id: 'huawei-cloud-embodied-intelligence-2026',
+    name: '华为云具身智能大赛',
+    fullName: '2026 华为云具身智能大赛',
+    org: '华为云计算技术有限公司',
+    rel: 'A+',
+    loc: '国内全日制高校及职教在校学生 · 单人或 2—3 人团队',
+    date: '报名及作品提交截止 2026-08-30',
+    deadlineISO: '2026-08-30',
+    deadlineTimezone: 'Asia/Shanghai',
+    tier: 'A',
+    cat: '学生限定',
+    match: 8.3,
+    suit: '具身智能学生团队高',
+    desc: '华为云首届具身智能大赛，基于 CloudRobo 平台开展单/双臂操作任务，分线上仿真初赛与线下真机决赛。官网显示火热进行中、可立即报名，总奖金 8.8 万元；报名和作品提交均在 8 月 30 日截止。',
+    strategy: '仅适合满足学籍条件且已经具备机器人算法基础的学生。先完成华为云学生认证并立即申请 CloudRobo，再决定单臂或双臂任务，避免被平台 4—7 天开通周期卡住。',
+    audience: '2026-06-01 前正式注册的国内全日制普通高校专科生、本科生、硕士及博士研究生（不含在职研究生），以及全日制职教本科、高职高专在校学生',
+    rewards: ['官网显示总奖金 88,000 元（具体奖项拆分未公开）', '高质量具身智能基准数据与 CloudRobo 赛事环境', '线下真机决赛与华为云赛事展示'],
+    pros: ['报名与作品截止日明确', '单人也可参赛', '仿真初赛降低前期硬件门槛', '华为云具身智能平台与数据支持'],
+    cons: ['仅限国内全日制学生', '不含在职研究生', '必须完成华为云学生认证', 'CloudRobo 开通预计 4—7 个自然日'],
+    winning: ['操作任务成功率', '策略泛化能力', '仿真评测表现', '线下真机稳定性'],
+    entryStatus: 'open-to-new',
+    eligibility: {
+      scope: 'students-only',
+      regions: ['中国境内全日制普通高校及全日制职业教育院校'],
+      chinaEligible: 'yes',
+      fee: 'not-stated',
+      team: '单人或 2–3 人团队；每人只能加入一队',
+    },
+    prizeBoundary: {
+      cash: [{ currency: 'CNY', amount: 88000, quantity: 1, scope: '官网公布赛事总奖金；具体奖项拆分未公开' }],
+      nonCash: ['CloudRobo 赛事环境与数据资源', '线下真机决赛展示'],
+      investment: [],
+      cashStatus: 'total-only',
+      ip: '提交前需复核官网参赛协议与作品知识产权条款',
+    },
+    timeline: [
+      { event: '报名开启', date: '2026-06-05' },
+      { event: '作品提交开放', date: '2026-08-15' },
+      { event: '报名及作品提交截止', date: '2026-08-30', critical: true },
+      { event: '初赛作品评审及公示（9 月初）', date: '2026-09-05' },
+      { event: '线下真机决赛（9 月中旬）', date: '2026-09-15' },
+      { event: '颁奖（9 月下旬）', date: '2026-09-25' },
+    ],
+    deadlines: [
+      {
+        type: 'registration',
+        date: '2026-08-30',
+        certainty: 'confirmed',
+        timezone: 'Asia/Shanghai',
+        label: '报名截止',
+        primary: true,
+        sourceUrl: 'https://developer.huaweicloud.com/competition/information/1300000267?ggw_kfz',
+      },
+      {
+        type: 'submission',
+        date: '2026-08-30',
+        certainty: 'confirmed',
+        timezone: 'Asia/Shanghai',
+        label: '作品提交截止',
+        primary: false,
+        sourceUrl: 'https://developer.huaweicloud.com/competition/information/1300000267?ggw_kfz',
+      },
+    ],
+    primaryDeadline: {
+      type: 'registration',
+      date: '2026-08-30',
+      certainty: 'confirmed',
+      timezone: 'Asia/Shanghai',
+      label: '报名截止',
+      primary: true,
+      sourceUrl: 'https://developer.huaweicloud.com/competition/information/1300000267?ggw_kfz',
+    },
+    curation: {
+      primaryFormats: ['algorithm', 'robotics'],
+      rewardAccessibility: 'medium',
+      rewardEvidence: '官网只披露 8.8 万元总奖金，未披露奖项拆分；学生限定会缩小竞争池。',
+    },
+    sources: [
+      evidenceSource('华为云官方｜2026 华为云具身智能大赛', 'https://developer.huaweicloud.com/competition/information/1300000267?ggw_kfz'),
+    ],
+    url: 'https://developer.huaweicloud.com/competition/information/1300000267?ggw_kfz',
+  }),
+
+  trackedAddition({
+    id: 'tencent-cloud-game-dev-hackathon-2026',
+    name: '腾讯云黑客松·游戏开发挑战赛',
+    fullName: '腾讯云黑客松 · 游戏开发挑战赛 2026',
+    org: '腾讯云 × 腾讯游戏学堂 × Tencent WeTech Academy × 腾讯互娱社会价值探索中心 × 腾讯教育',
+    rel: 'A+',
+    loc: '全球高校开发者 · 校区初赛 + 线下路演',
+    date: '报名已于 2026-07-15 截止；赛程持续至 2026-09-13',
+    deadlineISO: '2026-07-15',
+    deadlineTimezone: 'Asia/Shanghai',
+    tier: 'A',
+    cat: '学生限定',
+    match: 7.4,
+    suit: '已报名的高校游戏团队继续参赛',
+    desc: '腾讯云面向全球高校开发者的 AI 驱动游戏开发赛，设小红花社会价值游戏、文化表达类游戏和叙事类游戏三条赛道，官方显示奖金 100 万元。赛事仍处比赛阶段，但原始赛程数据明确报名已于 7 月 15 日结束，因此不能作为新用户当前可报名项目推荐。',
+    strategy: '只有已经报名的高校团队才继续投入，围绕 AI 原生玩法和可玩 Build 准备校区路演；未报名团队应转投截止 9 月 15 日的腾讯全球游戏创作大赛，二者不是同一赛事。',
+    audience: '全球高校开发者；程序员、设计师和创意策划均可组队，具体人数上限需在报名手册复核',
+    rewards: ['官方赛事页显示奖金 100 万元（具体奖项拆分未公开）', '腾讯游戏、云与高校开发者生态展示', '校区初赛及线下路演机会'],
+    pros: ['AI 游戏方向明确', '三类游戏赛道覆盖社会价值与文化表达', '腾讯高校及游戏生态资源', '奖金总额明确'],
+    cons: ['报名已于 7 月 15 日截止', '仅面向全球高校开发者', '需要可玩游戏作品与路演', '具体奖金拆分未公开'],
+    winning: ['可玩完成度', 'AI 原生机制', '文化或社会价值', '叙事与现场展示'],
+    entryStatus: 'registered-only',
+    eligibility: {
+      scope: 'students-only',
+      regions: ['全球高校'],
+      chinaEligible: 'yes',
+      fee: 'not-stated',
+      team: '高校开发者团队；人数上限需复核赛事手册',
+    },
+    prizeBoundary: {
+      cash: [{ currency: 'CNY', amount: 1000000, quantity: 1, scope: '官网公布赛事总奖金；具体奖项拆分未公开' }],
+      nonCash: ['校区初赛与线下路演', '腾讯游戏及高校开发者生态展示'],
+      investment: [],
+      cashStatus: 'total-only',
+      ip: '提交前需复核赛事手册中的作品授权与第三方素材条款',
+    },
+    timeline: [
+      { event: '赛事启动', date: '2026-04-17' },
+      { event: '报名截止', date: '2026-07-15', critical: true },
+      { event: '校区初赛线下路演结束', date: '2026-08-18' },
+      { event: '预计决赛', date: '2026-09-13', critical: true },
+    ],
+    deadlines: [
+      {
+        type: 'registration',
+        date: '2026-07-15',
+        certainty: 'confirmed',
+        timezone: 'Asia/Shanghai',
+        label: '报名截止（新用户已无法报名）',
+        primary: true,
+        sourceUrl: 'https://tch.cloud.tencent.com/contest/40',
+      },
+      {
+        type: 'event',
+        date: '2026-09-13',
+        certainty: 'confirmed',
+        timezone: 'Asia/Shanghai',
+        label: '预计决赛时间',
+        primary: false,
+        sourceUrl: 'https://tch.cloud.tencent.com/contest/40',
+      },
+    ],
+    primaryDeadline: {
+      type: 'registration',
+      date: '2026-07-15',
+      certainty: 'confirmed',
+      timezone: 'Asia/Shanghai',
+      label: '报名截止（新用户已无法报名）',
+      primary: true,
+      sourceUrl: 'https://tch.cloud.tencent.com/contest/40',
+    },
+    curation: {
+      primaryFormats: ['game-build'],
+      rewardAccessibility: 'low',
+      rewardEvidence: '奖金总额高，但仅限高校开发者且新报名已截止。',
+    },
+    verification: {
+      status: 'verified',
+      checkedAt: ROUND10_ADDITIONS_CHECKED_AT,
+      sourceKind: 'official',
+      linkHealth: 'reachable',
+      notes: '腾讯云赛事详情页显示比赛中、奖金 100 万元、报名数 2589；页面内嵌 contestNodes 原始数据明确报名结束为 2026-07-15 23:59:59、校区路演至 08-18、预计决赛 09-13。',
+    },
+    sources: [
+      evidenceSource('腾讯云官方｜游戏开发挑战赛详情', 'https://tch.cloud.tencent.com/contest/40'),
+      evidenceSource('腾讯云官方｜赛事总览与周期', 'https://tch.cloud.tencent.com/contest'),
+    ],
+    url: 'https://tch.cloud.tencent.com/contest/40',
+  }),
+
+  trackedAddition({
+    id: 'alibaba-cloud-ai-hackathon-pakistan-2026',
+    name: '阿里云 AI 黑客松·巴基斯坦站',
+    fullName: 'Alibaba Cloud AI Hackathon Pakistan 2026',
+    org: 'Alibaba Cloud × Alkhidmat Foundation Pakistan × Bano Qabil Pakistan',
+    rel: 'A+',
+    loc: '巴基斯坦全国限定 · 线上/本地赛程',
+    date: '赛事周期 2026-07-08 至 2026-09-10',
+    deadlineISO: '2026-09-10',
+    deadlineTimezone: 'Asia/Karachi',
+    tier: 'A',
+    cat: '地区限定',
+    match: 5.5,
+    suit: '仅适合符合巴基斯坦参赛资格的团队',
+    desc: '阿里云全球 AI 黑客松系列当前列出的巴基斯坦站，由 Alkhidmat Foundation 主办，面向巴基斯坦学生、开发者、创业者和 AI 爱好者，设置六个主题。阿里云官方总览标注 7 月 8 日至 9 月 10 日；当地官网尚未公布现金奖具体金额。',
+    strategy: '中国大陆团队不要投入；仅在团队具备巴基斯坦参赛身份时再选择最接近现有能力的主题。先向当地组织方确认报名入口与阶段细分时间，因为官网目前只公开赛事周期。',
+    audience: '巴基斯坦境内学生、开发者、创业者与 AI 爱好者；初学者和有经验团队均可',
+    rewards: ['现金奖具体金额将在开幕式公布', '第一名：现金、延长云 Credits、Bano Qabil 认证、全国媒体曝光和伙伴孵化', '第二名：现金、云 Credits、认证和校友网络', '第三名：现金与认证', '所有进入 Stage 2 的参与者均获证书'],
+    pros: ['学生和独立开发者均可', '六个主题可选', '现金与云资源并列', 'Stage 2 参与者均有证书'],
+    cons: ['巴基斯坦全国平台，存在地区资格硬门槛', '中国大陆普通团队不符合推荐条件', '现金金额尚未公开', '报名与提交阶段细分时间未公开'],
+    winning: ['真实社会问题', 'AI 方案影响力', '可运行原型', '云能力使用', '本地落地价值'],
+    entryStatus: 'open-to-new',
+    eligibility: {
+      scope: 'country-limited',
+      regions: ['Pakistan national platform'],
+      chinaEligible: 'no',
+      fee: 'not-stated',
+      team: '学生、开发者、创业者与 AI 爱好者；组队人数未公开',
+    },
+    prizeBoundary: {
+      cash: [],
+      nonCash: ['Alibaba Cloud Credits', 'Bano Qabil 认证', '全国媒体曝光', '伙伴网络孵化', 'Stage 2 参与证书'],
+      investment: ['第一名可获 partner network incubation；具体形式未公开'],
+      cashStatus: 'amount-not-stated',
+      ip: 'not-stated',
+    },
+    timeline: [
+      { event: '赛事开始', date: '2026-07-08' },
+      { event: '赛事周期结束（报名/提交细分节点未公开）', date: '2026-09-10', critical: true },
+    ],
+    deadlines: [{
+      type: 'event',
+      date: '2026-09-10',
+      certainty: 'confirmed',
+      timezone: 'Asia/Karachi',
+      label: '官方赛事周期结束；报名/提交截止待主办方细分',
+      primary: true,
+      sourceUrl: 'https://www.alibabacloud.com/en/developer/global-ai-hackathon-series',
+    }],
+    primaryDeadline: {
+      type: 'event',
+      date: '2026-09-10',
+      certainty: 'confirmed',
+      timezone: 'Asia/Karachi',
+      label: '官方赛事周期结束；报名/提交截止待主办方细分',
+      primary: true,
+      sourceUrl: 'https://www.alibabacloud.com/en/developer/global-ai-hackathon-series',
+    },
+    curation: {
+      primaryFormats: ['software-product', 'agent'],
+      rewardAccessibility: 'medium',
+      rewardEvidence: 'Stage 2 所有参与者均获证书；现金奖金额尚未公布。',
+    },
+    verification: {
+      status: 'partially-verified',
+      checkedAt: ROUND10_ADDITIONS_CHECKED_AT,
+      sourceKind: 'official',
+      linkHealth: 'reachable',
+      notes: '阿里云官方总览确认赛事周期与当前站点；当地官方页确认面向巴基斯坦全国、参与人群、六个主题及奖励类型。当地页未披露报名/提交细分日期和现金金额。',
+    },
+    sources: [
+      evidenceSource('Alibaba Cloud 官方｜Global AI Hackathon Series', 'https://www.alibabacloud.com/en/developer/global-ai-hackathon-series'),
+      evidenceSource('Bano Qabil 官方｜AI Hackathon Pakistan 2026', 'https://banoqabil.org/hackathon'),
+    ],
+    url: 'https://banoqabil.org/hackathon',
+  }),
+];
+
+export const competitionRound10Additions = normalizeCompetitionCollection(
+  additions,
+  {},
+  { updatedAt: ROUND10_ADDITIONS_CHECKED_AT },
+);
+
+export default competitionRound10Additions;

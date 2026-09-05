@@ -8,6 +8,7 @@ import { HERCLAW_PROFILE, PROJECT_PRESETS } from '../data/competition-project-pr
 import { ACCESS_FILTERS, getCompetitionAccessSummary } from '../lib/competition-access.js';
 import { getCompetitionDeadlineInfo } from '../lib/competition-radar.js';
 import { getHerClawCompetitionFit, getMatchingProjectPresetIds } from '../lib/competition-project-fit.js';
+import { evaluateCompetitionIntake } from '../lib/competition-curation.js';
 
 const TODAY = new Date();
 const enriched = enrichCompetitions(competitions, TODAY);
@@ -20,6 +21,10 @@ const categories = getCompetitionCategories(enriched);
 const deadlineInfo = new Map(enriched.map(c => [c.id, getCompetitionDeadlineInfo(c)]));
 const accessByCompetition = new Map(enriched.map(c => [c.id, getCompetitionAccessSummary(c)]));
 const projectPresetIdsByCompetition = new Map(enriched.map(c => [c.id, getMatchingProjectPresetIds(c)]));
+const recommendationEligibilityByCompetition = new Map(enriched.map(c => [
+  c.id,
+  evaluateCompetitionIntake(c).decision === 'include',
+]));
 const projectPresetCounts = new Map(PROJECT_PRESETS.map(preset => [
   preset.id,
   enriched.filter(c => projectPresetIdsByCompetition.get(c.id)?.includes(preset.id)).length,
@@ -54,6 +59,7 @@ const workbenchRecords = enriched.map(c => {
     deadlineType: deadline?.type ?? 'deadline',
     deadlineLabel: deadline?.label ?? '关键截止',
     calendarEligible: deadline?.calendarEligible ?? false,
+    recommendationEligible: recommendationEligibilityByCompetition.get(c.id) ?? true,
     access: accessByCompetition.get(c.id),
     projectPresetIds: projectPresetIdsByCompetition.get(c.id) ?? ['all'],
     ...(herclawFit ? { herclawFit } : {}),
@@ -88,6 +94,7 @@ const initialAccess = initialCompetition
 const initialActionRecords = enriched
   .filter(c => c.status.kind !== 'expired'
     && deadlineInfo.get(c.id)?.calendarEligible
+    && recommendationEligibilityByCompetition.get(c.id)
     && accessByCompetition.get(c.id)?.group !== 'blocked')
   .sort((a, b) => (a.status.days ?? Number.POSITIVE_INFINITY) - (b.status.days ?? Number.POSITIVE_INFINITY) || b.match - a.match)
   .slice(0, 5);
@@ -175,7 +182,7 @@ const initialActionRecords = enriched
           <p class="section-kicker mb-4">// 项目行动摘要</p>
           <h2 id="project-summary-title" class="text-2xl md:text-4xl mb-5 leading-tight" style="font-family: var(--font-heading); color: var(--text); letter-spacing: -0.005em;">全部项目的近期可行动机会</h2>
           <p id="project-summary-description" class="text-sm md:text-base leading-relaxed" style="color: var(--text-secondary);">
-            这里只使用未过期且关键日期已经确认的记录；选择上方项目预设后，会按访问当天重新计算可投清单。
+            这里只使用未过期且关键日期已经确认的记录；纯视频或纯音乐赛事默认不进入主动推荐，除非有官方证据表明奖励覆盖面高、获取门槛友好。
           </p>
           <div id="herclaw-profile" class="project-profile mt-6" hidden>
             <p class="project-profile-title">HerClaw · {HERCLAW_PROFILE.positioning}</p>

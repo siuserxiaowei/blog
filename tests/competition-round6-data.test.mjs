@@ -37,7 +37,7 @@ test('round-six delivers the forty-four synthesis records exactly once', () => {
   assert.equal(ROUND6_ADDITIONS_CHECKED_AT, researchDate);
   assert.equal(ROUND6_CORRECTIONS_CHECKED_AT, researchDate);
   assert.equal(competitionRound6Additions.length, 44);
-  assert.equal(competitions.length, 364);
+  assert.equal(competitions.length, 439);
 
   const expected = new Set([
     'gauntlet-of-gods-2026',

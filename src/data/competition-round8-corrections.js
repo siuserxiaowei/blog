@@ -1,0 +1,101 @@
+export const ROUND8_CORRECTIONS_CHECKED_AT = '2026-08-05';
+
+const officialUrl = 'https://opc.aliyun.com/xiaoyoukewei?display_mode=3';
+
+export const competitionRound8Corrections = Object.freeze({
+  'xiaoyoukewei-ai-good-2026': {
+    name: '小有可为 AI 向善挑战赛',
+    fullName: '「小有可为 2026」AI 向善创新挑战赛',
+    org: '阿里云「小有可为」· 公益出题方与技术出题方',
+    rel: 'A+',
+    loc: '中国线上初赛 · 线下决赛拟定',
+    date: '初赛材料提交截止 2026-08-13 24:00',
+    deadlineISO: '2026-08-13',
+    deadlineTimezone: 'Asia/Shanghai',
+    tier: 'S',
+    cat: 'AI 软件',
+    match: 9.4,
+    suit: '公益 AI 应用 / Agent 很高',
+    desc: '阿里云「小有可为」第二届 AI 公益创新赛，围绕残健融合、普惠养老、乡村教育、绿色发展四大公益场景征集可运行 AI 应用；每赛题 Top 10 进入决赛。官网公布总奖金 21 万元，另有 Token、课程、公益场景与 OPC 资源支持。',
+    strategy: '优先选择教师 AI 助教或家庭化学品安全评测 Agent，复用现有 AI 软件 / Agent 能力做可运行应用；也可评估无障碍或养老软件方向。乡村音乐启蒙只是可选子方向，不必做音乐作品。',
+    audience: 'AI 开发者、Agent 与轻硬件团队；具体主体资格、团队人数和费用未在静态官网完整披露，提交前需在意向报名表或赛事群复核',
+    rewards: [
+      '一等奖 2 万元 ×4（各赛题 1 名）',
+      '二等奖 1.5 万元 ×4（各赛题 1 名）',
+      '三等奖 1 万元 ×4（各赛题 1 名）',
+      '人气应用奖 5000 元 ×4（各赛题 1 名）',
+      '开源贡献奖 1000 元 ×10（跨赛道）',
+      '参赛证书、新用户 1 亿免费 Token、老用户最高 200 元等额补贴、学练课与生态资源',
+    ],
+    pros: ['AI 软件 / Agent 为主', '四类公益场景可选', '奖金档位与名额明确', '报名有证书和 Token 支持', '每赛题 Top 10 进决赛'],
+    cons: ['初赛窗口很短', '一等奖要求评分 ≥90 且具备落地潜力', '线下决赛地点待确认', '完整资格、费用与知识产权条款仍需复核'],
+    winning: ['公益需求真实性', '技术与场景匹配', '核心功能可运行', '落地潜力', '决赛路演分数'],
+    entryStatus: 'open-to-new',
+    eligibility: {
+      scope: 'not-stated',
+      regions: ['公开赛事页未披露国籍、居住地或主体注册地限制'],
+      chinaEligible: 'not-stated',
+      fee: 'not-stated',
+      team: '页面语境面向开发者；个人 / 团队及人数上限未完整披露',
+    },
+    prizeBoundary: {
+      cash: [
+        { currency: 'CNY', amount: 20000, quantity: 4, scope: '一等奖/名（各赛题 1 名）' },
+        { currency: 'CNY', amount: 15000, quantity: 4, scope: '二等奖/名（各赛题 1 名）' },
+        { currency: 'CNY', amount: 10000, quantity: 4, scope: '三等奖/名（各赛题 1 名）' },
+        { currency: 'CNY', amount: 5000, quantity: 4, scope: '人气应用奖/名（各赛题 1 名）' },
+        { currency: 'CNY', amount: 1000, quantity: 10, scope: '开源贡献奖/名（跨赛道）' },
+      ],
+      nonCash: ['参赛证书', '新用户 1 亿免费 Token', '老用户最高 200 元等额补贴', '学练课', '公益场景对接、媒体曝光与 OPC 助力'],
+      investment: [],
+      cashStatus: 'disclosed',
+      ip: 'FAQ 列出知识产权问题，但静态官网未展开答案；提交前需在交互式 FAQ 或赛事群复核',
+    },
+    timeline: [
+      { event: '初赛材料提交截止（24:00）', date: '2026-08-13', critical: true },
+      { event: '决赛名单公布 / 人气应用奖数据统计截止', date: '2026-08-21', critical: false },
+      { event: '决赛材料提交截止', date: '2026-09-03', critical: true },
+      { event: '线下决赛路演及颁奖（拟定）', date: '2026-09-05', critical: false },
+    ],
+    deadlines: [{
+      type: 'submission',
+      date: '2026-08-13',
+      certainty: 'confirmed',
+      timezone: 'Asia/Shanghai',
+      label: '初赛材料提交截止（24:00）',
+      primary: true,
+      sourceUrl: officialUrl,
+    }],
+    primaryDeadline: {
+      type: 'submission',
+      date: '2026-08-13',
+      certainty: 'confirmed',
+      timezone: 'Asia/Shanghai',
+      label: '初赛材料提交截止（24:00）',
+      primary: true,
+      sourceUrl: officialUrl,
+    },
+    curation: {
+      primaryFormats: ['software-product', 'agent'],
+      secondaryFormats: ['music', 'light-hardware'],
+      rewardAccessibility: 'medium',
+      rewardEvidence: '每赛题 Top 10 进决赛；现金奖名额与分数门槛已在官网奖项图披露。',
+    },
+    verification: {
+      status: 'verified',
+      checkedAt: ROUND8_CORRECTIONS_CHECKED_AT,
+      sourceKind: 'official',
+      linkHealth: 'reachable',
+      notes: '官网 HTML 核对赛程、场景和总奖金；官网奖项图逐项核对 21 万元构成。线下地点、FAQ 展开答案、报名费用及具体组队上限仍待报名页/赛事群复核。',
+    },
+    sources: [{
+      title: '阿里云官网｜小有可为 2026（2026-08-05 核验）',
+      date: ROUND8_CORRECTIONS_CHECKED_AT,
+      url: officialUrl,
+      kind: 'official',
+    }],
+    url: officialUrl,
+  },
+});
+
+export default competitionRound8Corrections;
