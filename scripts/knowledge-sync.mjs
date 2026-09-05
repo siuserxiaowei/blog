@@ -96,7 +96,7 @@ export async function syncKnowledge(config, { check = false, force = false } = {
     if (!force && [...files.values()].some(record => Date.now() - record.stat.mtimeMs < (config.settleSeconds ?? 45) * 1000)) {
       await save('等待最近的编辑保存完成'); return { status: 'settling' };
     }
-    const git = args => command('/opt/homebrew/bin/git', args, { cwd: config.projectDir });
+    const git = args => command('/usr/bin/git', args, { cwd: config.projectDir });
     if (check) {
       const summary = await exportKnowledge({ source: config.sourceDir, output: config.projectDir, stateDir: path.join(config.stateDir, 'export'), check: true });
       return { status: 'checked', count: summary.count, bytes: summary.bytes };
