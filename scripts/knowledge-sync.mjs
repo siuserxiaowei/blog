@@ -133,6 +133,8 @@ export async function syncKnowledge(config, { check = false, force = false } = {
     // existing static output directory. Start from a clean dist so a withdrawn
     // note or attachment cannot remain publicly reachable.
     await fs.rm(path.join(config.projectDir, 'dist'), { recursive: true, force: true });
+    await fs.rm(path.join(config.projectDir, '.astro'), { recursive: true, force: true });
+    await fs.rm(path.join(config.projectDir, 'node_modules/.astro'), { recursive: true, force: true });
     await command('/opt/homebrew/bin/npm', ['run', 'build'], { cwd: config.projectDir });
     if (changed) {
       await git(['add', '--', ...MANAGED]);
