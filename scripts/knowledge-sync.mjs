@@ -129,6 +129,10 @@ export async function syncKnowledge(config, { check = false, force = false } = {
     const changed = (await git(['status', '--porcelain=v1', '-uall', '--', ...MANAGED])).trim();
     if (!changed && state.deployedCommit === head && !force) { await save('已同步，没有新改动'); return { status: 'unchanged', count: summary.count }; }
     await save('正在构建网页');
+    // Astro can retain files removed from a content collection when reusing an
+    // existing static output directory. Start from a clean dist so a withdrawn
+    // note or attachment cannot remain publicly reachable.
+    await fs.rm(path.join(config.projectDir, 'dist'), { recursive: true, force: true });
     await command('/opt/homebrew/bin/npm', ['run', 'build'], { cwd: config.projectDir });
     if (changed) {
       await git(['add', '--', ...MANAGED]);
