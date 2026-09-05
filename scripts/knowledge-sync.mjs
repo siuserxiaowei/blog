@@ -40,7 +40,7 @@ export async function validateConfig(config) {
   const source = await sourceRoot(config.sourceDir);
   const homeStat = await fs.stat(os.homedir());
   if (source.dev !== homeStat.dev) throw new Error('发布目录不在本机内置磁盘。');
-  const origin = await command('/opt/homebrew/bin/git', ['remote', 'get-url', 'origin'], { cwd: config.projectDir });
+  const origin = await command('/usr/bin/git', ['remote', 'get-url', 'origin'], { cwd: config.projectDir });
   if (origin !== EXPECTED_ORIGIN) throw new Error('Git 远程仓库与本站不符。');
   return source;
 }
