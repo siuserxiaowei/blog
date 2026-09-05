@@ -3,12 +3,14 @@ import LangToggle from './LangToggle.astro';
 
 const currentPath = Astro.url.pathname;
 const isHome = currentPath === '/';
+const isKnowledge = currentPath === '/knowledge' || currentPath.startsWith('/knowledge/');
 
 const homeLinks = [
   { href: '#home', label: '首页' },
   { href: '#work', label: '工作台' },
   { href: '#projects', label: '项目' },
   { href: '#blog', label: '文章' },
+  { href: '/knowledge/', label: '知识库' },
   { href: '/tools', label: '工具箱' },
   { href: '#contact', label: '联系' },
 ];
@@ -16,6 +18,7 @@ const homeLinks = [
 const pageLinks = [
   { href: '/', label: '首页' },
   { href: '/blog', label: '文章' },
+  { href: '/knowledge/', label: '知识库' },
   { href: '/projects', label: '项目' },
   { href: '/competitions', label: '比赛雷达' },
   { href: '/tools', label: '工具箱' },
@@ -35,12 +38,13 @@ const pageLinks = [
 
     <nav class="nav-links">
       {(isHome ? homeLinks : pageLinks).map((link) => {
-        const active = !isHome && (currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)));
+        const active = !isHome && (link.href === '/knowledge/' ? isKnowledge : currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)));
         const isSection = link.href.startsWith('#');
         return (
           <a
             href={link.href}
             class:list={['nav-link', active && 'is-active']}
+            aria-current={active ? 'page' : undefined}
             data-nav-link={isSection ? link.href.slice(1) : undefined}
           >
             {link.label}
@@ -50,8 +54,8 @@ const pageLinks = [
     </nav>
 
     <div class="header-actions">
-      <form id="site-search-form" class="site-search" role="search" aria-label="站内搜索">
-        <input id="site-search-input" type="search" name="q" placeholder="搜索站内..." autocomplete="off" />
+      <form id="site-search-form" class="site-search" role="search" aria-label={isKnowledge ? '搜索知识库' : '站内搜索'} action={isKnowledge ? '/knowledge/' : '/blog/'}>
+        <input id="site-search-input" type="search" name="q" placeholder={isKnowledge ? '搜索笔记全文...' : '搜索站内...'} autocomplete="off" aria-label={isKnowledge ? '搜索笔记全文' : '搜索站内'} />
         <kbd>⌘K</kbd>
       </form>
       <LangToggle />
@@ -70,8 +74,8 @@ const pageLinks = [
 
   <div id="mobile-menu" class="mobile-menu" aria-hidden="true" inert>
     <div class="mobile-inner">
-      <form id="mobile-site-search-form" class="mobile-site-search" role="search" aria-label="站内搜索">
-        <input id="mobile-site-search-input" type="search" name="q" placeholder="搜索工具、文章、比赛..." autocomplete="off" />
+      <form id="mobile-site-search-form" class="mobile-site-search" role="search" aria-label={isKnowledge ? '搜索知识库' : '站内搜索'} action={isKnowledge ? '/knowledge/' : '/blog/'}>
+        <input id="mobile-site-search-input" type="search" name="q" placeholder={isKnowledge ? '搜索笔记全文...' : '搜索工具、文章、比赛...'} autocomplete="off" aria-label={isKnowledge ? '搜索笔记全文' : '搜索站内'} />
       </form>
       {(isHome ? homeLinks : pageLinks).map((link) => (
         <a href={link.href} class="mobile-link" data-mobile-link>{link.label}</a>
@@ -408,8 +412,13 @@ const pageLinks = [
   }
 </style>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   (() => {
+    window.__siteHeaderController?.abort();
+    window.__siteHeaderObserver?.disconnect();
+    const controller = new AbortController();
+    const { signal } = controller;
+    window.__siteHeaderController = controller;
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const themeBtn = document.getElementById('theme-toggle');
@@ -425,6 +434,10 @@ const pageLinks = [
       if (!query) return;
       const lower = query.toLowerCase();
       const encoded = encodeURIComponent(query);
+      if (window.location.pathname === '/knowledge' || window.location.pathname.startsWith('/knowledge/')) {
+        window.location.href = `/knowledge/?q=${encoded}`;
+        return;
+      }
       const toolIntent = /工具|tool|json|yaml|csv|base64|jwt|aes|hash|token|密码|二维码|时间戳|timestamp|正则|regex|颜色|图片|curl|ai工具|chatgpt|claude|gemini|manus|grok/.test(lower);
       const competitionIntent = /比赛|赛事|竞赛|hackathon|beyond|opc|创业|报名|截止|雷达/.test(lower);
       if (competitionIntent) {
@@ -469,7 +482,7 @@ const pageLinks = [
     };
 
     const focusBestSearch = () => {
-      const localSearch = Array.from(document.querySelectorAll('#tool-search, #search-input, #radar-search, #resource-search'))
+      const localSearch = Array.from(document.querySelectorAll('#knowledge-search, #tool-search, #search-input, #radar-search, #resource-search'))
         .find((element) => isVisible(element));
       if (localSearch) {
         localSearch.focus();
@@ -487,41 +500,42 @@ const pageLinks = [
       }
     };
 
-    themeBtn?.addEventListener('click', () => window.toggleTheme?.());
-    mobileThemeBtn?.addEventListener('click', () => window.toggleTheme?.());
+    themeBtn?.addEventListener('click', () => window.toggleTheme?.(), { signal });
+    mobileThemeBtn?.addEventListener('click', () => window.toggleTheme?.(), { signal });
 
     siteSearchForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       routeSearch(siteSearchInput?.value);
-    });
+    }, { signal });
 
     mobileSearchForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       routeSearch(mobileSearchInput?.value);
       closeMenu();
-    });
+    }, { signal });
 
     mobileBtn?.addEventListener('click', () => {
       if (!mobileMenu || !mobileBtn) return;
       const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
       if (expanded) closeMenu();
       else openMenu();
-    });
+    }, { signal });
 
     document.querySelectorAll('[data-mobile-link]').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+      link.addEventListener('click', closeMenu, { signal });
     });
 
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener('click', (event) => {
         const targetId = anchor.getAttribute('href');
         if (!targetId || targetId === '#') return;
-        const target = document.querySelector(targetId);
+        let target;
+        try { target = document.getElementById(decodeURIComponent(targetId.slice(1))); } catch { return; }
         if (!target) return;
         event.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         closeMenu();
-      });
+      }, { signal });
     });
 
     if (sectionLinks.length > 0) {
@@ -536,14 +550,19 @@ const pageLinks = [
       }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
 
       sections.forEach((section) => observer.observe(section));
+      window.__siteHeaderObserver = observer;
     }
 
     window.addEventListener('keydown', (event) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
       event.preventDefault();
       focusBestSearch();
-    });
+    }, { signal });
 
-    document.addEventListener('astro:page-load', closeMenu);
+    document.addEventListener('astro:page-load', closeMenu, { signal });
+    document.addEventListener('astro:before-swap', () => {
+      window.__siteHeaderObserver?.disconnect();
+      controller.abort();
+    }, { once: true, signal });
   })();
 </script>

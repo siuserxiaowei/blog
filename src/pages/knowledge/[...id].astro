@@ -1,0 +1,62 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { isPublishedKnowledge, knowledgeHref, formatKnowledgeDate, knowledgePlainText } from '../../lib/knowledge.js';
+import '../../styles/knowledge.css';
+
+export async function getStaticPaths() {
+  const notes = (await getCollection('knowledge')).filter(isPublishedKnowledge);
+  return notes.map((note) => ({ params: { id: note.id }, props: { note } }));
+}
+
+interface Props { note: CollectionEntry<'knowledge'> }
+const { note } = Astro.props;
+const { Content, headings } = await render(note);
+const toc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+const readingTime = Math.max(1, Math.ceil(knowledgePlainText(note.body || '').length / 450));
+const related = (await getCollection('knowledge'))
+  .filter((candidate) => candidate.id !== note.id && isPublishedKnowledge(candidate))
+  .map((candidate) => ({
+    note: candidate,
+    score: (candidate.data.topic === note.data.topic ? 3 : 0) + candidate.data.tags.filter((tag) => note.data.tags.includes(tag)).length,
+  }))
+  .filter((candidate) => candidate.score > 0)
+  .sort((a, b) => b.score - a.score || b.note.data.date.valueOf() - a.note.data.date.valueOf())
+  .slice(0, 3);
+const topicURL = `/knowledge/?topic=${encodeURIComponent(note.data.topic)}`;
+---
+
+<BaseLayout title={`${note.data.title} · 知识库 - siuser小伟`} description={note.data.description || knowledgePlainText(note.body || '').slice(0, 150)} ogType="article">
+  <Header />
+  <main class="knowledge-main knowledge-reading-main">
+    <nav class="knowledge-breadcrumb" aria-label="面包屑导航"><a href="/knowledge/">← 日常与学习</a><span aria-hidden="true">/</span><a href={topicURL}>{note.data.topic}</a></nav>
+    <article>
+      <header class="knowledge-article-header">
+        <div class="knowledge-article-meta"><span>{note.data.type}</span><time datetime={note.data.date.toISOString()}>{formatKnowledgeDate(note.data.date)}</time><span>约 {readingTime} 分钟</span></div>
+        <h1>{note.data.title}</h1>
+        {note.data.description && <p class="knowledge-article-description">{note.data.description}</p>}
+        {note.data.tags.length > 0 && <ul class="knowledge-tags" aria-label="标签">{note.data.tags.map((tag) => <li>#{tag}</li>)}</ul>}
+        {note.data.updated && note.data.updated.valueOf() > note.data.date.valueOf() && <p class="knowledge-updated">更新于 <time datetime={note.data.updated.toISOString()}>{formatKnowledgeDate(note.data.updated)}</time></p>}
+      </header>
+      <div class:list={['knowledge-reading-layout', toc.length > 0 && 'has-toc']}>
+        {toc.length > 0 && (
+          <aside class="knowledge-toc" aria-label="本篇目录">
+            <details open>
+              <summary>本篇目录</summary>
+              <nav aria-label="跳转到章节"><ol>{toc.map((heading) => <li class:list={[heading.depth === 3 && 'knowledge-toc-sub']}><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol></nav>
+            </details>
+          </aside>
+        )}
+        <div class="knowledge-reading-body">
+          <div class="prose knowledge-prose"><Content /></div>
+          {note.data.sourceUrl && <aside class="knowledge-source"><p>资料来源</p><a href={note.data.sourceUrl} target="_blank" rel="noopener noreferrer">{new URL(note.data.sourceUrl).hostname}<span class="knowledge-sr-only">（在新窗口打开）</span><span aria-hidden="true"> ↗</span></a></aside>}
+          <footer class="knowledge-article-footer"><a href="/knowledge/">← 返回全部笔记</a><a href={topicURL}>继续浏览「{note.data.topic}」 →</a></footer>
+        </div>
+      </div>
+    </article>
+    {related.length > 0 && <section class="knowledge-related" aria-labelledby="knowledge-related-heading"><div class="knowledge-list-heading"><h2 id="knowledge-related-heading">接着读</h2><p>与这篇笔记相关</p></div><ul>{related.map(({ note: candidate }) => <li><a href={knowledgeHref(candidate.id)}><span>{candidate.data.topic}</span><h3>{candidate.data.title} <span aria-hidden="true">↗</span></h3><p>{candidate.data.description}</p></a></li>)}</ul></section>}
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { isPublishedKnowledge, knowledgeHref, formatKnowledgeDate, knowledgePlainText, serializeKnowledgeIndex } from '../../lib/knowledge.js';
+import '../../styles/knowledge.css';
+
+const notes = (await getCollection('knowledge'))
+  .filter(isPublishedKnowledge)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id));
+const topics = [...new Set(notes.map((note) => note.data.topic))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+const types = ['日常', '学习', '工具', '方法', '随想'];
+const index = notes.map((note) => ({
+  id: note.id,
+  title: note.data.title,
+  description: note.data.description,
+  topic: note.data.topic,
+  type: note.data.type,
+  tags: note.data.tags,
+  text: knowledgePlainText(note.body || ''),
+}));
+---
+
+<BaseLayout title="知识库 · 日常与学习 - siuser小伟" description="留存日常里的观察、学习中的收获，以及值得回看的方法与链接。按主题浏览，或搜索笔记全文。">
+  <Header />
+  <main class="knowledge-main" id="knowledge-main">
+    <header class="knowledge-hero">
+      <div>
+        <p class="section-kicker">知识库 · 随时回看</p>
+        <h1>日常与学习<span aria-hidden="true">。</span></h1>
+        <p class="knowledge-intro">留住每天的一点发现。<br />日常里的观察，学习中的收获，和值得再看一次的经验。</p>
+      </div>
+      <div class="knowledge-hero-note">
+        <span class="knowledge-count">{String(notes.length).padStart(2, '0')}</span>
+        <span>篇公开笔记</span>
+        {notes.length > 0 && <p>最近收录 <time datetime={notes[0].data.date.toISOString()}>{formatKnowledgeDate(notes[0].data.date)}</time></p>}
+      </div>
+    </header>
+
+    {notes.length > 0 ? (
+      <section class="knowledge-library" aria-label="浏览知识库" data-knowledge-library>
+        <form class="knowledge-controls" id="knowledge-search-form" role="search" aria-label="搜索知识库" action="/knowledge/" method="get" hidden>
+          <div class="knowledge-query-field">
+            <label for="knowledge-search">搜索笔记</label>
+            <div class="knowledge-query">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg>
+              <input id="knowledge-search" type="search" name="q" placeholder="搜一个词，找回一段经验" autocomplete="off" aria-describedby="knowledge-search-hint" />
+              <button type="submit">搜索</button>
+            </div>
+            <p id="knowledge-search-hint">搜索标题、标签与笔记全文</p>
+          </div>
+          <div class="knowledge-select-field">
+            <label for="knowledge-topic">主题</label>
+            <select id="knowledge-topic" name="topic">
+              <option value="">全部主题</option>
+              {topics.map((topic) => <option value={topic}>{topic}</option>)}
+            </select>
+          </div>
+          <div class="knowledge-select-field">
+            <label for="knowledge-type">内容类型</label>
+            <select id="knowledge-type" name="type">
+              <option value="">全部类型</option>
+              {types.filter((type) => notes.some((note) => note.data.type === type)).map((type) => <option value={type}>{type}</option>)}
+            </select>
+          </div>
+        </form>
+        <noscript><p class="knowledge-noscript">下方为全部公开笔记。可用浏览器“在页面中查找”搜索标题，开启 JavaScript 后可搜索全文并筛选。</p></noscript>
+
+        <div class="knowledge-list-heading">
+          <h2 id="knowledge-results-heading">最近收录</h2>
+          <p id="knowledge-result-count" role="status" aria-live="polite" aria-atomic="true">共 {notes.length} 篇 · 按时间排列</p>
+        </div>
+
+        <ul class="knowledge-list" aria-labelledby="knowledge-results-heading">
+          {notes.map((note) => (
+            <li class="knowledge-entry" data-knowledge-id={note.id}>
+              <div class="knowledge-entry-date"><time datetime={note.data.date.toISOString()}>{formatKnowledgeDate(note.data.date)}</time><span>{note.data.type}</span></div>
+              <article>
+                <p class="knowledge-entry-topic">{note.data.topic}</p>
+                <h3><a href={knowledgeHref(note.id)}>{note.data.title}<span aria-hidden="true"> ↗</span></a></h3>
+                <p class="knowledge-entry-description" data-knowledge-excerpt>{note.data.description || knowledgePlainText(note.body || '').slice(0, 140)}</p>
+                {note.data.tags.length > 0 && <ul class="knowledge-tags" aria-label="标签">{note.data.tags.map((tag) => <li>#{tag}</li>)}</ul>}
+              </article>
+            </li>
+          ))}
+        </ul>
+        <div class="knowledge-empty knowledge-no-results" id="knowledge-no-results" hidden>
+          <h2>还没找到这条笔记</h2>
+          <p>换一个关键词，或试试减少筛选条件。</p>
+          <button type="button" id="knowledge-reset">查看全部笔记 <span aria-hidden="true">↗</span></button>
+        </div>
+        <script type="application/json" id="knowledge-index" set:html={serializeKnowledgeIndex(index)} />
+      </section>
+    ) : (
+      <section class="knowledge-empty" aria-labelledby="knowledge-empty-title">
+        <span class="knowledge-empty-rule" aria-hidden="true"></span>
+        <h2 id="knowledge-empty-title">从一点记录开始</h2>
+        <p>这里将陆续收录日常记录、学习收获和实用经验。<br />第一篇笔记，正在路上。</p>
+        <a href="/blog/">先读已有文章 <span aria-hidden="true">↗</span></a>
+      </section>
+    )}
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { initKnowledgeSearch } from '../../lib/knowledge-search.js';
+  let dispose: (() => void) | undefined;
+  const setup = () => {
+    dispose?.();
+    dispose = initKnowledgeSearch();
+  };
+  document.addEventListener('astro:page-load', setup);
+  document.addEventListener('astro:before-swap', () => {
+    dispose?.();
+    dispose = undefined;
+  });
+  setup();
+</script>
